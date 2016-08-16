@@ -11,8 +11,6 @@ class ServerlessWebpack {
     this.serverless = serverless;
     this.options = options;
 
-    this.serverless.cli.log('Bundling with Webpack...');
-
     Object.assign(
       this,
       validate,
@@ -25,7 +23,7 @@ class ServerlessWebpack {
         .then(this.validate)
         .then(this.compile),
 
-      'after:deploy:cleanup': () => BbPromise.bind(this)
+      'after:deploy:deploy': () => BbPromise.bind(this)
         .then(this.cleanup),
     };
   }
