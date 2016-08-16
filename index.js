@@ -27,6 +27,12 @@ class ServerlessWebpack {
           'validate',
           'compile',
         ],
+        options: {
+          out: {
+            usage: 'Path to output directory',
+            shortcut: 'o',
+          },
+        },
         commands: {
           run: {
             usage: 'Run a function locally from the webpack output bundle',
