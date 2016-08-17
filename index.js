@@ -34,10 +34,10 @@ class ServerlessWebpack {
           },
         },
         commands: {
-          run: {
+          invoke: {
             usage: 'Run a function locally from the webpack output bundle',
             lifecycleEvents: [
-              'run',
+              'invoke',
             ],
             options: {
               function: {
@@ -86,7 +86,7 @@ class ServerlessWebpack {
       'webpack:compile': () => BbPromise.bind(this)
         .then(this.compile),
 
-      'webpack:run:run': () => BbPromise.bind(this)
+      'webpack:invoke:invoke': () => BbPromise.bind(this)
         .then(this.validate)
         .then(this.compile)
         .then(this.run)

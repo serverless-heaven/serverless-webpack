@@ -29,6 +29,7 @@ Note that, if the `output` configuration is not set, it will automatically be
 generated to write bundles in the `.webpack` directory.
 
 ## Usage
+### Automatic bundling
 
 The normal Serverless deploy procedure will automatically bundle with Webpack:
 
@@ -36,11 +37,20 @@ The normal Serverless deploy procedure will automatically bundle with Webpack:
 - Install Serverless Webpack as above
 - Deploy with `serverless deploy`
 
+### Run a function locally
+
 To run your bundled functions locally you can:
 
 ```
-serverless webpack run --function <function-name>
+serverless webpack invoke --function <function-name>
 ```
+
+Options are:
+
+- `--function` or `-f` (required) is the name of the function to run
+- `--path` or `-p` (optional) is a JSON file path used as the function input event
+
+### Run a function locally on source changes
 
 Or to run a function every time the source files change use `watch`:
 
@@ -48,12 +58,22 @@ Or to run a function every time the source files change use `watch`:
 serverless webpack watch --function <function-name> --path event.json
 ```
 
-For both commands the options are:
+Options are:
 
 - `--function` or `-f` (required) is the name of the function to run
 - `--path` or `-p` (optional) is a JSON file path used as the function input event
 
-Lastly use `serverless webpack --out dist` to compile files in the `dist` directory.
+### Bundle with webpack
+
+To just bundle and see the output result use:
+
+```
+serverless webpack --out dist
+```
+
+Options are:
+
+- `--out` or `-o` (optional) The output directory. Defaults to `.webpack`.
 
 ## Example with Babel
 
