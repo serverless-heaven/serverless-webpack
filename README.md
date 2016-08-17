@@ -29,6 +29,7 @@ Note that, if the `output` configuration is not set, it will automatically be
 generated to write bundles in the `.webpack` directory.
 
 ## Usage
+
 ### Automatic bundling
 
 The normal Serverless deploy procedure will automatically bundle with Webpack:
@@ -36,6 +37,20 @@ The normal Serverless deploy procedure will automatically bundle with Webpack:
 - Create the Serverless project with `serverless create -t aws-node`
 - Install Serverless Webpack as above
 - Deploy with `serverless deploy`
+
+### Simulate API Gateway locally
+
+To start a local server that will act like the API Gateway use the following command.
+Your code will be reloaded upon change so that every request to your local server
+will serve the latest code.
+
+```
+serverless webpack serve
+```
+
+Options are:
+
+- `--port` or `-p` (optional) The local server port. Defaults to `8000`
 
 ### Run a function locally
 
