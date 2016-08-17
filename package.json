@@ -23,6 +23,8 @@
   "homepage": "https://github.com/elastic-coders/serverless-webpack#readme",
   "dependencies": {
     "bluebird": "^3.4.0",
+    "body-parser": "^1.15.2",
+    "express": "^4.14.0",
     "fs-extra": "^0.26.7",
     "webpack": "^1.13.1"
   }
