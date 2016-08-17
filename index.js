@@ -6,6 +6,7 @@ const validate = require('./lib/validate');
 const compile = require('./lib/compile');
 const cleanup = require('./lib/cleanup');
 const run = require('./lib/run');
+const serve = require('./lib/serve');
 
 class ServerlessWebpack {
   constructor(serverless, options) {
@@ -17,7 +18,8 @@ class ServerlessWebpack {
       validate,
       compile,
       cleanup,
-      run
+      run,
+      serve
     );
 
     this.commands = {
@@ -68,6 +70,18 @@ class ServerlessWebpack {
               },
             },
           },
+          serve: {
+            usage: 'Simulate the API Gateway and serves lambdas locally',
+            lifecycleEvents: [
+              'serve',
+            ],
+            options: {
+              port: {
+                usage: 'The local server port',
+                shortcut: 'p',
+              },
+            },
+          },
         },
       },
     };
@@ -95,6 +109,10 @@ class ServerlessWebpack {
       'webpack:watch:watch': () => BbPromise.bind(this)
         .then(this.validate)
         .then(this.watch),
+
+      'webpack:serve:serve': () => BbPromise.bind(this)
+        .then(this.validate)
+        .then(this.serve),
     };
   }
 }
