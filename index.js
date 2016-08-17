@@ -73,7 +73,7 @@ class ServerlessWebpack {
     };
 
     this.hooks = {
-      'before:deploy:createDeploymentPackage': () => BbPromise.bind(this)
+      'before:deploy:createDeploymentArtifacts': () => BbPromise.bind(this)
         .then(this.validate)
         .then(this.compile),
 
