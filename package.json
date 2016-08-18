@@ -21,11 +21,20 @@
     "url": "https://github.com/elastic-coders/serverless-webpack/issues"
   },
   "homepage": "https://github.com/elastic-coders/serverless-webpack#readme",
+  "scripts": {
+    "test": "istanbul cover _mocha tests/all -- -R spec --recursive"
+  },
   "dependencies": {
     "bluebird": "^3.4.0",
     "body-parser": "^1.15.2",
     "express": "^4.14.0",
     "fs-extra": "^0.26.7",
     "webpack": "^1.13.1"
+  },
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "istanbul": "^0.4.4",
+    "mocha": "^3.0.2",
+    "sinon": "^1.17.5"
   }
 }
