@@ -92,8 +92,8 @@ Options are:
 
 ## Example with Babel
 
-In the `example` folder there is a Serverless project using this plugin with Babel.
-To try it, from inside the example folder:
+In the [`examples`](./examples) folder there is a Serverless project using this
+plugin with Babel. To try it, from inside the example folder:
 
 - `npm install` to install dependencies
 - `serverless webpack run -f hello` to run the example function
