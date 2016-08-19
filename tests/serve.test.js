@@ -5,12 +5,13 @@ const sinon = require('sinon');
 const mockery = require('mockery');
 const Serverless = require('serverless');
 const makeWebpackMock = require('./webpack.mock');
-const makeUtilsMock = require('./utils.mock');
+const makeExpressMock = require('./express.mock');
 chai.use(require('sinon-chai'));
 const expect = chai.expect;
 
 describe('serve', () => {
   let webpackMock;
+  let expressMock;
   let baseModule;
   let module;
   let serverless;
@@ -18,8 +19,11 @@ describe('serve', () => {
   before(() => {
     mockery.enable({ warnOnUnregistered: false });
     webpackMock = makeWebpackMock();
+    expressMock = makeExpressMock();
     mockery.registerMock('webpack', webpackMock);
+    mockery.registerMock('express', expressMock);
     baseModule = require('../lib/serve');
+    Object.freeze(baseModule);
   });
 
   after(() => {
@@ -29,8 +33,12 @@ describe('serve', () => {
 
   beforeEach(() => {
     serverless = new Serverless();
-    serverless.cli = { log: sinon.spy() };
+    serverless.cli = {
+      log: sinon.spy(),
+      consoleLog: sinon.spy(),
+    };
     webpackMock._resetSpies();
+    expressMock._resetSpies();
     module = Object.assign({
       serverless,
       options: {},
@@ -145,6 +153,266 @@ describe('serve', () => {
       module.options.port = 1234;
       const port = module._getPort();
       expect(port).to.equal(1234);
+    });
+  });
+
+  describe('_getFuncConfig', () => {
+    const testFunctionsConfig = {
+      func1: {
+        handler: 'module1.func1handler',
+        events: [{
+          http: {
+            method: 'get',
+            path: 'func1path',
+          },
+        }],
+      },
+      func2: {
+        handler: 'module2.func2handler',
+        events: [{
+          http: {
+            method: 'POST',
+            path: 'func2path',
+          },
+        }, {
+          nonhttp: 'non-http',
+        }],
+      },
+      func3: {
+        handler: 'module2.func3handler',
+        events: [{
+          nonhttp: 'non-http',
+        }],
+      },
+    };
+
+    beforeEach(() => {
+      serverless.service.functions = testFunctionsConfig;
+    });
+
+    it('should return a list of normalized functions configurations', () => {
+      const res = module._getFuncConfigs();
+      expect(res).to.eql([
+        {
+          'events': [
+            {
+              'method': 'get',
+              'path': 'func1path',
+            }
+          ],
+          'handler': 'module1.func1handler',
+          'handlerFunc': null,
+          'id': 'func1',
+          'moduleName': 'module1',
+        },
+        {
+          'events': [
+            {
+              'method': 'POST',
+              'path': 'func2path',
+            }
+          ],
+          'handler': 'module2.func2handler',
+          'handlerFunc': null,
+          'id': 'func2',
+          'moduleName': 'module2',
+        },
+      ]);
+    });
+  });
+
+  describe('_newExpressApp', () => {
+    it('should return an express app', () => {
+      const res = module._newExpressApp([]);
+      expect(res).to.equal(expressMock.appMock);
+    });
+
+    it('should add a body-parser to the app', () => {
+      const res = module._newExpressApp([]);
+      expect(res.use).to.have.been.calledWith(sinon.match(value => {
+        return typeof value === 'function' && value.name === 'jsonParser';
+      }));
+    });
+
+    describe('OPTIONS handler', () => {
+      let optionsHandler;
+
+      beforeEach(() => {
+        const res = module._newExpressApp([]);
+        const optionsHandlers = res.use.getCalls().filter(c =>
+          typeof c.args[0] === 'function' &&
+          c.args[0].name === 'optionsHandler'
+        );
+        optionsHandler = optionsHandlers.length ? optionsHandlers[0].args[0] : null;
+      });
+
+      it('should add an OPTIONS request handler', () => {
+        expect(optionsHandler).to.exist;
+      });
+
+      it('should continue for non OPTIONS requests', () => {
+        const req = { method: 'GET' };
+        const next = sinon.spy();
+        optionsHandler(req, {}, next);
+        expect(next).to.have.callCount(1);
+      });
+
+      it('should send status 200 for OPTIONS requests', () => {
+        const req = { method: 'OPTIONS' };
+        const res = { sendStatus: sinon.spy() };
+        const next = sinon.spy();
+        optionsHandler(req, res, next);
+        expect(res.sendStatus).to.have.been.calledWith(200);
+        expect(next).to.have.callCount(0);
+      });
+    });
+
+    it('should create express handlers for all functions http event', () => {
+      const testFuncsConfs = [
+        {
+          'events': [
+            {
+              'method': 'get',
+              'path': 'func1path',
+              'cors': true,
+            }
+          ],
+          'handler': 'module1.func1handler',
+          'handlerFunc': null,
+          'id': 'func1',
+          'moduleName': 'module1',
+        },
+        {
+          'events': [
+            {
+              'method': 'POST',
+              'path': 'func2path/{testParam}',
+            }
+          ],
+          'handler': 'module2.func2handler',
+          'handlerFunc': null,
+          'id': 'func2',
+          'moduleName': 'module2',
+        },
+      ];
+      const testStage = 'test';
+      module.options.stage = testStage;
+      const testHandlerBase = 'testHandlerBase';
+      const testHandlerCors = 'testHandlerCors';
+      module._handlerBase = sinon.stub().returns(testHandlerBase);
+      module._handlerAddCors = sinon.stub().returns(testHandlerCors);
+      const app = module._newExpressApp(testFuncsConfs);
+      expect(app.get).to.have.callCount(1);
+      expect(app.get).to.have.been.calledWith(
+        '/test/func1path',
+        testHandlerCors
+      );
+      expect(module.serverless.cli.consoleLog).to.have.been.calledWith(
+        '  GET - http://localhost:8000/test/func1path'
+      );
+      expect(app.post).to.have.callCount(1);
+      expect(app.post).to.have.been.calledWith(
+        '/test/func2path/:testParam',
+        testHandlerBase
+      );
+      expect(module.serverless.cli.consoleLog).to.have.been.calledWith(
+        '  POST - http://localhost:8000/test/func2path/{testParam}'
+      );
+    });
+  });
+
+  describe('serve method', () => {
+    let serve;
+    let listenerCb;
+
+    beforeEach(() => {
+      serve = module.serve();
+      listenerCb = expressMock.appMock.listen.firstCall.args[1];
+    });
+
+    it('should start an express app listener', () => {
+      expect(expressMock.appMock.listen).to.have.callCount(1);
+    });
+
+    it('should start a webpack watcher', () => {
+      listenerCb.bind(module)();
+      expect(webpackMock.compilerMock.watch).to.have.callCount(1);
+    });
+
+    it('should throw if compiler fails', () => {
+      listenerCb.bind(module)();
+      const compileCb = webpackMock.compilerMock.watch.firstCall.args[1];
+      const testError = 'testError';
+      expect(compileCb.bind(module, testError)).to.throw(testError);
+    });
+
+    it('should reload all function handlers on compilation', () => {
+      const testFuncsConfs = [
+        {
+          'events': [
+            {
+              'method': 'get',
+              'path': 'func1path',
+              'cors': true,
+            }
+          ],
+          'handler': 'module1.func1handler',
+          'handlerFunc': null,
+          'id': 'func1',
+          'moduleName': 'module1',
+        },
+        {
+          'events': [
+            {
+              'method': 'POST',
+              'path': 'func2path/{testParam}',
+            }
+          ],
+          'handler': 'module2.func2handler',
+          'handlerFunc': null,
+          'id': 'func2',
+          'moduleName': 'module2',
+        },
+        {
+          'events': [
+            {
+              'method': 'GET',
+              'path': 'func3path',
+            }
+          ],
+          'handler': 'module2.func2handler',
+          'handlerFunc': null,
+          'id': 'func3',
+          'moduleName': 'module2',
+        },
+      ];
+      module._getFuncConfigs = sinon.stub().returns(testFuncsConfs);
+      module.loadHandler = sinon.spy();
+      expressMock._resetSpies();
+      webpackMock._resetSpies();
+      serve = module.serve();
+      listenerCb = expressMock.appMock.listen.firstCall.args[1];
+      listenerCb.bind(module)();
+      const compileCb = webpackMock.compilerMock.watch.firstCall.args[1];
+      const testStats = {};
+      module.loadHandler.reset();
+      compileCb.bind(module)(null, testStats);
+      expect(module.loadHandler).to.have.callCount(3);
+      expect(module.loadHandler).to.have.been.calledWith(
+        testStats,
+        'func1',
+        true
+      );
+      expect(module.loadHandler).to.have.been.calledWith(
+        testStats,
+        'func2',
+        true
+      );
+      expect(module.loadHandler).to.have.been.calledWith(
+        testStats,
+        'func3',
+        false
+      );
     });
   });
 });

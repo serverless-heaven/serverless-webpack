@@ -20,6 +20,7 @@ describe('validate', () => {
     fsExtraMock = makeFsExtraMock();
     mockery.registerMock('fs-extra', fsExtraMock);
     baseModule = require('../lib/validate');
+    Object.freeze(baseModule);
   });
 
   after(() => {

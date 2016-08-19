@@ -23,6 +23,7 @@ describe('run', () => {
     mockery.registerMock('webpack', webpackMock);
     mockery.registerMock('./utils', utilsMock);
     baseModule = require('../lib/run');
+    Object.freeze(baseModule);
   });
 
   after(() => {

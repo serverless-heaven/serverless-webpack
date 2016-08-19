@@ -27,6 +27,7 @@ webpackMock.compilerMock = compilerMock;
 webpackMock._resetSpies = () => {
   webpackMock.reset();
   compilerMock.run.reset();
+  compilerMock.watch.reset();
   Object.assign(statsMock, statsMockBase());
 };
 

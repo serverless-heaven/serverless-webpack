@@ -19,6 +19,7 @@ describe('compile', () => {
     webpackMock = makeWebpackMock();
     mockery.registerMock('webpack', webpackMock);
     baseModule = require('../lib/compile');
+    Object.freeze(baseModule);
   });
 
   after(() => {
