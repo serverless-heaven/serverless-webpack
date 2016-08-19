@@ -1,0 +1,15 @@
+{
+  "name": "serverless-webpack-multiple-entries-example",
+  "version": "1.0.0",
+  "description": "Serverless webpack example",
+  "main": "first.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Nicola Peduzzi <thenikso@gmail.com> (http://nikso.net)",
+  "license": "MIT",
+  "devDependencies": {
+    "serverless-webpack": "^1.0.0-beta.2",
+    "webpack": "^1.13.1"
+  }
+}
