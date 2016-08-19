@@ -48,10 +48,18 @@ describe('run', () => {
       expect(module.getContext).to.be.a('function');
     });
 
-    it('should require the output file with `loadHandler`', () => {
+    describe('loadHandler', () => {
+      const testFunctionId = 'testFunctionId';
+      const testHandlerModuleName = 'testHandlerModule';
+      const testHandlerFunctionName = 'testHandlerFunction';
+      const testFunctionsConfig = {
+        [testFunctionId]: {
+          handler: `${testHandlerModuleName}.${testHandlerFunctionName}`,
+        }
+      };
       const testPath = '/testpath';
-      const testFilename = 'testfilename';
-      const testModuleName = `${testPath}/${testFilename}`;
+      const testFilename = `${testHandlerModuleName}.js`;
+      const testModuleFileName = `${testPath}/${testFilename}`;
       const testStats = {
         compilation: {
           options: {
@@ -62,12 +70,33 @@ describe('run', () => {
           },
         },
       };
-      const testModule = {};
-      mockery.registerMock(testModuleName, testModule);
-      const res = module.loadHandler(testStats);
-      mockery.deregisterMock(testModuleName);
-      expect(res).to.equal(testModule);
-      expect(utilsMock.purgeCache).to.have.callCount(1);
+      const testHandlerFunction = sinon.spy();
+      const testModule = {
+        [testHandlerFunctionName]: testHandlerFunction,
+      };
+
+      before(() => {
+        mockery.registerMock(testModuleFileName, testModule);
+      });
+
+      after(() => {
+        mockery.deregisterMock(testModuleFileName);
+      });
+
+      beforeEach(() => {
+        serverless.service.functions = testFunctionsConfig;
+      });
+
+      it('should require the handler module', () => {
+        const res = module.loadHandler(testStats, testFunctionId);
+        expect(res).to.equal(testHandlerFunction);
+        expect(utilsMock.purgeCache).to.have.callCount(0);
+      });
+
+      it('should purge the modules cache if required', () => {
+        const res = module.loadHandler(testStats, testFunctionId, true);
+        expect(utilsMock.purgeCache).to.have.been.calledWith(testModuleFileName);
+      });
     });
 
     it('should return a default event with `getEvent` and no option path', () => {
@@ -107,25 +136,21 @@ describe('run', () => {
     const testStats = {};
     const testFunctionId = 'testFunctionId';
     const testFunctionResult = 'testFunctionResult';
-    const testModule = {
-      [testFunctionId]: null,
-    };
 
     beforeEach(() => {
       module.options['function'] = testFunctionId;
-      module.loadHandler = sinon.stub().returns(testModule);
       module.getEvent = sinon.stub().returns(testEvent);
       module.getContext = sinon.stub().returns(testContext);
     });
 
     it('should execute the given function handler', () => {
-      const testFunction = sinon.spy((e, c, cb) => cb(null, testFunctionResult));
-      testModule[testFunctionId] = testFunction;
+      const testHandlerFunc = sinon.spy((e, c, cb) => cb(null, testFunctionResult));
+      module.loadHandler = sinon.stub().returns(testHandlerFunc);
       return module
         .run(testStats)
         .then((res) => {
           expect(res).to.equal(testFunctionResult);
-          expect(testFunction).to.have.been.calledWith(
+          expect(testHandlerFunc).to.have.been.calledWith(
             testEvent,
             testContext
           );
@@ -134,8 +159,8 @@ describe('run', () => {
 
     it('should fail if the function handler returns an error', () => {
       const testError = 'testError';
-      const testFunction = sinon.spy((e, c, cb) => cb(testError));
-      testModule[testFunctionId] = testFunction;
+      const testHandlerFunc = sinon.spy((e, c, cb) => cb(testError));
+      module.loadHandler = sinon.stub().returns(testHandlerFunc);
       return module
         .run(testStats)
         .catch((res) => {
@@ -150,13 +175,9 @@ describe('run', () => {
     const testStats = {};
     const testFunctionId = 'testFunctionId';
     const testFunctionResult = 'testFunctionResult';
-    const testModule = {
-      [testFunctionId]: null,
-    };
 
     beforeEach(() => {
       module.options['function'] = testFunctionId;
-      module.loadHandler = sinon.stub().returns(testModule);
       module.getEvent = sinon.stub().returns(testEvent);
       module.getContext = sinon.stub().returns(testContext);
     });
@@ -169,8 +190,8 @@ describe('run', () => {
 
     it('should throw if function handler fails', () => {
       const testError = 'testHandlerError';
-      const testFunction = sinon.spy((e, c, cb) => cb(testError));
-      testModule[testFunctionId] = testFunction;
+      const testHandlerFunc = sinon.spy((e, c, cb) => cb(testError));
+      module.loadHandler = sinon.stub().returns(testHandlerFunc);
       let testCb;
       webpackMock.compilerMock.watch = sinon.spy((opt, cb) => {
         testCb = cb;
@@ -180,17 +201,17 @@ describe('run', () => {
     });
 
     it('should call the handler every time a compilation occurs', () => {
-      const testFunction = sinon.spy((e, c, cb) => cb(null, testFunctionResult));
-      testModule[testFunctionId] = testFunction;
+      const testHandlerFunc = sinon.spy((e, c, cb) => cb(null, testFunctionResult));
+      module.loadHandler = sinon.stub().returns(testHandlerFunc);
       let testCb;
       webpackMock.compilerMock.watch = sinon.spy((opt, cb) => {
         testCb = cb;
         cb(null, webpackMock.statsMock);
       });
       module.watch();
-      expect(testFunction).to.have.callCount(1);
+      expect(testHandlerFunc).to.have.callCount(1);
       testCb(null, webpackMock.statsMock);
-      expect(testFunction).to.have.callCount(2);
+      expect(testHandlerFunc).to.have.callCount(2);
     });
   });
 });
