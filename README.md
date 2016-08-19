@@ -1,6 +1,7 @@
 # Serverless Webpack
 
 [![serverless](http://public.serverless.com/badges/v3.svg)](http://www.serverless.com)
+[![CircleCI](https://circleci.com/gh/elastic-coders/serverless-webpack.svg?style=shield)](https://circleci.com/gh/elastic-coders/serverless-webpack)
 
 A Serverless v1.0 plugin to build your lambda functions with [Webpack](https://webpack.github.io).
 
