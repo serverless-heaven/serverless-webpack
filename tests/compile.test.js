@@ -28,7 +28,10 @@ describe('compile', () => {
 
   beforeEach(() => {
     serverless = new Serverless();
-    serverless.cli = { log: sinon.spy() };
+    serverless.cli = {
+      log: sinon.spy(),
+      consoleLog: sinon.spy(),
+    };
     webpackMock._resetSpies();
     module = Object.assign({
       serverless,

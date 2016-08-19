@@ -104,7 +104,7 @@ class ServerlessWebpack {
         .then(this.validate)
         .then(this.compile)
         .then(this.run)
-        .then(out => console.log(out)),
+        .then(out => this.serverless.cli.consoleLog(out)),
 
       'webpack:watch:watch': () => BbPromise.bind(this)
         .then(this.validate)
