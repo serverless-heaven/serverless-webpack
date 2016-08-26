@@ -31,24 +31,24 @@ generated to write bundles in the `.webpack` directory.
 
 
 By default, the plugin will try to bundle all dependencies. However, you don't
-want to include all packages in some cases such as selectively import, excluding
-builtin package (aws-sdk) and handling webpack-incompatible packages. In this case,
-you add all the packages, you want to exclude from bundled files, into `externals` field
+want to include all modules in some cases such as selectively import, excluding
+builtin package (aws-sdk) and handling webpack-incompatible modules. In this case,
+you add all the modules, you want to exclude from bundled files, into `externals` field
 of your `webpack.config.json` and add those, you want to include in final distribution,
 into `serverless.yml`:
 
 ```json
 // webpack.config.json
 {
-  externals: ["package1", "package2"] // packages to be excluded from bundled file
+  externals: ["module1", "module2"] // modules to be excluded from bundled file
 }
 ```
 
 ```yaml
 # serverless.yml
 custom:
-  includePackages:
-    - package1        # packages to be included in distribution
+  webpackIncludeModules:
+    - module1        # modules to be included in distribution
 ```
 
 You can find an example setup in the [`examples`](./examples) folder.

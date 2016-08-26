@@ -9,7 +9,7 @@ provider:
   runtime: nodejs4.3
 
 custom:
-  includePackages:  # packages to be included in distribution
+  webpackIncludeModules:  # modules to be included in distribution
     - fbgraph   
 
 functions:
