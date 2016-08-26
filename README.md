@@ -37,7 +37,7 @@ you add all the modules, you want to exclude from bundled files, into `externals
 of your `webpack.config.json` and add those, you want to include in final distribution,
 into `serverless.yml`:
 
-```json
+```javascript
 // webpack.config.json
 {
   externals: ["module1", "module2"] // modules to be excluded from bundled file
