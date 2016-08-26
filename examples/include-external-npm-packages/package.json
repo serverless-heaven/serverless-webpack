@@ -1,0 +1,19 @@
+{
+  "name": "serverless-include-external-npm-package",
+  "version": "1.0.0",
+  "description": "Serverless webpack example",
+  "main": "handler.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Tony Yuen <colsy2@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "serverless-webpack": "^1.0.0-beta.2",
+    "webpack": "^1.13.1"
+  },
+  "dependencies": {
+    "aws-sdk": "^2.5.3",
+    "fbgraph": "^1.3.0"
+  }
+}
