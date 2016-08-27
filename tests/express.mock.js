@@ -5,6 +5,7 @@ const appMock = {
   use: sinon.spy(),
   get: sinon.spy(),
   post: sinon.spy(),
+  options: sinon.spy(),
 };
 
 const expressMock = sinon.stub().returns(appMock);
@@ -15,6 +16,7 @@ expressMock._resetSpies = () => {
   appMock.use.reset();
   appMock.get.reset();
   appMock.post.reset();
+  appMock.options.reset();
 };
 
 module.exports = () => expressMock;
