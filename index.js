@@ -7,7 +7,9 @@ const compile = require('./lib/compile');
 const cleanup = require('./lib/cleanup');
 const run = require('./lib/run');
 const serve = require('./lib/serve');
-const packExternalModules = require('./lib/packExternalModules')
+const packExternalModules = require('./lib/packExternalModules');
+const setEnv = require('./lib/utils').setEnv;
+const unsetEnv = require('./lib/utils').unsetEnv;
 
 class ServerlessWebpack {
   constructor(serverless, options) {
@@ -91,11 +93,13 @@ class ServerlessWebpack {
 
     this.hooks = {
       'before:deploy:createDeploymentArtifacts': () => BbPromise.bind(this)
+        .then(() => setEnv('SERVERLESS_WEBPACK_DEPLOY', 'true'))
         .then(this.validate)
         .then(this.compile)
         .then(this.packExternalModules),
 
       'after:deploy:createDeploymentArtifacts': () => BbPromise.bind(this)
+        .then(() => unsetEnv('SERVERLESS_WEBPACK_DEPLOY'))
         .then(this.cleanup),
 
       'webpack:validate': () => BbPromise.bind(this)
