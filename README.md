@@ -34,11 +34,11 @@ By default, the plugin will try to bundle all dependencies. However, you don't
 want to include all modules in some cases such as selectively import, excluding
 builtin package (aws-sdk) and handling webpack-incompatible modules. In this case,
 you add all the modules, you want to exclude from bundled files, into `externals` field
-of your `webpack.config.json` and add those, you want to include in final distribution,
+of your `webpack.config.js` and add those, you want to include in final distribution,
 into `serverless.yml`:
 
 ```javascript
-// webpack.config.json
+// webpack.config.js
 {
   externals: ["module1", "module2"] // modules to be excluded from bundled file
 }
