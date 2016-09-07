@@ -33,23 +33,39 @@ generated to write bundles in the `.webpack` directory.
 By default, the plugin will try to bundle all dependencies. However, you don't
 want to include all modules in some cases such as selectively import, excluding
 builtin package (aws-sdk) and handling webpack-incompatible modules. In this case,
-you add all the modules, you want to exclude from bundled files, into `externals` field
-of your `webpack.config.json` and add those, you want to include in final distribution,
-into `serverless.yml`:
+you can enable external-module-auto-packaging feature by setting `webpackIncludeModules`
+custom key to be true and defines your webpack `externals` in `webpack.config.json`.
+All modules stated in `externals` will be excluded from bundled files. If an excluded module
+is stated as `dependencies` in `package.json`, it will be packed into node_modules in
+artifact.
 
-```javascript
-// webpack.config.json
-{
-  externals: ["module1", "module2"] // modules to be excluded from bundled file
+```js
+// webpack.config.js
+var nodeExternals = require('webpack-node-externals')
+
+modules.export = {
+  // we use webpack-node-externals to excludes all node deps. You can manually set
+  // the externals too.
+  externals: [nodeExternals()],
 }
 ```
 
 ```yaml
 # serverless.yml
 custom:
-  webpackIncludeModules:
-    - module1        # modules to be included in distribution
+  webpackIncludeModules: true # enable auto-packing
 ```
+
+By default, the plugin will use the `package.json` file in working directory, If you want to
+use a different package conf, set `packagePath` to your custom package.json. eg:
+
+```yaml
+# serverless.yml
+custom:
+  webpackIncludeModules:
+    packagePath: '../package.json' # relative path to custom package.json file.
+```
+> Noted that only relative path is supported now.
 
 You can find an example setup in the [`examples`](./examples) folder.
 

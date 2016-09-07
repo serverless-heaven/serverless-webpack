@@ -7,7 +7,7 @@ const compile = require('./lib/compile');
 const cleanup = require('./lib/cleanup');
 const run = require('./lib/run');
 const serve = require('./lib/serve');
-const packExternalModules = require('./lib/packExternalModules')
+const packExternalModules = require('./lib/packExternalModules');
 
 class ServerlessWebpack {
   constructor(serverless, options) {
@@ -30,7 +30,6 @@ class ServerlessWebpack {
         lifecycleEvents: [
           'validate',
           'compile',
-          'packExternalModules',
         ],
         options: {
           out: {
@@ -102,9 +101,7 @@ class ServerlessWebpack {
         .then(this.validate),
 
       'webpack:compile': () => BbPromise.bind(this)
-        .then(this.compile),
-
-      'webpack:packExternalModules': () => BbPromise.bind(this)
+        .then(this.compile)
         .then(this.packExternalModules),
 
       'webpack:invoke:invoke': () => BbPromise.bind(this)
