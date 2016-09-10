@@ -7,6 +7,7 @@ module.exports = {
     path: path.join(__dirname, '.webpack'),
     filename: 'handler.js'
   },
+  target: 'node',
   module: {
     loaders: [
       { test: /\.ts(x?)$/, loader: 'ts-loader' }

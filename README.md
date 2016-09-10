@@ -18,6 +18,8 @@ plugins:
   - serverless-webpack
 ```
 
+## Configure
+
 By default the plugin will look for a `webpack.config.js` in the service directory.
 In alternative you can specify a different file or configuration in the `serverless.yml` with:
 
@@ -27,8 +29,20 @@ custom:
 ```
 
 Note that, if the `output` configuration is not set, it will automatically be
-generated to write bundles in the `.webpack` directory.
+generated to write bundles in the `.webpack` directory. An base Webpack
+configuration might look like this:
 
+```javascript
+// webpack.config.js
+
+module.exports = {
+  entry: './handler.js',
+  target: 'node',
+  module: {
+    loaders: [ ... ]
+  }
+};
+```
 
 By default, the plugin will try to bundle all dependencies. However, you don't
 want to include all modules in some cases such as selectively import, excluding
