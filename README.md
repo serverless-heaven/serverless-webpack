@@ -3,7 +3,11 @@
 [![serverless](http://public.serverless.com/badges/v3.svg)](http://www.serverless.com)
 [![CircleCI](https://circleci.com/gh/elastic-coders/serverless-webpack.svg?style=shield)](https://circleci.com/gh/elastic-coders/serverless-webpack)
 
-A Serverless v1.0 plugin to build your lambda functions with [Webpack](https://webpack.github.io).
+A Serverless v1.0 plugin to build your lambda functions with [Webpack](https://webpack.github.io). 
+
+This plugin is for you if you want to use the latest Javascript version with [Babel](https://babeljs.io/); 
+use custom [resource loaders](https://webpack.github.io/docs/loaders.html);
+try your lambda functions locally and much more!
 
 ## Install
 
