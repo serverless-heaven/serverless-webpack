@@ -32,9 +32,7 @@ custom:
   webpack: ./folder/my-webpack.config.js
 ```
 
-Note that, if the `output` configuration is not set, it will automatically be
-generated to write bundles in the `.webpack` directory. An base Webpack
-configuration might look like this:
+An base Webpack configuration might look like this:
 
 ```javascript
 // webpack.config.js
@@ -45,6 +43,25 @@ module.exports = {
   module: {
     loaders: [ ... ]
   }
+};
+```
+
+Note that, if the `output` configuration is not set, it will automatically be
+generated to write bundles in the `.webpack` directory. If you set your own `output`
+configuration make sure to add a [`libraryTarget`](https://webpack.github.io/docs/configuration.html#output-librarytarget)
+for best compatibility with external dependencies:
+
+```javascript
+// webpack.config.js
+
+module.exports = {
+  // ...
+  output: {
+    libraryTarget: 'commonjs',
+    path: '.webpack',
+    filename: 'handler.js', // this should match the first part of function handler in serverless.yml
+  },
+  // ...
 };
 ```
 
