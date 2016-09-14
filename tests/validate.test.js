@@ -90,7 +90,7 @@ describe('validate', () => {
       .validate()
       .then(() => {
         expect(module.webpackConfig.output).to.eql({
-          path: `${testServicePath}/${testOptionsOut}`,
+          path: path.join(`${testServicePath}`, `${testOptionsOut}`),
           filename: 'filename',
         });
       });
@@ -125,7 +125,7 @@ describe('validate', () => {
         .then(() => {
           expect(module.webpackConfig.output).to.eql({
             libraryTarget: 'commonjs',
-            path: `${testServicePath}/.webpack`,
+            path: path.join(`${testServicePath}`, '.webpack'),
             filename: testEntry,
           });
         });
@@ -144,7 +144,7 @@ describe('validate', () => {
         .then(() => {
           expect(module.webpackConfig.output).to.eql({
             libraryTarget: 'commonjs',
-            path: `${testServicePath}/.webpack`,
+            path: path.join(`${testServicePath}`, '.webpack'),
             filename: 'last',
           });
         });
@@ -160,7 +160,7 @@ describe('validate', () => {
         .then(() => {
           expect(module.webpackConfig.output).to.eql({
             libraryTarget: 'commonjs',
-            path: `${testServicePath}/.webpack`,
+            path: path.join(`${testServicePath}`, '.webpack'),
             filename: 'handler.js',
           });
         });
@@ -171,7 +171,7 @@ describe('validate', () => {
     it('should load a webpack config from file if `custom.webpack` is a string', () => {
       const testConfig = 'testconfig'
       const testServicePath = 'testpath';
-      const requiredPath = `${testServicePath}/${testConfig}`;
+      const requiredPath = path.join(`${testServicePath}`, `${testConfig}`);
       module.serverless.config.servicePath = testServicePath;
       module.serverless.service.custom.webpack = testConfig;
       serverless.utils.fileExistsSync = sinon.stub().returns(true);
@@ -191,7 +191,7 @@ describe('validate', () => {
     it('should throw if providing an invalid file', () => {
       const testConfig = 'testconfig'
       const testServicePath = 'testpath';
-      const requiredPath = `${testServicePath}/${testConfig}`;
+      const requiredPath = path.join(`${testServicePath}`, `${testConfig}`);
       module.serverless.config.servicePath = testServicePath;
       module.serverless.service.custom.webpack = testConfig;
       serverless.utils.fileExistsSync = sinon.stub().returns(false);
@@ -204,7 +204,7 @@ describe('validate', () => {
     it('should load a default file if no custom config is provided', () => {
       const testConfig = 'webpack.config.js';
       const testServicePath = 'testpath';
-      const requiredPath = `${testServicePath}/${testConfig}`;
+      const requiredPath = path.join(`${testServicePath}`, `${testConfig}`);
       module.serverless.config.servicePath = testServicePath;
       serverless.utils.fileExistsSync = sinon.stub().returns(true);
       const loadedConfig = {

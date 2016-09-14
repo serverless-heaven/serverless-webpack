@@ -162,6 +162,7 @@ serverless webpack --out dist
 Options are:
 
 - `--out` or `-o` (optional) The output directory. Defaults to `.webpack`.
+- `--debug` or `-d` (optional) Debug. To include source maps.
 
 ## Example with Babel
 
