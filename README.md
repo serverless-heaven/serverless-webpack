@@ -3,7 +3,11 @@
 [![serverless](http://public.serverless.com/badges/v3.svg)](http://www.serverless.com)
 [![CircleCI](https://circleci.com/gh/elastic-coders/serverless-webpack.svg?style=shield)](https://circleci.com/gh/elastic-coders/serverless-webpack)
 
-A Serverless v1.0 plugin to build your lambda functions with [Webpack](https://webpack.github.io).
+A Serverless v1.0 plugin to build your lambda functions with [Webpack](https://webpack.github.io). 
+
+This plugin is for you if you want to use the latest Javascript version with [Babel](https://babeljs.io/); 
+use custom [resource loaders](https://webpack.github.io/docs/loaders.html);
+try your lambda functions locally and much more!
 
 ## Install
 
@@ -18,6 +22,8 @@ plugins:
   - serverless-webpack
 ```
 
+## Configure
+
 By default the plugin will look for a `webpack.config.js` in the service directory.
 In alternative you can specify a different file or configuration in the `serverless.yml` with:
 
@@ -26,9 +32,38 @@ custom:
   webpack: ./folder/my-webpack.config.js
 ```
 
-Note that, if the `output` configuration is not set, it will automatically be
-generated to write bundles in the `.webpack` directory.
+An base Webpack configuration might look like this:
 
+```javascript
+// webpack.config.js
+
+module.exports = {
+  entry: './handler.js',
+  target: 'node',
+  module: {
+    loaders: [ ... ]
+  }
+};
+```
+
+Note that, if the `output` configuration is not set, it will automatically be
+generated to write bundles in the `.webpack` directory. If you set your own `output`
+configuration make sure to add a [`libraryTarget`](https://webpack.github.io/docs/configuration.html#output-librarytarget)
+for best compatibility with external dependencies:
+
+```javascript
+// webpack.config.js
+
+module.exports = {
+  // ...
+  output: {
+    libraryTarget: 'commonjs',
+    path: '.webpack',
+    filename: 'handler.js', // this should match the first part of function handler in serverless.yml
+  },
+  // ...
+};
+```
 
 By default, the plugin will try to bundle all dependencies. However, you don't
 want to include all modules in some cases such as selectively import, excluding
@@ -76,6 +111,19 @@ serverless webpack serve
 Options are:
 
 - `--port` or `-p` (optional) The local server port. Defaults to `8000`
+
+The `serve` command will automatically look for the local `serverless.yml` and serve 
+all the `http` events. For example this configuration will generate a GET enpoint:
+
+```yaml
+functions:
+  hello:
+    handler: handler.hello
+    events:
+      - http:
+          method: get
+          path: hello
+```
 
 ### Run a function locally
 
