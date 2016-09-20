@@ -9,8 +9,7 @@ provider:
   runtime: nodejs4.3
 
 custom:
-  webpackIncludeModules:  # modules to be included in distribution
-    - fbgraph   
+  webpackIncludeModules: true # enable auto including modules
 
 functions:
   first:

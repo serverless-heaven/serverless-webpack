@@ -10,10 +10,11 @@
   "license": "MIT",
   "devDependencies": {
     "serverless-webpack": "^1.0.0-beta.2",
-    "webpack": "^1.13.1"
+    "webpack": "^1.13.1",
+    "webpack-node-externals": "^1.3.3",
+    "aws-sdk": "^2.5.3" // packages in devDependencies won't be included in distribution
   },
-  "dependencies": {
-    "aws-sdk": "^2.5.3",
+  "dependencies": { // packages in dependencies will be included in distribution if required
     "fbgraph": "^1.3.0"
   }
 }
