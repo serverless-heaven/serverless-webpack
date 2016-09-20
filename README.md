@@ -3,9 +3,9 @@
 [![serverless](http://public.serverless.com/badges/v3.svg)](http://www.serverless.com)
 [![CircleCI](https://circleci.com/gh/elastic-coders/serverless-webpack.svg?style=shield)](https://circleci.com/gh/elastic-coders/serverless-webpack)
 
-A Serverless v1.0 plugin to build your lambda functions with [Webpack](https://webpack.github.io). 
+A Serverless v1.0 plugin to build your lambda functions with [Webpack](https://webpack.github.io).
 
-This plugin is for you if you want to use the latest Javascript version with [Babel](https://babeljs.io/); 
+This plugin is for you if you want to use the latest Javascript version with [Babel](https://babeljs.io/);
 use custom [resource loaders](https://webpack.github.io/docs/loaders.html);
 try your lambda functions locally and much more!
 
@@ -67,26 +67,46 @@ module.exports = {
 
 By default, the plugin will try to bundle all dependencies. However, you don't
 want to include all modules in some cases such as selectively import, excluding
-builtin package (aws-sdk) and handling webpack-incompatible modules. In this case,
-you add all the modules, you want to exclude from bundled files, into `externals` field
-of your `webpack.config.js` and add those, you want to include in final distribution,
-into `serverless.yml`:
+builtin package (ie: `aws-sdk`) and handling webpack-incompatible modules.
 
-```javascript
+In this case you might add external modules in
+[Webpack `externals` configuration](https://webpack.github.io/docs/configuration.html#externals).
+Those modules can be included in the Serverless bundle with the `webpackIncludeModules`
+option in `serverless.yml`:
+
+```js
 // webpack.config.js
-{
-  externals: ["module1", "module2"] // modules to be excluded from bundled file
+var nodeExternals = require('webpack-node-externals')
+
+modules.export = {
+  // we use webpack-node-externals to excludes all node deps.
+  // You can manually set the externals too.
+  externals: [nodeExternals()],
 }
 ```
 
 ```yaml
 # serverless.yml
 custom:
-  webpackIncludeModules:
-    - module1        # modules to be included in distribution
+  webpackIncludeModules: true # enable auto-packing of external modules
 ```
 
-You can find an example setup in the [`examples`](./examples) folder.
+All modules stated in `externals` will be excluded from bundled files. If an excluded module
+is stated as `dependencies` in `package.json`, it will be packed into the Serverless
+artifact under the `node_modules` directory.
+
+By default, the plugin will use the `package.json` file in working directory, If you want to
+use a different package conf, set `packagePath` to your custom package.json. eg:
+
+```yaml
+# serverless.yml
+custom:
+  webpackIncludeModules:
+    packagePath: '../package.json' # relative path to custom package.json file.
+```
+> Note that only relative path is supported at the moment.
+
+You can find an example setups in the [`examples`](./examples) folder.
 
 ## Usage
 
@@ -112,7 +132,7 @@ Options are:
 
 - `--port` or `-p` (optional) The local server port. Defaults to `8000`
 
-The `serve` command will automatically look for the local `serverless.yml` and serve 
+The `serve` command will automatically look for the local `serverless.yml` and serve
 all the `http` events. For example this configuration will generate a GET enpoint:
 
 ```yaml

@@ -1,7 +1,7 @@
-var path = require('path');
+var nodeExternals = require('webpack-node-externals');
 
 module.exports = {
   entry: './handler.js',
   target: 'node',
-  externals: ["fbgraph", "aws-sdk"] // modules to be excluded from bundled file
+  externals: [nodeExternals()] // exclude external modules
 };
