@@ -190,3 +190,20 @@ plugin with Babel. To try it, from inside the example folder:
 
 - `npm install` to install dependencies
 - `serverless webpack run -f hello` to run the example function
+
+
+## Compatibility with other plugins
+
+### [`serverless-offline`](https://github.com/dherault/serverless-offline) 
+
+Add both plugins to your `serverless.yml` file:
+
+```yaml
+plugins:
+  - serverless-webpack
+  - serverless-offline
+```
+
+Make sure that `serverless-webpack` is above `serverless-offline` so it will be loaded earlier.
+
+Now your functions will be automatically built before running `serverless offline`.
