@@ -86,7 +86,7 @@ describe('serve', () => {
           headers: 'testheaders',
           method: 'testmethod',
           path: 'testparams',
-          query: 'testquery',
+          queryStringParameters: 'testquery',
         },
         'testContext'
       );
