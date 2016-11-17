@@ -4,6 +4,7 @@ const BbPromise = require('bluebird');
 
 const validate = require('./lib/validate');
 const compile = require('./lib/compile');
+const wpwatch = require('./lib/wpwatch');
 const cleanup = require('./lib/cleanup');
 const run = require('./lib/run');
 const serve = require('./lib/serve');
@@ -18,6 +19,7 @@ class ServerlessWebpack {
       this,
       validate,
       compile,
+      wpwatch,
       cleanup,
       run,
       serve,
@@ -117,6 +119,10 @@ class ServerlessWebpack {
       'webpack:serve:serve': () => BbPromise.bind(this)
         .then(this.validate)
         .then(this.serve),
+
+      'before:offline:start': () => BbPromise.bind(this)
+        .then(this.validate)
+        .then(this.wpwatch),
     };
   }
 }
