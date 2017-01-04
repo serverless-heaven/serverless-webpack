@@ -108,6 +108,29 @@ custom:
 
 You can find an example setups in the [`examples`](./examples) folder.
 
+### Custom CORS options
+You can add custom CORS configuration the same way you would for Serverless and API Gateway in the `serverless.yml` on
+a per method basis.
+
+```yaml
+# serverless.yml
+functions:
+  hello:
+    handler: handler.hello
+    events:
+      - http:
+          method: get
+          path: hello
+          cors: # Defaults shown below
+            origins:
+              - '*'
+            headers:
+              - '*'
+            methods:
+              - GET
+              - OPTIONS
+```
+
 ## Usage
 
 ### Automatic bundling
