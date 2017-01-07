@@ -8,8 +8,11 @@ export const hello = (event, context, cb) => {
   });
   p
     .then(r => cb(null, {
-      message: 'Go Serverless Webpack (Babel) v1.0! Your function executed successfully!',
-      event,
+      statusCode: 200,
+      body: JSON.stringify({
+        "message": 'Go Serverless Webpack (Babel) v1.0! Your function executed successfully!',
+        "event": event
+      }),
     }))
     .catch(e => cb(e));
 };
