@@ -18,3 +18,4 @@ functions:
       - http:
           method: GET
           path: first
+          integration: lambda
