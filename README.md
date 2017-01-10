@@ -131,6 +131,8 @@ serverless webpack serve
 Options are:
 
 - `--port` or `-p` (optional) The local server port. Defaults to `8000`
+- `--pathPrefix` or `-x` (optional) Add stage as a prefix to all path routes.
+Defaults to value of `provider.stage` defined in `serverless.yml`, which defaults to `dev`
 
 The `serve` command will automatically look for the local `serverless.yml` and serve
 all the `http` events. For example this configuration will generate a GET enpoint:

@@ -84,6 +84,10 @@ class ServerlessWebpack {
                 usage: 'The local server port',
                 shortcut: 'p',
               },
+              stagePrefix: {
+                usage: 'Add stage as a prefix to all path routes',
+                shortcut: 'x',
+              },
             },
           },
         },
