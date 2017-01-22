@@ -5,6 +5,10 @@
 
 A Serverless v1.0 plugin to build your lambda functions with [Webpack](https://webpack.github.io).
 
+This plugin is for you if you want to use the latest Javascript version with [Babel](https://babeljs.io/);
+use custom [resource loaders](https://webpack.github.io/docs/loaders.html);
+try your lambda functions locally and much more!
+
 ## Install
 
 ```
@@ -18,6 +22,8 @@ plugins:
   - serverless-webpack
 ```
 
+## Configure
+
 By default the plugin will look for a `webpack.config.js` in the service directory.
 In alternative you can specify a different file or configuration in the `serverless.yml` with:
 
@@ -26,32 +32,81 @@ custom:
   webpack: ./folder/my-webpack.config.js
 ```
 
-Note that, if the `output` configuration is not set, it will automatically be
-generated to write bundles in the `.webpack` directory.
+An base Webpack configuration might look like this:
 
+```javascript
+// webpack.config.js
+
+module.exports = {
+  entry: './handler.js',
+  target: 'node',
+  module: {
+    loaders: [ ... ]
+  }
+};
+```
+
+Note that, if the `output` configuration is not set, it will automatically be
+generated to write bundles in the `.webpack` directory. If you set your own `output`
+configuration make sure to add a [`libraryTarget`](https://webpack.github.io/docs/configuration.html#output-librarytarget)
+for best compatibility with external dependencies:
+
+```javascript
+// webpack.config.js
+
+module.exports = {
+  // ...
+  output: {
+    libraryTarget: 'commonjs',
+    path: '.webpack',
+    filename: 'handler.js', // this should match the first part of function handler in serverless.yml
+  },
+  // ...
+};
+```
 
 By default, the plugin will try to bundle all dependencies. However, you don't
 want to include all modules in some cases such as selectively import, excluding
-builtin package (aws-sdk) and handling webpack-incompatible modules. In this case,
-you add all the modules, you want to exclude from bundled files, into `externals` field
-of your `webpack.config.json` and add those, you want to include in final distribution,
-into `serverless.yml`:
+builtin package (ie: `aws-sdk`) and handling webpack-incompatible modules.
 
-```javascript
-// webpack.config.json
-{
-  externals: ["module1", "module2"] // modules to be excluded from bundled file
+In this case you might add external modules in
+[Webpack `externals` configuration](https://webpack.github.io/docs/configuration.html#externals).
+Those modules can be included in the Serverless bundle with the `webpackIncludeModules`
+option in `serverless.yml`:
+
+```js
+// webpack.config.js
+var nodeExternals = require('webpack-node-externals')
+
+modules.export = {
+  // we use webpack-node-externals to excludes all node deps.
+  // You can manually set the externals too.
+  externals: [nodeExternals()],
 }
 ```
 
 ```yaml
 # serverless.yml
 custom:
-  webpackIncludeModules:
-    - module1        # modules to be included in distribution
+  webpackIncludeModules: true # enable auto-packing of external modules
 ```
 
-You can find an example setup in the [`examples`](./examples) folder.
+All modules stated in `externals` will be excluded from bundled files. If an excluded module
+is stated as `dependencies` in `package.json`, it will be packed into the Serverless
+artifact under the `node_modules` directory.
+
+By default, the plugin will use the `package.json` file in working directory, If you want to
+use a different package conf, set `packagePath` to your custom package.json. eg:
+
+```yaml
+# serverless.yml
+custom:
+  webpackIncludeModules:
+    packagePath: '../package.json' # relative path to custom package.json file.
+```
+> Note that only relative path is supported at the moment.
+
+You can find an example setups in the [`examples`](./examples) folder.
 
 ## Usage
 
@@ -76,6 +131,19 @@ serverless webpack serve
 Options are:
 
 - `--port` or `-p` (optional) The local server port. Defaults to `8000`
+
+The `serve` command will automatically look for the local `serverless.yml` and serve
+all the `http` events. For example this configuration will generate a GET enpoint:
+
+```yaml
+functions:
+  hello:
+    handler: handler.hello
+    events:
+      - http:
+          method: get
+          path: hello
+```
 
 ### Run a function locally
 

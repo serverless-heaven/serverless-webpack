@@ -64,6 +64,9 @@ describe('serve', () => {
         id: 'testFuncId',
         handlerFunc: testHandlerFunc,
       };
+      const testHttpEvent = {
+        integration: 'lambda'
+      }
       const testReq = {
         method: 'testmethod',
         headers: 'testheaders',
@@ -76,7 +79,7 @@ describe('serve', () => {
       };
       testRes.status = sinon.stub().returns(testRes);
       module.getContext = sinon.stub().returns('testContext');
-      const handler = module._handlerBase(testFuncConf);
+      const handler = module._handlerBase(testFuncConf, testHttpEvent);
       handler(testReq, testRes);
       expect(testRes.status).to.have.been.calledWith(200);
       expect(testRes.send).to.have.been.calledWith(testHandlerResp);
@@ -110,6 +113,55 @@ describe('serve', () => {
       handler({}, testRes);
       expect(testRes.status).to.have.been.calledWith(500);
       expect(testRes.send).to.have.been.calledWith(testHandlerErr);
+    });
+
+    it('handles lambda-proxy integration for request and response', () => {
+      const testHandlerResp = { statusCode: 200, body: 'testHandlerResp' };
+      const testHandlerFunc = sinon.spy((ev, ct, cb) => {
+        cb(null, testHandlerResp);
+      });
+      const testFuncConf = {
+        id: 'testFuncId',
+        handlerFunc: testHandlerFunc,
+      };
+      const testHttpEvent = {}
+      const testReq = {
+        method: 'testmethod',
+        headers: 'testheaders',
+        body: 'testbody',
+        params: 'testparams',
+        query: 'testquery',
+      };
+      const testRes = {
+        send: sinon.spy(),
+      };
+      testRes.status = sinon.stub().returns(testRes);
+      module.getContext = sinon.stub().returns('testContext');
+      const handler = module._handlerBase(testFuncConf, testHttpEvent);
+      handler(testReq, testRes);
+      expect(testRes.status).to.have.been.calledWith(testHandlerResp.statusCode);
+      expect(testRes.send).to.have.been.calledWith(testHandlerResp.body);
+      expect(testHandlerFunc).to.have.been.calledWith(
+        {
+          body: 'testbody',
+          headers: 'testheaders',
+          method: 'testmethod',
+          pathParameters: 'testparams',
+          queryStringParameters: 'testquery',
+        },
+        'testContext'
+      );
+    });
+  });
+
+  describe('_optionsHandler', () => {
+    it('should send a 200 express response', () => {
+      const testRes = {
+        sendStatus: sinon.spy(),
+      };
+      const handler = module._optionsHandler;
+      handler({}, testRes);
+      expect(testRes.sendStatus).to.have.been.calledWith(200);
     });
   });
 
@@ -234,39 +286,6 @@ describe('serve', () => {
       }));
     });
 
-    describe('OPTIONS handler', () => {
-      let optionsHandler;
-
-      beforeEach(() => {
-        const res = module._newExpressApp([]);
-        const optionsHandlers = res.use.getCalls().filter(c =>
-          typeof c.args[0] === 'function' &&
-          c.args[0].name === 'optionsHandler'
-        );
-        optionsHandler = optionsHandlers.length ? optionsHandlers[0].args[0] : null;
-      });
-
-      it('should add an OPTIONS request handler', () => {
-        expect(optionsHandler).to.exist;
-      });
-
-      it('should continue for non OPTIONS requests', () => {
-        const req = { method: 'GET' };
-        const next = sinon.spy();
-        optionsHandler(req, {}, next);
-        expect(next).to.have.callCount(1);
-      });
-
-      it('should send status 200 for OPTIONS requests', () => {
-        const req = { method: 'OPTIONS' };
-        const res = { sendStatus: sinon.spy() };
-        const next = sinon.spy();
-        optionsHandler(req, res, next);
-        expect(res.sendStatus).to.have.been.calledWith(200);
-        expect(next).to.have.callCount(0);
-      });
-    });
-
     it('should create express handlers for all functions http event', () => {
       const testFuncsConfs = [
         {
@@ -299,7 +318,9 @@ describe('serve', () => {
       module.options.stage = testStage;
       const testHandlerBase = 'testHandlerBase';
       const testHandlerCors = 'testHandlerCors';
+      const testHandlerOptions = 'testHandlerOptions';
       module._handlerBase = sinon.stub().returns(testHandlerBase);
+      module._optionsHandler = testHandlerOptions;
       module._handlerAddCors = sinon.stub().returns(testHandlerCors);
       const app = module._newExpressApp(testFuncsConfs);
       expect(app.get).to.have.callCount(1);
@@ -317,6 +338,15 @@ describe('serve', () => {
       );
       expect(module.serverless.cli.consoleLog).to.have.been.calledWith(
         '  POST - http://localhost:8000/test/func2path/{testParam}'
+      );
+      expect(app.options).to.have.callCount(2);
+      expect(app.options.firstCall).to.have.been.calledWith(
+        '/test/func1path',
+        testHandlerCors
+      );
+      expect(app.options.secondCall).to.have.been.calledWith(
+        '/test/func2path/:testParam',
+        testHandlerOptions
       );
     });
   });

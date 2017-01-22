@@ -2,3 +2,5 @@ node_modules
 dist
 .webpack
 coverage
+
+.idea

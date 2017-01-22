@@ -5,6 +5,7 @@ module.exports = {
     first: './first.js',
     second: './second.js'
   },
+  target: 'node',
   output: {
     libraryTarget: 'commonjs',
     path: path.join(__dirname, '.webpack'),

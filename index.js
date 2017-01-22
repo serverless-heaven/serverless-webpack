@@ -4,12 +4,11 @@ const BbPromise = require('bluebird');
 
 const validate = require('./lib/validate');
 const compile = require('./lib/compile');
+const wpwatch = require('./lib/wpwatch');
 const cleanup = require('./lib/cleanup');
 const run = require('./lib/run');
 const serve = require('./lib/serve');
 const packExternalModules = require('./lib/packExternalModules');
-const setEnv = require('./lib/utils').setEnv;
-const unsetEnv = require('./lib/utils').unsetEnv;
 
 class ServerlessWebpack {
   constructor(serverless, options) {
@@ -20,6 +19,7 @@ class ServerlessWebpack {
       this,
       validate,
       compile,
+      wpwatch,
       cleanup,
       run,
       serve,
@@ -32,7 +32,6 @@ class ServerlessWebpack {
         lifecycleEvents: [
           'validate',
           'compile',
-          'packExternalModules',
         ],
         options: {
           out: {
@@ -106,9 +105,7 @@ class ServerlessWebpack {
         .then(this.validate),
 
       'webpack:compile': () => BbPromise.bind(this)
-        .then(this.compile),
-
-      'webpack:packExternalModules': () => BbPromise.bind(this)
+        .then(this.compile)
         .then(this.packExternalModules),
 
       'webpack:invoke:invoke': () => BbPromise.bind(this)
@@ -124,6 +121,10 @@ class ServerlessWebpack {
       'webpack:serve:serve': () => BbPromise.bind(this)
         .then(this.validate)
         .then(this.serve),
+
+      'before:offline:start': () => BbPromise.bind(this)
+        .then(this.validate)
+        .then(this.wpwatch),
     };
   }
 }
