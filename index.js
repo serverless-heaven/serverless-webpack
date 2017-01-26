@@ -99,6 +99,10 @@ class ServerlessWebpack {
       'after:deploy:createDeploymentArtifacts': () => BbPromise.bind(this)
         .then(this.cleanup),
 
+      'before:deploy:function:packageFunction': () => BbPromise.bind(this)
+        .then(this.validate)
+        .then(this.compile),
+
       'webpack:validate': () => BbPromise.bind(this)
         .then(this.validate),
 
