@@ -349,6 +349,42 @@ describe('serve', () => {
         testHandlerOptions
       );
     });
+
+    it('should create express handler for all methods for functions with method "any"', () => {
+      const testFuncsConfs = [
+        {
+          'events': [
+            {
+              'method': 'any',
+              'path': 'func1path',
+              'cors': true,
+            }
+          ],
+          'handler': 'module1.func1handler',
+          'handlerFunc': null,
+          'id': 'func1',
+          'moduleName': 'module1',
+        },
+      ];
+      const testStage = 'test';
+      module.options.stage = testStage;
+      const testHandlerBase = 'testHandlerBase';
+      const testHandlerCors = 'testHandlerCors';
+      const testHandlerOptions = 'testHandlerOptions';
+      module._handlerBase = sinon.stub().returns(testHandlerBase);
+      module._optionsHandler = testHandlerOptions;
+      module._handlerAddCors = sinon.stub().returns(testHandlerCors);
+      const app = module._newExpressApp(testFuncsConfs);
+      expect(app.all).to.have.callCount(1);
+      expect(app.all).to.have.been.calledWith(
+        '/test/func1path',
+        testHandlerCors
+      );
+      expect(module.serverless.cli.consoleLog).to.have.been.calledWith(
+        '  ANY - http://localhost:8000/test/func1path'
+      );
+      expect(app.options).to.have.callCount(0);
+    });
   });
 
   describe('serve method', () => {
