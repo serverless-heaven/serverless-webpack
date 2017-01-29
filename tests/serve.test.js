@@ -339,14 +339,10 @@ describe('serve', () => {
       expect(module.serverless.cli.consoleLog).to.have.been.calledWith(
         '  POST - http://localhost:8000/test/func2path/{testParam}'
       );
-      expect(app.options).to.have.callCount(2);
+      expect(app.options).to.have.callCount(1);
       expect(app.options.firstCall).to.have.been.calledWith(
         '/test/func1path',
         testHandlerCors
-      );
-      expect(app.options.secondCall).to.have.been.calledWith(
-        '/test/func2path/:testParam',
-        testHandlerOptions
       );
     });
 
