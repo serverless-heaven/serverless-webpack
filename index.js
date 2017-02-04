@@ -101,7 +101,8 @@ class ServerlessWebpack {
 
       'before:deploy:function:packageFunction': () => BbPromise.bind(this)
         .then(this.validate)
-        .then(this.compile),
+        .then(this.compile)
+        .then(this.packExternalModules),
 
       'webpack:validate': () => BbPromise.bind(this)
         .then(this.validate),
