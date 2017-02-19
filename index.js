@@ -120,7 +120,7 @@ class ServerlessWebpack {
         .then(this.validate)
         .then(this.serve),
 
-      'before:offline:start': () => BbPromise.bind(this)
+      'before:offline:start:init': () => BbPromise.bind(this)
         .then(this.validate)
         .then(this.wpwatch),
     };
