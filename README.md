@@ -118,6 +118,21 @@ The normal Serverless deploy procedure will automatically bundle with Webpack:
 - Install Serverless Webpack as above
 - Deploy with `serverless deploy`
 
+### Use with serverless-offline
+
+- Put the serverless-webpack plugin before the serverless-offline plugin in your configuration file.
+```yaml
+plugins:
+  - serverless-webpack
+  - serverless-offline
+```
+
+- Let serverless-offline know where the bundles are built
+```
+> serverless offline start --location .webpack 
+```
+
+
 ### Simulate API Gateway locally
 
 To start a local server that will act like the API Gateway use the following command.
