@@ -99,6 +99,15 @@ class ServerlessWebpack {
       'after:deploy:createDeploymentArtifacts': () => BbPromise.bind(this)
         .then(this.cleanup),
 
+      // This hook is exposed by SLS' deploy function command
+      'before:deploy:function:packageFunction': () => BbPromise.bind(this)
+        .then(this.validate)
+        .then(this.compile)
+        .then(this.packExternalModules),
+
+      'after:deploy:function:packageFunction': () => BbPromise.bind(this)
+        .then(this.cleanup),
+
       'webpack:validate': () => BbPromise.bind(this)
         .then(this.validate),
 
