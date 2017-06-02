@@ -4,6 +4,7 @@ const BbPromise = require('bluebird');
 
 const validate = require('./lib/validate');
 const compile = require('./lib/compile');
+const copyFunctionArtifact = require('./lib/copyFunctionArtifact');
 const wpwatch = require('./lib/wpwatch');
 const cleanup = require('./lib/cleanup');
 const run = require('./lib/run');
@@ -28,6 +29,7 @@ class ServerlessWebpack {
       this,
       validate,
       compile,
+      copyFunctionArtifact,
       wpwatch,
       cleanup,
       run,
@@ -108,6 +110,14 @@ class ServerlessWebpack {
       'after:deploy:createDeploymentArtifacts': () => BbPromise.bind(this)
         .then(this.cleanup),
 
+      'before:deploy:function:packageFunction': () => BbPromise.bind(this)
+         .then(this.validate)
+         .then(this.compile)
+         .then(this.packExternalModules),
+
+      'after:deploy:function:packageFunction': () => BbPromise.bind(this)
+         .then(this.copyFunctionArtifact),
+ 
       'webpack:validate': () => BbPromise.bind(this)
         .then(this.validate),
 
