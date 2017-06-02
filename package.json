@@ -42,5 +42,8 @@
     "serverless": "^1.0.0-beta.2",
     "sinon": "^1.17.5",
     "sinon-chai": "^2.8.0"
+  },
+  "peerDependencies": {
+    "webpack": "*"
   }
 }
