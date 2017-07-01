@@ -133,7 +133,7 @@ Options are:
 - `--port` or `-p` (optional) The local server port. Defaults to `8000`
 
 The `serve` command will automatically look for the local `serverless.yml` and serve
-all the `http` events. For example this configuration will generate a GET enpoint:
+all the `http` events. For example this configuration will generate a GET endpoint:
 
 ```yaml
 functions:
