@@ -173,7 +173,7 @@ Options are:
 
 ### Using with serverless-offline and serverless-webpack plugin
 
- Run `serverless offline start`. In comparison with `serverless offline`, the `start` command will fire an `init` and a `end` lifecycle hook which is needed for serverless-offline and serverless-dynamodb-local to switch off both ressources. 
+ Run `serverless offline start`. In comparison with `serverless offline`, the `start` command will fire an `init` and a `end` lifecycle hook which is needed for serverless-offline and serverless-dynamodb-local to switch off both resources. 
  
  Add plugins to your `serverless.yml` file:
  ```yaml
