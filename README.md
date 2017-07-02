@@ -9,6 +9,8 @@ This plugin is for you if you want to use the latest Javascript version with [Ba
 use custom [resource loaders](https://webpack.github.io/docs/loaders.html);
 try your lambda functions locally and much more!
 
+> **BREAKING CHANGE IN v2**: `webpack` must now be installed alongside `serverless-webpack` as a peer dependency. This allows more control over which version of Webpack to run.
+
 ## Install
 
 ```
