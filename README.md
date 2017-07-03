@@ -1,20 +1,22 @@
 # Serverless Webpack
 
-[![serverless](http://public.serverless.com/badges/v3.svg)](http://www.serverless.com)
-[![CircleCI](https://circleci.com/gh/elastic-coders/serverless-webpack.svg?style=shield)](https://circleci.com/gh/elastic-coders/serverless-webpack)
+[![Serverless][ico-serverless]][link-serverless]
+[![CircleCI][ico-circleci]][link-circleci]
+[![NPM][ico-npm]][link-npm]
+[![Contributors][ico-contributors]][link-contributors]
 
-A Serverless v1.0 plugin to build your lambda functions with [Webpack](https://webpack.github.io).
+A Serverless v1.x plugin to build your lambda functions with [Webpack][link-webpack].
 
-This plugin is for you if you want to use the latest Javascript version with [Babel](https://babeljs.io/);
-use custom [resource loaders](https://webpack.github.io/docs/loaders.html);
+This plugin is for you if you want to use the latest Javascript version with [Babel][link-babel];
+use custom [resource loaders][link-webpack-loaders];
 try your lambda functions locally and much more!
 
 > **BREAKING CHANGE IN v2**: `webpack` must now be installed alongside `serverless-webpack` as a peer dependency. This allows more control over which version of Webpack to run.
 
 ## Install
 
-```
-npm install serverless-webpack
+```bash
+$ npm install serverless-webpack --save-dev
 ```
 
 Add the plugin to your `serverless.yml` file:
@@ -27,7 +29,7 @@ plugins:
 ## Configure
 
 By default the plugin will look for a `webpack.config.js` in the service directory.
-In alternative you can specify a different file or configuration in the `serverless.yml` with:
+Alternatively, you can specify a different file or configuration in `serverless.yml`:
 
 ```yaml
 custom:
@@ -36,7 +38,7 @@ custom:
 
 An base Webpack configuration might look like this:
 
-```javascript
+```js
 // webpack.config.js
 
 module.exports = {
@@ -50,10 +52,10 @@ module.exports = {
 
 Note that, if the `output` configuration is not set, it will automatically be
 generated to write bundles in the `.webpack` directory. If you set your own `output`
-configuration make sure to add a [`libraryTarget`](https://webpack.github.io/docs/configuration.html#output-librarytarget)
+configuration make sure to add a [`libraryTarget`][link-webpack-libtarget]
 for best compatibility with external dependencies:
 
-```javascript
+```js
 // webpack.config.js
 
 module.exports = {
@@ -61,7 +63,7 @@ module.exports = {
   output: {
     libraryTarget: 'commonjs',
     path: '.webpack',
-    filename: 'handler.js', // this should match the first part of function handler in serverless.yml
+    filename: 'handler.js', // this should match the first part of function handler in `serverless.yml`
   },
   // ...
 };
@@ -72,7 +74,7 @@ want to include all modules in some cases such as selectively import, excluding
 builtin package (ie: `aws-sdk`) and handling webpack-incompatible modules.
 
 In this case you might add external modules in
-[Webpack `externals` configuration](https://webpack.github.io/docs/configuration.html#externals).
+[Webpack's `externals` configuration][link-webpack-externals].
 Those modules can be included in the Serverless bundle with the `webpackIncludeModules`
 option in `serverless.yml`:
 
@@ -98,7 +100,7 @@ is stated as `dependencies` in `package.json`, it will be packed into the Server
 artifact under the `node_modules` directory.
 
 By default, the plugin will use the `package.json` file in working directory, If you want to
-use a different package conf, set `packagePath` to your custom package.json. eg:
+use a different package file, set `packagePath` to your custom `package.json`:
 
 ```yaml
 # serverless.yml
@@ -108,7 +110,7 @@ custom:
 ```
 > Note that only relative path is supported at the moment.
 
-You can find an example setups in the [`examples`](./examples) folder.
+You can find an example setups in the [`examples`][link-examples] folder.
 
 ## Usage
 
@@ -116,7 +118,7 @@ You can find an example setups in the [`examples`](./examples) folder.
 
 The normal Serverless deploy procedure will automatically bundle with Webpack:
 
-- Create the Serverless project with `serverless create -t aws-node`
+- Create the Serverless project with `serverless create -t aws-nodejs`
 - Install Serverless Webpack as above
 - Deploy with `serverless deploy`
 
@@ -126,8 +128,8 @@ To start a local server that will act like the API Gateway use the following com
 Your code will be reloaded upon change so that every request to your local server
 will serve the latest code.
 
-```
-serverless webpack serve
+```bash
+$ serverless webpack serve
 ```
 
 Options are:
@@ -151,8 +153,8 @@ functions:
 
 To run your bundled functions locally you can:
 
-```
-serverless webpack invoke --function <function-name>
+```bash
+$ serverless webpack invoke --function <function-name>
 ```
 
 Options are:
@@ -164,8 +166,8 @@ Options are:
 
 Or to run a function every time the source files change use `watch`:
 
-```
-serverless webpack watch --function <function-name> --path event.json
+```bash
+$ serverless webpack watch --function <function-name> --path event.json
 ```
 
 Options are:
@@ -177,8 +179,8 @@ Options are:
 
 To just bundle and see the output result use:
 
-```
-serverless webpack --out dist
+```bash
+$ serverless webpack --out dist
 ```
 
 Options are:
@@ -187,8 +189,25 @@ Options are:
 
 ## Example with Babel
 
-In the [`examples`](./examples) folder there is a Serverless project using this
+In the [`examples`][link-examples] folder there is a Serverless project using this
 plugin with Babel. To try it, from inside the example folder:
 
 - `npm install` to install dependencies
 - `serverless webpack run -f hello` to run the example function
+
+[ico-serverless]: http://public.serverless.com/badges/v3.svg
+[ico-circleci]: https://img.shields.io/circleci/project/github/elastic-coders/serverless-webpack.svg
+[ico-npm]: https://img.shields.io/npm/v/serverless-webpack.svg
+[ico-contributors]: https://img.shields.io/github/contributors/elastic-coders/serverless-webpack.svg
+
+[link-serverless]: http://www.serverless.com/
+[link-circleci]: https://circleci.com/gh/elastic-coders/serverless-webpack/
+[link-npm]: https://www.npmjs.com/package/serverless-webpack
+[link-contributors]: https://github.com/elastic-coders/serverless-webpack/graphs/contributors
+
+[link-webpack]: https://webpack.github.io/
+[link-babel]: https://babeljs.io/
+[link-webpack-loaders]: https://webpack.github.io/docs/loaders.html
+[link-webpack-libtarget]: https://webpack.github.io/docs/configuration.html#output-librarytarget
+[link-webpack-externals]: https://webpack.github.io/docs/configuration.html#externals
+[link-examples]: ./examples
