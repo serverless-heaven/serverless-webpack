@@ -175,6 +175,18 @@ Options are:
 - `--function` or `-f` (required) is the name of the function to run
 - `--path` or `-p` (optional) is a JSON file path used as the function input event
 
+### Using with serverless-offline and serverless-webpack plugin
+
+ Run `serverless offline start`. In comparison with `serverless offline`, the `start` command will fire an `init` and a `end` lifecycle hook which is needed for serverless-offline and serverless-dynamodb-local to switch off both resources. 
+ 
+ Add plugins to your `serverless.yml` file:
+ ```yaml
+ plugins:
+   - serverless-webpack
+   - serverless-dynamodb-local
+   - serverless-offline #serverless-offline needs to be last in the list
+ ```
+
 ### Bundle with webpack
 
 To just bundle and see the output result use:
