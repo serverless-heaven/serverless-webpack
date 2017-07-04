@@ -243,6 +243,14 @@ plugin with Babel. To try it, from inside the example folder:
 - `npm install` to install dependencies
 - `serverless webpack run -f hello` to run the example function
 
+## Release Notes
+
+* 2.0.0
+  * Support arbitrary Webpack versions as peer dependency [#83][link-83]
+  * Support `serverless offline start` invocation [#131][link-131]
+  * Documentation updates [#88][link-88], [#132][link-132], [#140][link-140], [#141][link-141], [#144][link-144]
+  * Print Webpack stats on recompile [#127][link-127]
+
 [ico-serverless]: http://public.serverless.com/badges/v3.svg
 [ico-circleci]: https://img.shields.io/circleci/project/github/elastic-coders/serverless-webpack.svg
 [ico-npm]: https://img.shields.io/npm/v/serverless-webpack.svg
@@ -261,3 +269,14 @@ plugin with Babel. To try it, from inside the example folder:
 [link-examples]: ./examples
 [link-serverless-offline]: https://www.npmjs.com/package/serverless-offline
 [link-serverless-dynamodb-local]: https://www.npmjs.com/package/serverless-dynamodb-local
+
+[comment]: # (Referenced issues)
+
+[link-83]: https://github.com/elastic-coders/serverless-webpack/pull/83
+[link-88]: https://github.com/elastic-coders/serverless-webpack/pull/88
+[link-127]: https://github.com/elastic-coders/serverless-webpack/pull/127
+[link-131]: https://github.com/elastic-coders/serverless-webpack/pull/131
+[link-132]: https://github.com/elastic-coders/serverless-webpack/pull/132
+[link-140]: https://github.com/elastic-coders/serverless-webpack/pull/140
+[link-141]: https://github.com/elastic-coders/serverless-webpack/issues/141
+[link-144]: https://github.com/elastic-coders/serverless-webpack/issues/144
