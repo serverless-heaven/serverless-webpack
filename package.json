@@ -24,7 +24,7 @@
   },
   "homepage": "https://github.com/elastic-coders/serverless-webpack#readme",
   "scripts": {
-    "test": "istanbul cover _mocha tests/all -- -R spec --recursive"
+    "test": "istanbul cover node_modules/mocha/bin/_mocha tests/all -- -R spec --recursive"
   },
   "dependencies": {
     "bluebird": "^3.4.0",

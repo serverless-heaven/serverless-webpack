@@ -38,6 +38,14 @@ class ServerlessWebpack {
             usage: 'Path to output directory',
             shortcut: 'o',
           },
+          debug: {
+            usage: 'Debug. To include source maps',
+            shortcut: 'd',
+          },
+          // 'optimize-minimize': {
+          //   usage: 'Optimize and minimize for production',
+          //   shortcut: 'm',
+          // }
         },
         commands: {
           invoke: {
