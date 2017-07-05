@@ -1,6 +1,7 @@
 # Serverless Webpack
 
 [![Serverless][ico-serverless]][link-serverless]
+[![License][ico-license]][link-license]
 [![CircleCI][ico-circleci]][link-circleci]
 [![NPM][ico-npm]][link-npm]
 [![Contributors][ico-contributors]][link-contributors]
@@ -252,11 +253,13 @@ plugin with Babel. To try it, from inside the example folder:
   * Print Webpack stats on recompile [#127][link-127]
 
 [ico-serverless]: http://public.serverless.com/badges/v3.svg
+[ico-license]: https://img.shields.io/github/license/elastic-coders/serverless-webpack.svg
 [ico-circleci]: https://img.shields.io/circleci/project/github/elastic-coders/serverless-webpack.svg
 [ico-npm]: https://img.shields.io/npm/v/serverless-webpack.svg
 [ico-contributors]: https://img.shields.io/github/contributors/elastic-coders/serverless-webpack.svg
 
 [link-serverless]: http://www.serverless.com/
+[link-license]: ./blob/master/LICENSE
 [link-circleci]: https://circleci.com/gh/elastic-coders/serverless-webpack/
 [link-npm]: https://www.npmjs.com/package/serverless-webpack
 [link-contributors]: https://github.com/elastic-coders/serverless-webpack/graphs/contributors
