@@ -1,6 +1,7 @@
 # Serverless Webpack
 
 [![Serverless][ico-serverless]][link-serverless]
+[![License][ico-license]][link-license]
 [![CircleCI][ico-circleci]][link-circleci]
 [![NPM][ico-npm]][link-npm]
 [![Contributors][ico-contributors]][link-contributors]
@@ -206,11 +207,11 @@ Options are:
 ### Simulate API Gateway locally
 
 _There are plans to remove the integrated simulation functionality in favor of
-using serverless-offline (see [#135](https://github.com/elastic-coders/serverless-webpack/issues/135))
-which already does the job perfectly and fully integrates with serverless-webpack.
-Please consider to switch to serverless-offline if you do not use it already._
+using `serverless-offline` (see [#135][link-135]) which already does the job
+perfectly and fully integrates with `serverless-webpack`.
+Please consider switching to `serverless-offline` if you do not use it already._
 
-To start a local server that will act like the API Gateway use the following command.
+To start a local server that will act like API Gateway, use the following command.
 Your code will be reloaded upon change so that every request to your local server
 will serve the latest code.
 
@@ -252,11 +253,13 @@ plugin with Babel. To try it, from inside the example folder:
   * Print Webpack stats on recompile [#127][link-127]
 
 [ico-serverless]: http://public.serverless.com/badges/v3.svg
+[ico-license]: https://img.shields.io/github/license/elastic-coders/serverless-webpack.svg
 [ico-circleci]: https://img.shields.io/circleci/project/github/elastic-coders/serverless-webpack.svg
 [ico-npm]: https://img.shields.io/npm/v/serverless-webpack.svg
 [ico-contributors]: https://img.shields.io/github/contributors/elastic-coders/serverless-webpack.svg
 
 [link-serverless]: http://www.serverless.com/
+[link-license]: ./blob/master/LICENSE
 [link-circleci]: https://circleci.com/gh/elastic-coders/serverless-webpack/
 [link-npm]: https://www.npmjs.com/package/serverless-webpack
 [link-contributors]: https://github.com/elastic-coders/serverless-webpack/graphs/contributors
@@ -271,6 +274,8 @@ plugin with Babel. To try it, from inside the example folder:
 [link-serverless-dynamodb-local]: https://www.npmjs.com/package/serverless-dynamodb-local
 
 [comment]: # (Referenced issues)
+
+[link-135]: https://github.com/elastic-coders/serverless-webpack/issues/135
 
 [link-83]: https://github.com/elastic-coders/serverless-webpack/pull/83
 [link-88]: https://github.com/elastic-coders/serverless-webpack/pull/88
