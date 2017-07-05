@@ -210,7 +210,7 @@ using `serverless-offline` (see [#135][link-135]) which already does the job
 perfectly and fully integrates with `serverless-webpack`.
 Please consider switching to `serverless-offline` if you do not use it already._
 
-To start a local server that will act like the API Gateway use the following command.
+To start a local server that will act like API Gateway, use the following command.
 Your code will be reloaded upon change so that every request to your local server
 will serve the latest code.
 
