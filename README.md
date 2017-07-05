@@ -206,9 +206,9 @@ Options are:
 ### Simulate API Gateway locally
 
 _There are plans to remove the integrated simulation functionality in favor of
-using serverless-offline (see [#135](https://github.com/elastic-coders/serverless-webpack/issues/135))
-which already does the job perfectly and fully integrates with serverless-webpack.
-Please consider to switch to serverless-offline if you do not use it already._
+using `serverless-offline` (see [#135][link-135]) which already does the job
+perfectly and fully integrates with `serverless-webpack`.
+Please consider switching to `serverless-offline` if you do not use it already._
 
 To start a local server that will act like the API Gateway use the following command.
 Your code will be reloaded upon change so that every request to your local server
@@ -271,6 +271,8 @@ plugin with Babel. To try it, from inside the example folder:
 [link-serverless-dynamodb-local]: https://www.npmjs.com/package/serverless-dynamodb-local
 
 [comment]: # (Referenced issues)
+
+[link-135]: https://github.com/elastic-coders/serverless-webpack/issues/135
 
 [link-83]: https://github.com/elastic-coders/serverless-webpack/pull/83
 [link-88]: https://github.com/elastic-coders/serverless-webpack/pull/88
