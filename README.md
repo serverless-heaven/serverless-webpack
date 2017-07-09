@@ -143,6 +143,8 @@ Run `serverless offline` or `serverless offline start` to start the Lambda/API s
 
 In comparison to `serverless offline`, the `start` command will fire an `init` and a `end` lifecycle hook which is needed for `serverless-offline` and e.g. `serverless-dynamodb-local` to switch off resources (see below).
 
+You can find an example setup in the [`examples`][link-examples] folder.
+
 #### Custom paths
 
 If you do not use the default path and override it in your Webpack configuration,
