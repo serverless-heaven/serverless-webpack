@@ -31,7 +31,8 @@
     "body-parser": "^1.15.2",
     "express": "^4.14.0",
     "fs-extra": "^0.26.7",
-    "npm-programmatic": "0.0.5"
+    "npm-programmatic": "0.0.5",
+    "ts-node": "^3.2.0"
   },
   "devDependencies": {
     "chai": "^3.5.0",
