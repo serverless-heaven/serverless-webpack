@@ -246,6 +246,17 @@ plugin with Babel. To try it, from inside the example folder:
 - `npm install` to install dependencies
 - `serverless webpack run -f hello` to run the example function
 
+## Provider Support
+
+Plugin commands are supported by the following providers. ⁇ indicates that command has not been tested with that provider.
+
+|                | AWS Lambda | Apache OpenWhisk | Azure Functions | Google Cloud Functions |
+|----------------|------------|------------------|-----------------|------------------------|
+| webpack        |      ✔︎     |         ✔︎        |        ⁇        |            ⁇           |
+| webpack invoke |      ✔︎     |         ✘        |        ⁇        |            ⁇           |
+| webpack watch  |      ✔︎     |         ✔︎        |        ⁇        |            ⁇           |
+| webpack serve  |      ✔︎     |         ✘        |        ⁇        |            ⁇           |
+
 ## Release Notes
 
 * 2.0.0
