@@ -62,17 +62,6 @@ class ServerlessWebpack {
             lifecycleEvents: [
               'invoke',
             ],
-            options: {
-              function: {
-                usage: 'Name of the function',
-                shortcut: 'f',
-                required: true,
-              },
-              path: {
-                usage: 'Path to JSON file holding input data',
-                shortcut: 'p',
-              },
-            },
           },
           watch: {
             usage: 'Run a function from the webpack output bundle every time the source is changed',
@@ -124,6 +113,10 @@ class ServerlessWebpack {
       'after:deploy:function:packageFunction': () => BbPromise.bind(this)
         .then(this.copyFunctionArtifact),
 
+      'before:invoke:local:invoke': () => BbPromise.bind(this)
+        .then(this.validate)
+        .then(this.compile),
+
       'webpack:validate': () => BbPromise.bind(this)
         .then(this.validate),
 
@@ -132,10 +125,7 @@ class ServerlessWebpack {
         .then(this.packExternalModules),
 
       'webpack:invoke:invoke': () => BbPromise.bind(this)
-        .then(this.validate)
-        .then(this.compile)
-        .then(this.run)
-        .then(out => this.serverless.cli.consoleLog(out)),
+        .then(() => BbPromise.reject(new this.serverless.classes.Error('Use "serverless invoke local" instead.'))),
 
       'webpack:watch:watch': () => BbPromise.bind(this)
         .then(this.validate)
@@ -149,12 +139,12 @@ class ServerlessWebpack {
         .then(this.validate)
         .then(this.compile)
         .then(this.wpwatch),
-      
+
       'before:offline:start:init': () => BbPromise.bind(this)
         .then(this.validate)
         .then(this.compile)
         .then(this.wpwatch),
-      
+
     };
   }
 }
