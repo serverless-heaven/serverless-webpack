@@ -8,7 +8,7 @@ const wpwatch = require('./lib/wpwatch');
 const cleanup = require('./lib/cleanup');
 const run = require('./lib/run');
 const serve = require('./lib/serve');
-const utils = require('./lib/utils');
+const makePathOptionAbsolute = require('./lib/makePathOptionAbsolute');
 const packExternalModules = require('./lib/packExternalModules');
 
 class ServerlessWebpack {
@@ -25,7 +25,7 @@ class ServerlessWebpack {
       run,
       serve,
       packExternalModules,
-      utils
+      makePathOptionAbsolute
     );
 
     this.commands = {
@@ -93,7 +93,7 @@ class ServerlessWebpack {
       'before:invoke:local:invoke': () => BbPromise.bind(this)
         .then(this.validate)
         .then(this.compile)
-        .then(this.makeProcessedInputPathAbsolutePath),
+        .then(this.makePathOptionAbsolute),
 
       'webpack:validate': () => BbPromise.bind(this)
         .then(this.validate),
