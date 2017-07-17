@@ -77,8 +77,12 @@ class ServerlessWebpack {
                 required: true,
               },
               path: {
-                usage: 'Path to JSON file holding input data',
+                usage: 'Path to JSON or YAML file holding input data',
                 shortcut: 'p',
+              },
+              data: {
+                usage: 'input data',
+                shortcut: 'd',
               },
             },
           },
@@ -132,6 +136,7 @@ class ServerlessWebpack {
 
       'webpack:watch:watch': () => BbPromise.bind(this)
         .then(this.validate)
+        .then(this.makePathOptionAbsolute)
         .then(this.watch),
 
       'webpack:serve:serve': () => BbPromise.bind(this)
