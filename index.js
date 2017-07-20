@@ -10,8 +10,14 @@ const cleanup = require('./lib/cleanup');
 const run = require('./lib/run');
 const serve = require('./lib/serve');
 const packExternalModules = require('./lib/packExternalModules');
+const lib = require('./lib');
 
 class ServerlessWebpack {
+
+  static get lib() {
+    return lib;
+  }
+
   constructor(serverless, options) {
     this.serverless = serverless;
     this.options = options;
@@ -111,13 +117,13 @@ class ServerlessWebpack {
         .then(this.cleanup),
 
       'before:deploy:function:packageFunction': () => BbPromise.bind(this)
-         .then(this.validate)
-         .then(this.compile)
-         .then(this.packExternalModules),
+        .then(this.validate)
+        .then(this.compile)
+        .then(this.packExternalModules),
 
       'after:deploy:function:packageFunction': () => BbPromise.bind(this)
-         .then(this.copyFunctionArtifact),
- 
+        .then(this.copyFunctionArtifact),
+
       'webpack:validate': () => BbPromise.bind(this)
         .then(this.validate),
 
