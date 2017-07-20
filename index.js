@@ -15,6 +15,15 @@ class ServerlessWebpack {
     this.serverless = serverless;
     this.options = options;
 
+    if (
+      this.serverless.service
+      && this.serverless.service.custom
+      && this.serverless.service.custom.webpack
+      && this.serverless.service.custom.webpack.endsWith('.ts')
+    ) {
+      require('ts-node/register');
+    }
+
     Object.assign(
       this,
       validate,
