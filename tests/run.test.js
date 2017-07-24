@@ -146,46 +146,9 @@ describe('run', () => {
     });
   });
 
-  describe('run', () => {
-    const testEvent = {};
-    const testContext = {};
-    const testStats = {};
-    const testFunctionId = 'testFunctionId';
-    const testFunctionResult = 'testFunctionResult';
-
-    beforeEach(() => {
-      module.options['function'] = testFunctionId;
-      module.getEvent = sinon.stub().returns(testEvent);
-      module.getContext = sinon.stub().returns(testContext);
-    });
-
-    it('should execute the given function handler', () => {
-      const testHandlerFunc = sinon.spy((e, c, cb) => cb(null, testFunctionResult));
-      module.loadHandler = sinon.stub().returns(testHandlerFunc);
-      return module
-        .run(testStats)
-        .then((res) => {
-          expect(res).to.equal(testFunctionResult);
-          expect(testHandlerFunc).to.have.been.calledWith(
-            testEvent,
-            testContext
-          );
-        });
-    });
-
-    it('should fail if the function handler returns an error', () => {
-      const testError = 'testError';
-      const testHandlerFunc = sinon.spy((e, c, cb) => cb(testError));
-      module.loadHandler = sinon.stub().returns(testHandlerFunc);
-      return module
-        .run(testStats)
-        .catch((res) => {
-          expect(res).to.equal(testError);
-        });
-    });
-  });
-
   describe('watch', () => {
+    let spawnStub;
+
     const testEvent = {};
     const testContext = {};
     const testStats = {};
@@ -193,41 +156,45 @@ describe('run', () => {
     const testFunctionResult = 'testFunctionResult';
 
     beforeEach(() => {
-      module.options['function'] = testFunctionId;
-      module.getEvent = sinon.stub().returns(testEvent);
-      module.getContext = sinon.stub().returns(testContext);
+      spawnStub = sandbox.stub(serverless.pluginManager, 'spawn');
     });
 
     it('should throw if webpack watch fails', () => {
-      const testError = 'testError';
-      webpackMock.compilerMock.watch = sinon.spy((opt, cb) => cb(testError));
-      expect(module.watch.bind(module)).to.throw(testError);
+      const watch = module.watch.bind(module);
+      webpackMock.compilerMock.watch = sandbox.stub().yields(new Error('Failed'));
+
+      expect(() => watch()).to.throw('Failed');
     });
 
-    it('should throw if function handler fails', () => {
-      const testError = 'testHandlerError';
-      const testHandlerFunc = sinon.spy((e, c, cb) => cb(testError));
-      module.loadHandler = sinon.stub().returns(testHandlerFunc);
-      let testCb;
-      webpackMock.compilerMock.watch = sinon.spy((opt, cb) => {
-        testCb = cb;
-        cb(null, webpackMock.statsMock);
-      });
-      expect(module.watch.bind(module)).to.throw(testError);
+    it('should not spawn invoke local on first run', () => {
+      module.isWatching = false;
+      const watch = module.watch.bind(module);
+      webpackMock.compilerMock.watch = sandbox.stub().yields(null, {});
+
+      watch();
+      expect(spawnStub).to.not.have.been.called;
+      expect(module.isWatching).to.be.true;
     });
 
-    it('should call the handler every time a compilation occurs', () => {
-      const testHandlerFunc = sinon.spy((e, c, cb) => cb(null, testFunctionResult));
-      module.loadHandler = sinon.stub().returns(testHandlerFunc);
-      let testCb;
-      webpackMock.compilerMock.watch = sinon.spy((opt, cb) => {
-        testCb = cb;
-        cb(null, webpackMock.statsMock);
-      });
-      module.watch();
-      expect(testHandlerFunc).to.have.callCount(1);
-      testCb(null, webpackMock.statsMock);
-      expect(testHandlerFunc).to.have.callCount(2);
+    it('should spawn invoke local on subsequent runs', () => {
+      module.isWatching = true;
+      const watch = module.watch.bind(module);
+      webpackMock.compilerMock.watch = sandbox.stub().yields(null, {});
+
+      watch();
+      expect(spawnStub).to.have.been.calledOnce;
+      expect(spawnStub).to.have.been.calledWith('invoke:local');
+      expect(module.isWatching).to.be.true;
+    });
+
+    it('should reset the service path', () => {
+      module.isWatching = true;
+      module.originalServicePath = 'originalPath';
+      const watch = module.watch.bind(module);
+      webpackMock.compilerMock.watch = sandbox.stub().yields(null, {});
+
+      watch();
+      expect(serverless.config.servicePath).to.equal('originalPath');
     });
   });
 });
