@@ -8,7 +8,6 @@ const copyFunctionArtifact = require('./lib/copyFunctionArtifact');
 const wpwatch = require('./lib/wpwatch');
 const cleanup = require('./lib/cleanup');
 const run = require('./lib/run');
-const serve = require('./lib/serve');
 const makePathOptionAbsolute = require('./lib/makePathOptionAbsolute');
 const packExternalModules = require('./lib/packExternalModules');
 const lib = require('./lib');
@@ -40,7 +39,6 @@ class ServerlessWebpack {
       wpwatch,
       cleanup,
       run,
-      serve,
       packExternalModules,
       makePathOptionAbsolute
     );
@@ -76,12 +74,6 @@ class ServerlessWebpack {
             lifecycleEvents: [
               'serve',
             ],
-            options: {
-              port: {
-                usage: 'The local server port',
-                shortcut: 'p',
-              },
-            },
           },
         },
       },
@@ -131,8 +123,7 @@ class ServerlessWebpack {
         .then(() => BbPromise.reject(new this.serverless.classes.Error('Use "serverless invoke local --watch" instead.'))),
 
       'webpack:serve:serve': () => BbPromise.bind(this)
-        .then(this.validate)
-        .then(this.serve),
+        .then(() => BbPromise.reject(new this.serverless.classes.Error('serve has been removed. Use serverless-offline instead.'))),
 
       'before:offline:start': () => BbPromise.bind(this)
         .then(this.validate)
