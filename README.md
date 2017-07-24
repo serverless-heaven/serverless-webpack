@@ -291,12 +291,12 @@ plugin with Babel. To try it, from inside the example folder:
 
 Plugin commands are supported by the following providers. ⁇ indicates that command has not been tested with that provider.
 
-|                | AWS Lambda | Apache OpenWhisk | Azure Functions | Google Cloud Functions |
-|----------------|------------|------------------|-----------------|------------------------|
-| webpack        |      ✔︎     |         ✔︎        |        ⁇        |            ⁇           |
-| webpack invoke |      ✔︎     |         ✘        |        ⁇        |            ⁇           |
-| webpack watch  |      ✔︎     |         ✔︎        |        ⁇        |            ⁇           |
-| webpack serve  |      ✔︎     |         ✘        |        ⁇        |            ⁇           |
+|                       | AWS Lambda | Apache OpenWhisk | Azure Functions | Google Cloud Functions |
+|-----------------------|------------|------------------|-----------------|------------------------|
+| webpack               |      ✔︎     |         ✔︎        |        ⁇        |            ⁇           |
+| invoke local          |      ✔︎     |         ⁇        |        ⁇        |            ⁇           |
+| invoke local --watch  |      ✔︎     |         ⁇        |        ⁇        |            ⁇           |
+| webpack serve         |      ✔︎     |         ✘        |        ⁇        |            ⁇           |
 
 ## Release Notes
 
