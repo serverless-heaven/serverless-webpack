@@ -70,21 +70,6 @@ class ServerlessWebpack {
             lifecycleEvents: [
               'watch',
             ],
-            options: {
-              function: {
-                usage: 'Name of the function',
-                shortcut: 'f',
-                required: true,
-              },
-              path: {
-                usage: 'Path to JSON or YAML file holding input data',
-                shortcut: 'p',
-              },
-              data: {
-                usage: 'input data',
-                shortcut: 'd',
-              },
-            },
           },
           serve: {
             usage: 'Simulate the API Gateway and serves lambdas locally',
@@ -124,6 +109,14 @@ class ServerlessWebpack {
         .then(this.compile)
         .then(this.makePathOptionAbsolute),
 
+      'after:invoke:local:invoke': () => BbPromise.bind(this)
+        .then(() => {
+          if (this.options.watch && !this.isWatching) {
+            return this.watch();
+          }
+          return BbPromise.resolve();
+        }),
+
       'webpack:validate': () => BbPromise.bind(this)
         .then(this.validate),
 
@@ -135,9 +128,7 @@ class ServerlessWebpack {
         .then(() => BbPromise.reject(new this.serverless.classes.Error('Use "serverless invoke local" instead.'))),
 
       'webpack:watch:watch': () => BbPromise.bind(this)
-        .then(this.validate)
-        .then(this.makePathOptionAbsolute)
-        .then(this.watch),
+        .then(() => BbPromise.reject(new this.serverless.classes.Error('Use "serverless invoke local --watch" instead.'))),
 
       'webpack:serve:serve': () => BbPromise.bind(this)
         .then(this.validate)
