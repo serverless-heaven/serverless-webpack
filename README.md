@@ -96,8 +96,8 @@ custom:
   webpackIncludeModules: true # enable auto-packing of external modules
 ```
 
-All modules stated in `externals` will be excluded from bundled files. If an excluded module
-is stated as `dependencies` in `package.json`, it will be packed into the Serverless
+All modules stated in `externals` will be excluded from bundled files. Every module 
+stated as `dependencies` in `package.json` will be packed into the Serverless
 artifact under the `node_modules` directory.
 
 By default, the plugin will use the `package.json` file in working directory, If you want to
