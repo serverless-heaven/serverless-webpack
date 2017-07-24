@@ -1,22 +1,18 @@
 const sinon = require('sinon');
 
-const appMock = {
-  listen: sinon.spy(),
-  use: sinon.spy(),
-  get: sinon.spy(),
-  post: sinon.spy(),
-  options: sinon.spy(),
-};
+const AppMock = sandbox => ({
+  listen: sandbox.stub(),
+  use: sandbox.stub(),
+  get: sandbox.stub(),
+  post: sandbox.stub(),
+  options: sandbox.stub(),
+});
 
-const expressMock = sinon.stub().returns(appMock);
-expressMock.appMock = appMock;
-expressMock._resetSpies = () => {
-  expressMock.reset();
-  appMock.listen.reset();
-  appMock.use.reset();
-  appMock.get.reset();
-  appMock.post.reset();
-  appMock.options.reset();
-};
+const ExpressMock = sandbox => {
+  const appMock = AppMock(sandbox);
+  const mock = sandbox.stub().returns(appMock);
+  mock.appMock = appMock;
+  return mock;
+}
 
-module.exports = () => expressMock;
+module.exports = sandbox => ExpressMock(sandbox);
