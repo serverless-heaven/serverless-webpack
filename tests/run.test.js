@@ -1,25 +1,33 @@
 'use strict';
 
+const BbPromise = require('bluebird');
 const chai = require('chai');
 const sinon = require('sinon');
 const mockery = require('mockery');
 const Serverless = require('serverless');
 const makeWebpackMock = require('./webpack.mock');
 const makeUtilsMock = require('./utils.mock');
+
+chai.use(require('chai-as-promised'));
 chai.use(require('sinon-chai'));
 const expect = chai.expect;
 
 describe('run', () => {
+  let sandbox;
   let webpackMock;
   let utilsMock;
   let baseModule;
-  let module;
   let serverless;
+  let module;
 
   before(() => {
-    mockery.enable({ warnOnUnregistered: false });
-    webpackMock = makeWebpackMock();
+    sandbox = sinon.sandbox.create();
+    sandbox.usingPromise(BbPromise);
+
+    webpackMock = makeWebpackMock(sandbox);
     utilsMock = makeUtilsMock();
+
+    mockery.enable({ warnOnUnregistered: false });
     mockery.registerMock('webpack', webpackMock);
     mockery.registerMock('./utils', utilsMock);
     baseModule = require('../lib/run');
@@ -34,15 +42,19 @@ describe('run', () => {
   beforeEach(() => {
     serverless = new Serverless();
     serverless.cli = {
-      log: sinon.spy(),
-      consoleLog: sinon.spy(),
+      log: sandbox.stub(),
+      consoleLog: sandbox.stub()
     };
-    webpackMock._resetSpies();
-    utilsMock._resetSpies();
+
     module = Object.assign({
       serverless,
       options: {},
     }, baseModule);
+  });
+
+  afterEach(() => {
+    // This will reset the mocks too
+    sandbox.restore();
   });
 
   describe('utils', () => {
@@ -94,7 +106,7 @@ describe('run', () => {
       it('should require the handler module', () => {
         const res = module.loadHandler(testStats, testFunctionId);
         expect(res).to.equal(testHandlerFunction);
-        expect(utilsMock.purgeCache).to.have.callCount(0);
+        expect(utilsMock.purgeCache).to.have.not.been.called;
       });
 
       it('should purge the modules cache if required', () => {

@@ -2,33 +2,28 @@
 
 const sinon = require('sinon');
 
-const statsMockBase = () => ({
+const StatsMock = sandbox => ({
   compilation: {
     errors: [],
     compiler: {
       outputPath: 'statsMock-outputPath',
     },
   },
-  toString: () => 'testStats',
+  toString: sandbox.stub().returns('testStats'),
 });
 
-const statsMock = {};
+const CompilerMock = (sandbox, statsMock) => ({
+  run: sandbox.stub().yields(null, statsMock),
+  watch: sandbox.stub().yields(null, statsMock)
+});
 
-Object.assign(statsMock, statsMockBase());
+const webpackMock = sandbox => {
+  const statsMock = StatsMock(sandbox);
+  const compilerMock = CompilerMock(sandbox, statsMock);
+  const mock = sandbox.stub().returns(compilerMock);
+  mock.compilerMock = compilerMock;
+  mock.statsMock = statsMock;
+  return mock;
+}
 
-const compilerMock = {
-  run: sinon.spy((cb) => cb(null, statsMock)),
-  watch: sinon.spy((opt, cb) => cb(null, statsMock)),
-};
-
-const webpackMock = sinon.stub().returns(compilerMock);
-webpackMock.statsMock = statsMock;
-webpackMock.compilerMock = compilerMock;
-webpackMock._resetSpies = () => {
-  webpackMock.reset();
-  compilerMock.run.reset();
-  compilerMock.watch.reset();
-  Object.assign(statsMock, statsMockBase());
-};
-
-module.exports = () => webpackMock;
+module.exports = sandbox => webpackMock(sandbox);

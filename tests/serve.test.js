@@ -1,25 +1,33 @@
 'use strict';
 
+const BbPromise = require('bluebird');
 const chai = require('chai');
 const sinon = require('sinon');
 const mockery = require('mockery');
 const Serverless = require('serverless');
 const makeWebpackMock = require('./webpack.mock');
 const makeExpressMock = require('./express.mock');
+
+chai.use(require('chai-as-promised'));
 chai.use(require('sinon-chai'));
 const expect = chai.expect;
 
 describe('serve', () => {
+  let sandbox;
   let webpackMock;
   let expressMock;
   let baseModule;
-  let module;
   let serverless;
+  let module;
 
   before(() => {
+    sandbox = sinon.sandbox.create();
+    sandbox.usingPromise(BbPromise);
+
+    webpackMock = makeWebpackMock(sandbox);
+    expressMock = makeExpressMock(sandbox);
+
     mockery.enable({ warnOnUnregistered: false });
-    webpackMock = makeWebpackMock();
-    expressMock = makeExpressMock();
     mockery.registerMock('webpack', webpackMock);
     mockery.registerMock('express', expressMock);
     baseModule = require('../lib/serve');
@@ -34,22 +42,26 @@ describe('serve', () => {
   beforeEach(() => {
     serverless = new Serverless();
     serverless.cli = {
-      log: sinon.spy(),
-      consoleLog: sinon.spy(),
+      log: sandbox.stub(),
+      consoleLog: sandbox.stub()
     };
-    webpackMock._resetSpies();
-    expressMock._resetSpies();
+
     module = Object.assign({
       serverless,
       options: {},
     }, baseModule);
   });
 
+  afterEach(() => {
+    // This will reset the webpackMock too
+    sandbox.restore();
+  });
+
   describe('_handlerBase', () => {
     it('should return an express handler', () => {
       const testFuncConf = {
         id: 'testFuncId',
-        handerFunc: sinon.spy(),
+        handerFunc: sandbox.stub(),
       };
       const handler = module._handlerBase(testFuncConf);
       expect(handler).to.be.a('function');
@@ -57,9 +69,7 @@ describe('serve', () => {
 
     it('should send a 200 express response if successful', () => {
       const testHandlerResp = 'testHandlerResp';
-      const testHandlerFunc = sinon.spy((ev, ct, cb) => {
-        cb(null, testHandlerResp);
-      });
+      const testHandlerFunc = sandbox.stub().yields(null, testHandlerResp);
       const testFuncConf = {
         id: 'testFuncId',
         handlerFunc: testHandlerFunc,
@@ -75,10 +85,10 @@ describe('serve', () => {
         query: 'testquery',
       };
       const testRes = {
-        send: sinon.spy(),
+        send: sandbox.stub(),
       };
-      testRes.status = sinon.stub().returns(testRes);
-      module.getContext = sinon.stub().returns('testContext');
+      testRes.status = sandbox.stub().returns(testRes);
+      module.getContext = sandbox.stub().returns('testContext');
       const handler = module._handlerBase(testFuncConf, testHttpEvent);
       handler(testReq, testRes);
       expect(testRes.status).to.have.been.calledWith(200);
@@ -97,18 +107,16 @@ describe('serve', () => {
 
     it('should send a 500 express response if fails', () => {
       const testHandlerErr = 'testHandlerErr';
-      const testHandlerFunc = sinon.spy((ev, ct, cb) => {
-        cb(testHandlerErr);
-      });
+      const testHandlerFunc = sandbox.stub().yields(testHandlerErr);
       const testFuncConf = {
         id: 'testFuncId',
         handlerFunc: testHandlerFunc,
       };
       const testRes = {
-        send: sinon.spy(),
+        send: sandbox.stub(),
       };
-      testRes.status = sinon.stub().returns(testRes);
-      module.getContext = sinon.stub().returns('testContext');
+      testRes.status = sandbox.stub().returns(testRes);
+      module.getContext = sandbox.stub().returns('testContext');
       const handler = module._handlerBase(testFuncConf);
       handler({}, testRes);
       expect(testRes.status).to.have.been.calledWith(500);
@@ -117,9 +125,7 @@ describe('serve', () => {
 
     it('handles lambda-proxy integration for request and response', () => {
       const testHandlerResp = { statusCode: 200, body: 'testHandlerResp' };
-      const testHandlerFunc = sinon.spy((ev, ct, cb) => {
-        cb(null, testHandlerResp);
-      });
+      const testHandlerFunc = sandbox.stub().yields(null, testHandlerResp);
       const testFuncConf = {
         id: 'testFuncId',
         handlerFunc: testHandlerFunc,
@@ -133,10 +139,10 @@ describe('serve', () => {
         query: 'testquery',
       };
       const testRes = {
-        send: sinon.spy(),
+        send: sandbox.stub(),
       };
-      testRes.status = sinon.stub().returns(testRes);
-      module.getContext = sinon.stub().returns('testContext');
+      testRes.status = sandbox.stub().returns(testRes);
+      module.getContext = sandbox.stub().returns('testContext');
       const handler = module._handlerBase(testFuncConf, testHttpEvent);
       handler(testReq, testRes);
       expect(testRes.status).to.have.been.calledWith(testHandlerResp.statusCode);
@@ -157,7 +163,7 @@ describe('serve', () => {
   describe('_optionsHandler', () => {
     it('should send a 200 express response', () => {
       const testRes = {
-        sendStatus: sinon.spy(),
+        sendStatus: sandbox.stub(),
       };
       const handler = module._optionsHandler;
       handler({}, testRes);
@@ -172,9 +178,9 @@ describe('serve', () => {
     });
 
     it('should call the given handler when called adding CORS headers', () => {
-      const testHandler = sinon.spy();
+      const testHandler = sandbox.stub();
       const res = {
-        header: sinon.spy(),
+        header: sandbox.stub(),
       };
       const req = {};
       const next = () => {};
@@ -319,9 +325,9 @@ describe('serve', () => {
       const testHandlerBase = 'testHandlerBase';
       const testHandlerCors = 'testHandlerCors';
       const testHandlerOptions = 'testHandlerOptions';
-      module._handlerBase = sinon.stub().returns(testHandlerBase);
+      module._handlerBase = sandbox.stub().returns(testHandlerBase);
       module._optionsHandler = testHandlerOptions;
-      module._handlerAddCors = sinon.stub().returns(testHandlerCors);
+      module._handlerAddCors = sandbox.stub().returns(testHandlerCors);
       const app = module._newExpressApp(testFuncsConfs);
       expect(app.get).to.have.callCount(1);
       expect(app.get).to.have.been.calledWith(
@@ -361,12 +367,12 @@ describe('serve', () => {
     });
 
     it('should start an express app listener', () => {
-      expect(expressMock.appMock.listen).to.have.callCount(1);
+      expect(expressMock.appMock.listen).to.have.been.calledOnce;
     });
 
     it('should start a webpack watcher', () => {
       listenerCb.bind(module)();
-      expect(webpackMock.compilerMock.watch).to.have.callCount(1);
+      expect(webpackMock.compilerMock.watch).to.have.been.calledOnce;
     });
 
     it('should throw if compiler fails', () => {
@@ -416,33 +422,44 @@ describe('serve', () => {
           'moduleName': 'module2',
         },
       ];
-      module._getFuncConfigs = sinon.stub().returns(testFuncsConfs);
-      module.loadHandler = sinon.spy();
-      expressMock._resetSpies();
-      webpackMock._resetSpies();
-      serve = module.serve();
-      listenerCb = expressMock.appMock.listen.firstCall.args[1];
-      listenerCb.bind(module)();
-      const compileCb = webpackMock.compilerMock.watch.firstCall.args[1];
+      sandbox.stub(module, '_getFuncConfigs').returns(testFuncsConfs);
+      module.loadHandler = sandbox.stub();
+
       const testStats = {};
-      module.loadHandler.reset();
-      compileCb.bind(module)(null, testStats);
-      expect(module.loadHandler).to.have.callCount(3);
-      expect(module.loadHandler).to.have.been.calledWith(
-        testStats,
-        'func1',
-        true
-      );
-      expect(module.loadHandler).to.have.been.calledWith(
-        testStats,
-        'func2',
-        true
-      );
-      expect(module.loadHandler).to.have.been.calledWith(
-        testStats,
-        'func3',
-        false
-      );
+      let listenerCb;
+      let compileCb;
+      expressMock.appMock.listen.callsFake((port, cb) => {
+        listenerCb = cb;
+        return BbPromise.resolve();
+      });
+
+      webpackMock.compilerMock.watch.callsFake((options, cb) => {
+        compileCb = cb;
+      });
+
+      return expect(module.serve()).to.be.fulfilled
+      .then(() => {
+        listenerCb.bind(module)();
+        module.loadHandler.reset();
+        compileCb.bind(module)(null, testStats);
+        expect(module.loadHandler).to.have.been.calledThrice;
+        expect(module.loadHandler.firstCall).to.have.been.calledWith(
+          testStats,
+          'func1',
+          true
+        );
+        expect(module.loadHandler.secondCall).to.have.been.calledWith(
+          testStats,
+          'func2',
+          true
+        );
+        expect(module.loadHandler.thirdCall).to.have.been.calledWith(
+          testStats,
+          'func3',
+          false
+        );
+      });
+
     });
   });
 });
