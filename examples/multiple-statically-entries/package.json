@@ -10,6 +10,6 @@
   "license": "MIT",
   "devDependencies": {
     "serverless-webpack": "file:../../",
-    "webpack": "^1.13.1"
+    "webpack": "^3.3.0"
   }
 }
