@@ -125,7 +125,9 @@ describe('cleanup', () => {
     const testFunctionsConfig = {
       func1: {
         handler: 'module1.func1handler',
-        artifact: 'artifact-func1.zip',
+        package: {
+          artifact: 'artifact-func1.zip',
+        },
         events: [{
           http: {
             method: 'get',
@@ -135,7 +137,9 @@ describe('cleanup', () => {
       },
       func2: {
         handler: 'module2.func2handler',
-        artifact: 'artifact-func2.zip',
+        package: {
+          artifact: 'artifact-func2.zip',
+        },
         events: [{
           http: {
             method: 'POST',
@@ -147,7 +151,9 @@ describe('cleanup', () => {
       },
       func3: {
         handler: 'module2.func3handler',
-        artifact: 'artifact-func3.zip',
+        package: {
+          artifact: 'artifact-func3.zip',
+        },
         events: [{
           nonhttp: 'non-http',
         }],
@@ -162,7 +168,7 @@ describe('cleanup', () => {
       expect(fseMock.copy).to.have.been
         .calledWith('my/Output/Path/.serverless', 'my/Original/Service/Path/.serverless');
       _.forEach(['func1', 'func2', 'func3'], funcName => {
-        expect(serverless.service.functions[funcName]).to.have.a.property('artifact')
+        expect(serverless.service.functions[funcName].package).to.have.a.property('artifact')
           .that.equals(`my/Original/Service/Path/.serverless/artifact-${funcName}.zip`);
       });
     });
