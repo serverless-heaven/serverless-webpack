@@ -51,6 +51,20 @@ module.exports = {
 };
 ```
 
+You can also let the plugin determine the correct handler entry points at build time.
+Then you do not have to care anymore when you add or remove functions from your service:
+
+```js
+// webpack.config.js
+const slsw = require('serverless-webpack');
+
+module.exports = {
+  ...
+  entry: slsw.lib.entries,
+  ...
+};
+```
+
 Note that, if the `output` configuration is not set, it will automatically be
 generated to write bundles in the `.webpack` directory. If you set your own `output`
 configuration make sure to add a [`libraryTarget`][link-webpack-libtarget]
