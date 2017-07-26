@@ -246,7 +246,14 @@ describe('validate', () => {
         }],
       },
       func3: {
-        handler: 'module2.func3handler',
+        handler: 'handlers/func3/module2.func3handler',
+        artifact: 'artifact-func3.zip',
+        events: [{
+          nonhttp: 'non-http',
+        }],
+      },
+      func4: {
+        handler: 'handlers/module2/func3/module2.func3handler',
         artifact: 'artifact-func3.zip',
         events: [{
           nonhttp: 'non-http',
@@ -270,12 +277,10 @@ describe('validate', () => {
         .then(() => {
           const lib = require('../lib/index');
           const expectedLibEntries = {
-            module1: [
-              './module1.js'
-            ],
-            module2: [
-              './module2.js'
-            ]
+            'module1.js': './module1.js',
+            'module2.js': './module2.js',
+            'handlers/func3/module2.js': './handlers/func3/module2.js',
+            'handlers/module2/func3/module2.js': './handlers/module2/func3/module2.js',
           };
 
           expect(lib.entries).to.deep.eq(expectedLibEntries)
@@ -300,9 +305,7 @@ describe('validate', () => {
         .then(() => {
           const lib = require('../lib/index');
           const expectedLibEntries = {
-            module1: [
-              './module1.js'
-            ]
+            'module1.js': './module1.js'
           };
 
           expect(lib.entries).to.deep.eq(expectedLibEntries)
@@ -324,7 +327,7 @@ describe('validate', () => {
       module.options.function = testFunction;
       expect(() => {
         module.validate();
-      }).to.throw(new RegExp(`^Function "${testFunction}" not found in serverless.yml$`));
+      }).to.throw(new RegExp(`^Function "${testFunction}" doesn't exist`));
     });
   });
 });
