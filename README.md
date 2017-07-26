@@ -65,6 +65,22 @@ module.exports = {
 };
 ```
 
+Custom entries that are not part of the SLS build process can be added too:
+
+```js
+// webpack.config.js
+const _ = require('lodash');
+const slsw = require('serverless-webpack');
+
+module.exports = {
+  ...
+  entry: _.assign({
+    myCustomEntry1: './custom/path/something.js'
+  }, slsw.lib.entries),
+  ...
+};
+```
+
 Note that, if the `output` configuration is not set, it will automatically be
 generated to write bundles in the `.webpack` directory. If you set your own `output`
 configuration make sure to add a [`libraryTarget`][link-webpack-libtarget]
@@ -222,10 +238,10 @@ Options are:
 
 ### Simulate API Gateway locally
 
-_There are plans to remove the integrated simulation functionality in favor of
+_The integrated simulation functionality will be removed in version 3 in favor of
 using `serverless-offline` (see [#135][link-135]) which already does the job
 perfectly and fully integrates with `serverless-webpack`.
-Please consider switching to `serverless-offline` if you do not use it already._
+Please switch to `serverless-offline` if you do not use it already._
 
 To start a local server that will act like API Gateway, use the following command.
 Your code will be reloaded upon change so that every request to your local server
@@ -273,6 +289,13 @@ Plugin commands are supported by the following providers. ⁇ indicates that com
 
 ## Release Notes
 
+* 2.1.0
+  * Added support for webpack configuration in TypeScript format [#129][link-129]
+  * Fixed bug with serverless-offline exec [#154][link-154]
+  * Added unit tests for cleanup. Updated test framework [#11][link-11]
+  * Support single function deploy and packaging [#107][link-107]
+  * Fixed path exception bug with individual packaging and SLS 1.18 [#159][link-159]
+
 * 2.0.0
   * Support arbitrary Webpack versions as peer dependency [#83][link-83]
   * Support `serverless offline start` invocation [#131][link-131]
@@ -312,3 +335,9 @@ Plugin commands are supported by the following providers. ⁇ indicates that com
 [link-140]: https://github.com/elastic-coders/serverless-webpack/pull/140
 [link-141]: https://github.com/elastic-coders/serverless-webpack/issues/141
 [link-144]: https://github.com/elastic-coders/serverless-webpack/issues/144
+
+[link-11]: https://github.com/elastic-coders/serverless-webpack/issues/11
+[link-107]: https://github.com/elastic-coders/serverless-webpack/issues/107
+[link-129]: https://github.com/elastic-coders/serverless-webpack/pull/129
+[link-154]: https://github.com/elastic-coders/serverless-webpack/issues/154
+[link-159]: https://github.com/elastic-coders/serverless-webpack/issues/159
