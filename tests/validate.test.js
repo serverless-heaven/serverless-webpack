@@ -1,5 +1,6 @@
 'use strict';
 
+const _ = require('lodash');
 const chai = require('chai');
 const sinon = require('sinon');
 const mockery = require('mockery');
@@ -221,47 +222,8 @@ describe('validate', () => {
     });
   });
 
-  describe('expose entries', () => {
-    const testFunctionsConfig = {
-      func1: {
-        handler: 'module1.func1handler',
-        artifact: 'artifact-func1.zip',
-        events: [{
-          http: {
-            method: 'get',
-            path: 'func1path',
-          },
-        }],
-      },
-      func2: {
-        handler: 'module2.func2handler',
-        artifact: 'artifact-func2.zip',
-        events: [{
-          http: {
-            method: 'POST',
-            path: 'func2path',
-          },
-        }, {
-          nonhttp: 'non-http',
-        }],
-      },
-      func3: {
-        handler: 'handlers/func3/module2.func3handler',
-        artifact: 'artifact-func3.zip',
-        events: [{
-          nonhttp: 'non-http',
-        }],
-      },
-      func4: {
-        handler: 'handlers/module2/func3/module2.func3handler',
-        artifact: 'artifact-func3.zip',
-        events: [{
-          nonhttp: 'non-http',
-        }],
-      },
-    };
-
-    it('should expose entries from serverless.yml if `options.function` is not defined', () => {
+  describe('lib', () => {
+    it('should expose the serverless instance', () => {
       const testOutPath = 'test';
       const testConfig = {
         entry: 'test',
@@ -271,25 +233,15 @@ describe('validate', () => {
         },
       };
       module.serverless.service.custom.webpack = testConfig;
-      module.serverless.service.functions = testFunctionsConfig;
-      return module
-        .validate()
-        .then(() => {
-          const lib = require('../lib/index');
-          const expectedLibEntries = {
-            'module1.js': './module1.js',
-            'module2.js': './module2.js',
-            'handlers/func3/module2.js': './handlers/func3/module2.js',
-            'handlers/module2/func3/module2.js': './handlers/module2/func3/module2.js',
-          };
-
-          expect(lib.entries).to.deep.eq(expectedLibEntries)
-        });
+      return expect(module.validate()).to.be.fulfilled
+      .then(() => {
+        const lib = require('../lib/index');
+        expect(lib.serverless).to.equal(serverless);
+      });
     });
 
-    it('should expose entries with `options.function` value if `options.function` is defined and found in entries from serverless.yml', () => {
+    it('should expose the plugin options', () => {
       const testOutPath = 'test';
-      const testFunction = 'func1';
       const testConfig = {
         entry: 'test',
         context: 'testcontext',
@@ -297,37 +249,130 @@ describe('validate', () => {
           path: testOutPath,
         },
       };
-      module.serverless.service.custom.webpack = testConfig;
-      module.serverless.service.functions = testFunctionsConfig;
-      module.options.function = testFunction;
-      return module
-        .validate()
-        .then(() => {
-          const lib = require('../lib/index');
-          const expectedLibEntries = {
-            'module1.js': './module1.js'
-          };
-
-          expect(lib.entries).to.deep.eq(expectedLibEntries)
-        });
+      const testOptions = {
+        stage: 'testStage',
+        verbose: true
+      };
+      const configuredModule = Object.assign({
+        serverless,
+        options: _.cloneDeep(testOptions),
+      }, baseModule);
+      configuredModule.serverless.service.custom.webpack = testConfig;
+      return expect(configuredModule.validate()).to.be.fulfilled
+      .then(() => {
+        const lib = require('../lib/index');
+        expect(lib.options).to.deep.equal(testOptions);
+      });
     });
 
-    it('should throw an exception if `options.function` is defined but not found in entries from serverless.yml', () => {
-      const testOutPath = 'test';
-      const testFunction = 'test';
-      const testConfig = {
-        entry: 'test',
-        context: 'testcontext',
-        output: {
-          path: testOutPath,
+    describe('entries', () => {
+      const testFunctionsConfig = {
+        func1: {
+          handler: 'module1.func1handler',
+          artifact: 'artifact-func1.zip',
+          events: [{
+            http: {
+              method: 'get',
+              path: 'func1path',
+            },
+          }],
+        },
+        func2: {
+          handler: 'module2.func2handler',
+          artifact: 'artifact-func2.zip',
+          events: [{
+            http: {
+              method: 'POST',
+              path: 'func2path',
+            },
+          }, {
+            nonhttp: 'non-http',
+          }],
+        },
+        func3: {
+          handler: 'handlers/func3/module2.func3handler',
+          artifact: 'artifact-func3.zip',
+          events: [{
+            nonhttp: 'non-http',
+          }],
+        },
+        func4: {
+          handler: 'handlers/module2/func3/module2.func3handler',
+          artifact: 'artifact-func3.zip',
+          events: [{
+            nonhttp: 'non-http',
+          }],
         },
       };
-      module.serverless.service.custom.webpack = testConfig;
-      module.serverless.service.functions = testFunctionsConfig;
-      module.options.function = testFunction;
-      expect(() => {
-        module.validate();
-      }).to.throw(new RegExp(`^Function "${testFunction}" doesn't exist`));
+
+      it('should expose entries from serverless.yml if `options.function` is not defined', () => {
+        const testOutPath = 'test';
+        const testConfig = {
+          entry: 'test',
+          context: 'testcontext',
+          output: {
+            path: testOutPath,
+          },
+        };
+        module.serverless.service.custom.webpack = testConfig;
+        module.serverless.service.functions = testFunctionsConfig;
+        return module
+          .validate()
+          .then(() => {
+            const lib = require('../lib/index');
+            const expectedLibEntries = {
+              'module1.js': './module1.js',
+              'module2.js': './module2.js',
+              'handlers/func3/module2.js': './handlers/func3/module2.js',
+              'handlers/module2/func3/module2.js': './handlers/module2/func3/module2.js',
+            };
+
+            expect(lib.entries).to.deep.eq(expectedLibEntries)
+          });
+      });
+
+      it('should expose entries with `options.function` value if `options.function` is defined and found in entries from serverless.yml', () => {
+        const testOutPath = 'test';
+        const testFunction = 'func1';
+        const testConfig = {
+          entry: 'test',
+          context: 'testcontext',
+          output: {
+            path: testOutPath,
+          },
+        };
+        module.serverless.service.custom.webpack = testConfig;
+        module.serverless.service.functions = testFunctionsConfig;
+        module.options.function = testFunction;
+        return module
+          .validate()
+          .then(() => {
+            const lib = require('../lib/index');
+            const expectedLibEntries = {
+              'module1.js': './module1.js'
+            };
+
+            expect(lib.entries).to.deep.eq(expectedLibEntries)
+          });
+      });
+
+      it('should throw an exception if `options.function` is defined but not found in entries from serverless.yml', () => {
+        const testOutPath = 'test';
+        const testFunction = 'test';
+        const testConfig = {
+          entry: 'test',
+          context: 'testcontext',
+          output: {
+            path: testOutPath,
+          },
+        };
+        module.serverless.service.custom.webpack = testConfig;
+        module.serverless.service.functions = testFunctionsConfig;
+        module.options.function = testFunction;
+        expect(() => {
+          module.validate();
+        }).to.throw(new RegExp(`^Function "${testFunction}" doesn't exist`));
+      });
     });
   });
 });

@@ -51,7 +51,14 @@ module.exports = {
 };
 ```
 
-You can also let the plugin determine the correct handler entry points at build time.
+### serverless-webpack lib export helper
+
+serverless-webpack exposes a lib object, that can be used in your webpack.config.js
+to make the configuration easier and to build fully dynamic configurations.
+
+#### Automatic entry resolution
+
+You can let the plugin determine the correct handler entry points at build time.
 Then you do not have to care anymore when you add or remove functions from your service:
 
 ```js
@@ -81,6 +88,25 @@ module.exports = {
 };
 ```
 
+#### Full customization (for experts)
+
+The lib export also provides the `serverless` and `options` properties, through
+which you can access the Serverless instance and the options given on the command-line.
+
+This enables you to have a fully customized dynamic configuration, that can evaluate
+anything available in the Serverless framework. There are really no limits.
+
+Samples are: The current stage and the complete service definition. You thereby
+have access to anything that a Serverless plugin would have access to.
+
+Both properties should be handled with care and should never be written to,
+as that will modify the running framework and leads to unpredictable behavior!
+
+If you have cool use cases with the full customization, we might add your solution
+to the plugin examples as showcase.
+
+### Output
+
 Note that, if the `output` configuration is not set, it will automatically be
 generated to write bundles in the `.webpack` directory. If you set your own `output`
 configuration make sure to add a [`libraryTarget`][link-webpack-libtarget]
@@ -99,6 +125,8 @@ module.exports = {
   // ...
 };
 ```
+
+### Node modules / externals
 
 By default, the plugin will try to bundle all dependencies. However, you don't
 want to include all modules in some cases such as selectively import, excluding
