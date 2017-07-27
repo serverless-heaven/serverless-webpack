@@ -125,6 +125,65 @@ describe('cleanup', () => {
     const testFunctionsConfig = {
       func1: {
         handler: 'module1.func1handler',
+        package: {
+          artifact: 'artifact-func1.zip',
+        },
+        events: [{
+          http: {
+            method: 'get',
+            path: 'func1path',
+          },
+        }],
+      },
+      func2: {
+        handler: 'module2.func2handler',
+        package: {
+          artifact: 'artifact-func2.zip',
+        },
+        events: [{
+          http: {
+            method: 'POST',
+            path: 'func2path',
+          },
+        }, {
+          nonhttp: 'non-http',
+        }],
+      },
+      func3: {
+        handler: 'module2.func3handler',
+        package: {
+          artifact: 'artifact-func3.zip',
+        },
+        events: [{
+          nonhttp: 'non-http',
+        }],
+      },
+    };
+    serverless.service.functions = testFunctionsConfig;
+
+    return expect(module.cleanup()).to.be.fulfilled
+    .then(() => {
+      expect(serverless.config.servicePath).to.equal('my/Original/Service/Path');
+      expect(fseMock.copy).to.have.been.calledOnce;
+      expect(fseMock.copy).to.have.been
+        .calledWith('my/Output/Path/.serverless', 'my/Original/Service/Path/.serverless');
+      _.forEach(['func1', 'func2', 'func3'], funcName => {
+        expect(serverless.service.functions[funcName].package).to.have.a.property('artifact')
+          .that.equals(`my/Original/Service/Path/.serverless/artifact-${funcName}.zip`);
+      });
+    });
+  });
+
+  it('should call copy with the right parameters with individual packaging for old Serverless versions (<=1.17)', () => {
+    dirExistsSyncStub.returns(true);
+    module.originalServicePath = 'my/Original/Service/Path';
+    fseMock.copy.reset();
+    fseMock.copy.yields(null, {});
+    serverless.service.package.individually = true;
+
+    const testFunctionsConfig = {
+      func1: {
+        handler: 'module1.func1handler',
         artifact: 'artifact-func1.zip',
         events: [{
           http: {
