@@ -277,10 +277,10 @@ describe('validate', () => {
         .then(() => {
           const lib = require('../lib/index');
           const expectedLibEntries = {
-            'module1.js': './module1.js',
-            'module2.js': './module2.js',
-            'handlers/func3/module2.js': './handlers/func3/module2.js',
-            'handlers/module2/func3/module2.js': './handlers/module2/func3/module2.js',
+            'module1.js': './module1',
+            'module2.js': './module2',
+            'handlers/func3/module2.js': './handlers/func3/module2',
+            'handlers/module2/func3/module2.js': './handlers/module2/func3/module2',
           };
 
           expect(lib.entries).to.deep.eq(expectedLibEntries)
@@ -305,7 +305,7 @@ describe('validate', () => {
         .then(() => {
           const lib = require('../lib/index');
           const expectedLibEntries = {
-            'module1.js': './module1.js'
+            'module1.js': './module1'
           };
 
           expect(lib.entries).to.deep.eq(expectedLibEntries)
