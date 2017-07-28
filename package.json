@@ -27,16 +27,23 @@
     "test": "istanbul cover ./node_modules/mocha/bin/_mocha tests/all -- -R spec --recursive"
   },
   "dependencies": {
+    "archiver": "^2.0.0",
     "bluebird": "^3.4.0",
     "fs-extra": "^0.26.7",
     "glob": "^7.1.2",
     "lodash": "^4.17.4",
     "npm-programmatic": "0.0.5",
+    "semver": "^5.4.1",
     "ts-node": "^3.2.0"
   },
   "devDependencies": {
+    "babel-eslint": "^7.2.3",
     "chai": "^4.1.0",
     "chai-as-promised": "^7.1.1",
+    "eslint": "^4.3.0",
+    "eslint-plugin-import": "^2.7.0",
+    "eslint-plugin-lodash": "^2.4.4",
+    "eslint-plugin-promise": "^3.5.0",
     "istanbul": "^0.4.5",
     "mocha": "^3.4.2",
     "mockery": "^2.1.0",
