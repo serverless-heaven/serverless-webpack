@@ -381,7 +381,7 @@ describe('validate', () => {
         });
       });
 
-      it('should show a warning, if more than one matching handler is found', () => {
+      it('should show a warning if more than one matching handler is found', () => {
         const testOutPath = 'test';
         const testFunction = 'func1';
         const testConfig = {
@@ -395,6 +395,36 @@ describe('validate', () => {
         module.serverless.service.functions = testFunctionsConfig;
         module.options.function = testFunction;
         globSyncStub.returns([ 'module1.ts', 'module1.js' ]);
+        return expect(module.validate()).to.be.fulfilled
+        .then(() => {
+          const lib = require('../lib/index');
+          const expectedLibEntries = {
+            'module1': './module1.ts'
+          };
+
+          expect(lib.entries).to.deep.equal(expectedLibEntries)
+          expect(globSyncStub).to.have.been.calledOnce;
+          expect(serverless.cli.log).to.have.been.calledOnce;
+          expect(serverless.cli.log).to.have.been.calledWith(
+            'WARNING: More than one matching handlers found for \'module1\'. Using \'module1.ts\'.'
+          );
+        });
+      });
+
+      it('should select the most probable handler if multiple hits are found', () => {
+        const testOutPath = 'test';
+        const testFunction = 'func1';
+        const testConfig = {
+          entry: 'test',
+          context: 'testcontext',
+          output: {
+            path: testOutPath,
+          },
+        };
+        module.serverless.service.custom.webpack = testConfig;
+        module.serverless.service.functions = testFunctionsConfig;
+        module.options.function = testFunction;
+        globSyncStub.returns([ 'module1.doc', 'module1.json', 'module1.test.js', 'module1.ts', 'module1.js' ]);
         return expect(module.validate()).to.be.fulfilled
         .then(() => {
           const lib = require('../lib/index');
