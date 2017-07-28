@@ -317,6 +317,10 @@ Plugin commands are supported by the following providers. ⁇ indicates that com
 
 ## Release Notes
 
+* 2.2.0
+  * Allow full dynamic configurations [#158][link-158]
+  * Fix a bug that prevented the entries lib export to work with TypeScript [#165][link-165]
+
 * 2.1.0
   * Added support for webpack configuration in TypeScript format [#129][link-129]
   * Fixed bug with serverless-offline exec [#154][link-154]
@@ -369,3 +373,6 @@ Plugin commands are supported by the following providers. ⁇ indicates that com
 [link-129]: https://github.com/elastic-coders/serverless-webpack/pull/129
 [link-154]: https://github.com/elastic-coders/serverless-webpack/issues/154
 [link-159]: https://github.com/elastic-coders/serverless-webpack/issues/159
+
+[link-158]: https://github.com/elastic-coders/serverless-webpack/issues/158
+[link-165]: https://github.com/elastic-coders/serverless-webpack/issues/165
