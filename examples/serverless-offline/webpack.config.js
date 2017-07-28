@@ -16,6 +16,6 @@ module.exports = {
   output: {
     libraryTarget: 'commonjs',
     path: path.join(__dirname, '.webpack'),
-    filename: 'handler.js'
+    filename: 'src/handler.js'
   },
 };
