@@ -355,6 +355,51 @@ describe('serve', () => {
         testHandlerOptions
       );
     });
+
+    it('should simulate Lambda Proxy Integration', () => {
+      const testFuncsConfs = [
+        {
+          'events': [
+            {
+              'method': 'any',
+              'path': '/{proxy+}',
+              'cors': true,
+            }
+          ],
+          'handler': 'module1.func1handler',
+          'handlerFunc': null,
+          'id': 'func1',
+          'moduleName': 'module1',
+        },
+      ];
+      const testStage = 'test';
+      module.options.stage = testStage;
+      const testHandlerBase = 'testHandlerBase';
+      const testHandlerCors = 'testHandlerCors';
+      const testHandlerOptions = 'testHandlerOptions';
+      module._handlerBase = sinon.stub().returns(testHandlerBase);
+      module._optionsHandler = testHandlerOptions;
+      module._handlerAddCors = sinon.stub().returns(testHandlerCors);
+      const app = module._newExpressApp(testFuncsConfs);
+      expect(app.get).to.have.callCount(1);
+      expect(app.get).to.have.been.calledWith(
+        '/test/*',
+        testHandlerCors
+      );
+      expect(app.post).to.have.callCount(1);
+      expect(app.post).to.have.been.calledWith(
+        '/test/*',
+        testHandlerCors
+      );
+      expect(app.options).to.have.callCount(1);
+      expect(app.options).to.have.been.calledWith(
+        '/test/*',
+        testHandlerCors
+      );
+      expect(module.serverless.cli.consoleLog).to.have.been.calledWith(
+        '  ANY - http://localhost:8000/test/{proxy+}'
+      );
+    });
   });
 
   describe('serve method', () => {
