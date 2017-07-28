@@ -9,6 +9,7 @@ const wpwatch = require('./lib/wpwatch');
 const cleanup = require('./lib/cleanup');
 const run = require('./lib/run');
 const serve = require('./lib/serve');
+const makePathOptionAbsolute = require('./lib/makePathOptionAbsolute');
 const packExternalModules = require('./lib/packExternalModules');
 const lib = require('./lib');
 
@@ -40,7 +41,8 @@ class ServerlessWebpack {
       cleanup,
       run,
       serve,
-      packExternalModules
+      packExternalModules,
+      makePathOptionAbsolute
     );
 
     this.commands = {
@@ -62,34 +64,12 @@ class ServerlessWebpack {
             lifecycleEvents: [
               'invoke',
             ],
-            options: {
-              function: {
-                usage: 'Name of the function',
-                shortcut: 'f',
-                required: true,
-              },
-              path: {
-                usage: 'Path to JSON file holding input data',
-                shortcut: 'p',
-              },
-            },
           },
           watch: {
             usage: 'Run a function from the webpack output bundle every time the source is changed',
             lifecycleEvents: [
               'watch',
             ],
-            options: {
-              function: {
-                usage: 'Name of the function',
-                shortcut: 'f',
-                required: true,
-              },
-              path: {
-                usage: 'Path to JSON file holding input data',
-                shortcut: 'p',
-              },
-            },
           },
           serve: {
             usage: 'Simulate the API Gateway and serves lambdas locally',
@@ -124,6 +104,19 @@ class ServerlessWebpack {
       'after:deploy:function:packageFunction': () => BbPromise.bind(this)
         .then(this.copyFunctionArtifact),
 
+      'before:invoke:local:invoke': () => BbPromise.bind(this)
+        .then(this.validate)
+        .then(this.compile)
+        .then(this.makePathOptionAbsolute),
+
+      'after:invoke:local:invoke': () => BbPromise.bind(this)
+        .then(() => {
+          if (this.options.watch && !this.isWatching) {
+            return this.watch();
+          }
+          return BbPromise.resolve();
+        }),
+
       'webpack:validate': () => BbPromise.bind(this)
         .then(this.validate),
 
@@ -132,14 +125,10 @@ class ServerlessWebpack {
         .then(this.packExternalModules),
 
       'webpack:invoke:invoke': () => BbPromise.bind(this)
-        .then(this.validate)
-        .then(this.compile)
-        .then(this.run)
-        .then(out => this.serverless.cli.consoleLog(out)),
+        .then(() => BbPromise.reject(new this.serverless.classes.Error('Use "serverless invoke local" instead.'))),
 
       'webpack:watch:watch': () => BbPromise.bind(this)
-        .then(this.validate)
-        .then(this.watch),
+        .then(() => BbPromise.reject(new this.serverless.classes.Error('Use "serverless invoke local --watch" instead.'))),
 
       'webpack:serve:serve': () => BbPromise.bind(this)
         .then(this.validate)
@@ -149,12 +138,12 @@ class ServerlessWebpack {
         .then(this.validate)
         .then(this.compile)
         .then(this.wpwatch),
-      
+
       'before:offline:start:init': () => BbPromise.bind(this)
         .then(this.validate)
         .then(this.compile)
         .then(this.wpwatch),
-      
+
     };
   }
 }
