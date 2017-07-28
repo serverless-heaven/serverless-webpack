@@ -355,6 +355,70 @@ describe('serve', () => {
         testHandlerOptions
       );
     });
+
+    it('should create express handlers for Catch-all path variables (i.e "{foo+}")', () => {
+      const testFuncsConfs = [
+        {
+          'events': [
+            {
+              'method': 'get',
+              'path': 'func1path/{foo+}',
+              'cors': true,
+            }
+          ],
+          'handler': 'module1.func1handler',
+          'handlerFunc': null,
+          'id': 'func1',
+          'moduleName': 'module1',
+        },
+        {
+          'events': [
+            {
+              'method': 'POST',
+              'path': 'func2path/{testParam+}',
+            }
+          ],
+          'handler': 'module2.func2handler',
+          'handlerFunc': null,
+          'id': 'func2',
+          'moduleName': 'module2',
+        },
+      ];
+      const testStage = 'test';
+      module.options.stage = testStage;
+      const testHandlerBase = 'testHandlerBase';
+      const testHandlerCors = 'testHandlerCors';
+      const testHandlerOptions = 'testHandlerOptions';
+      module._handlerBase = sinon.stub().returns(testHandlerBase);
+      module._optionsHandler = testHandlerOptions;
+      module._handlerAddCors = sinon.stub().returns(testHandlerCors);
+      const app = module._newExpressApp(testFuncsConfs);
+      expect(app.get).to.have.callCount(1);
+      expect(app.get).to.have.been.calledWith(
+        '/test/func1path/:foo(*)',
+        testHandlerCors
+      );
+      expect(module.serverless.cli.consoleLog).to.have.been.calledWith(
+        '  GET - http://localhost:8000/test/func1path/{foo+}'
+      );
+      expect(app.post).to.have.callCount(1);
+      expect(app.post).to.have.been.calledWith(
+        '/test/func2path/:testParam(*)',
+        testHandlerBase
+      );
+      expect(module.serverless.cli.consoleLog).to.have.been.calledWith(
+        '  POST - http://localhost:8000/test/func2path/{testParam+}'
+      );
+      expect(app.options).to.have.callCount(2);
+      expect(app.options.firstCall).to.have.been.calledWith(
+        '/test/func1path/:foo(*)',
+        testHandlerCors
+      );
+      expect(app.options.secondCall).to.have.been.calledWith(
+        '/test/func2path/:testParam(*)',
+        testHandlerOptions
+      );
+    });
   });
 
   describe('serve method', () => {
