@@ -14,7 +14,7 @@ custom:
 
 functions:
   first:
-    handler: handler.hello
+    handler: src/handler.hello
     events:
       - http:
           method: GET
