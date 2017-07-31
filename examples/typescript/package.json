@@ -9,9 +9,9 @@
   "author": "Nicola Peduzzi <thenikso@gmail.com> (http://nikso.net)",
   "license": "MIT",
   "devDependencies": {
-    "serverless-webpack": "^1.0.0-rc.3",
-    "ts-loader": "^0.8.2",
-    "typescript": "^1.8.10",
-    "webpack": "^1.13.1"
+    "serverless-webpack": "file:../../",
+    "ts-loader": "^2.3.1",
+    "typescript": "^2.4.2",
+    "webpack": "^3.3.0"
   }
 }

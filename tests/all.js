@@ -5,4 +5,5 @@ describe('serverless-webpack', () => {
   require('./compile.test');
   require('./run.test');
   require('./serve.test');
+  require('./cleanup.test');
 });

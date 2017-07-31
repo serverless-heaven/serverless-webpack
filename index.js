@@ -4,21 +4,38 @@ const BbPromise = require('bluebird');
 
 const validate = require('./lib/validate');
 const compile = require('./lib/compile');
+const copyFunctionArtifact = require('./lib/copyFunctionArtifact');
 const wpwatch = require('./lib/wpwatch');
 const cleanup = require('./lib/cleanup');
 const run = require('./lib/run');
 const serve = require('./lib/serve');
 const packExternalModules = require('./lib/packExternalModules');
+const lib = require('./lib');
 
 class ServerlessWebpack {
+
+  static get lib() {
+    return lib;
+  }
+
   constructor(serverless, options) {
     this.serverless = serverless;
     this.options = options;
+
+    if (
+      this.serverless.service
+      && this.serverless.service.custom
+      && this.serverless.service.custom.webpack
+      && this.serverless.service.custom.webpack.endsWith('.ts')
+    ) {
+      require('ts-node/register');
+    }
 
     Object.assign(
       this,
       validate,
       compile,
+      copyFunctionArtifact,
       wpwatch,
       cleanup,
       run,
@@ -99,6 +116,14 @@ class ServerlessWebpack {
       'after:deploy:createDeploymentArtifacts': () => BbPromise.bind(this)
         .then(this.cleanup),
 
+      'before:deploy:function:packageFunction': () => BbPromise.bind(this)
+        .then(this.validate)
+        .then(this.compile)
+        .then(this.packExternalModules),
+
+      'after:deploy:function:packageFunction': () => BbPromise.bind(this)
+        .then(this.copyFunctionArtifact),
+
       'webpack:validate': () => BbPromise.bind(this)
         .then(this.validate),
 
@@ -122,7 +147,14 @@ class ServerlessWebpack {
 
       'before:offline:start': () => BbPromise.bind(this)
         .then(this.validate)
+        .then(this.compile)
         .then(this.wpwatch),
+      
+      'before:offline:start:init': () => BbPromise.bind(this)
+        .then(this.validate)
+        .then(this.compile)
+        .then(this.wpwatch),
+      
     };
   }
 }

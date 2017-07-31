@@ -1,6 +1,6 @@
 {
   "name": "serverless-webpack",
-  "version": "1.0.0-rc.4",
+  "version": "2.2.0",
   "description": "Serverless plugin to bundle your javascript with Webpack",
   "main": "index.js",
   "author": "Nicola Peduzzi <nicola.peduzzi@elastic-coders.com> (http://elastic-coders.com)",
@@ -24,24 +24,27 @@
   },
   "homepage": "https://github.com/elastic-coders/serverless-webpack#readme",
   "scripts": {
-    "test": "istanbul cover _mocha tests/all -- -R spec --recursive"
+    "test": "istanbul cover ./node_modules/mocha/bin/_mocha tests/all -- -R spec --recursive"
   },
   "dependencies": {
     "bluebird": "^3.4.0",
     "body-parser": "^1.15.2",
     "express": "^4.14.0",
     "fs-extra": "^0.26.7",
+    "glob": "^7.1.2",
+    "lodash": "^4.17.4",
     "npm-programmatic": "^0.0.7",
-    "webpack": "^1.13.1"
+    "ts-node": "^3.2.0"
   },
   "devDependencies": {
-    "chai": "^3.5.0",
-    "istanbul": "^0.4.4",
-    "mocha": "^3.0.2",
-    "mockery": "^1.7.0",
-    "serverless": "^1.0.0-beta.2",
-    "sinon": "^1.17.5",
-    "sinon-chai": "^2.8.0"
+    "chai": "^4.1.0",
+    "chai-as-promised": "^7.1.1",
+    "istanbul": "^0.4.5",
+    "mocha": "^3.4.2",
+    "mockery": "^2.1.0",
+    "serverless": "^1.17.0",
+    "sinon": "^2.3.8",
+    "sinon-chai": "^2.12.0"
   },
   "peerDependencies": {
     "webpack": "*"
