@@ -1,7 +1,5 @@
 'use strict';
 
-const sinon = require('sinon');
-
 const StatsMock = sandbox => ({
   compilation: {
     errors: [],
@@ -24,6 +22,6 @@ const webpackMock = sandbox => {
   mock.compilerMock = compilerMock;
   mock.statsMock = statsMock;
   return mock;
-}
+};
 
 module.exports = sandbox => webpackMock(sandbox);

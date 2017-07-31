@@ -1,6 +1,7 @@
 'use strict';
 
 const BbPromise = require('bluebird');
+const _ = require('lodash');
 const chai = require('chai');
 const sinon = require('sinon');
 const mockery = require('mockery');
@@ -9,6 +10,7 @@ const makeWebpackMock = require('./webpack.mock');
 
 chai.use(require('chai-as-promised'));
 chai.use(require('sinon-chai'));
+
 const expect = chai.expect;
 
 describe('compile', () => {
@@ -42,7 +44,7 @@ describe('compile', () => {
       consoleLog: sandbox.stub()
     };
 
-    module = Object.assign({
+    module = _.assign({
       serverless,
       options: {},
     }, baseModule);
@@ -64,6 +66,7 @@ describe('compile', () => {
     .then(() => {
       expect(webpackMock).to.have.been.calledWith(testWebpackConfig);
       expect(webpackMock.compilerMock.run).to.have.been.calledOnce;
+      return null;
     });
   });
 
@@ -74,18 +77,26 @@ describe('compile', () => {
     return expect(module.compile()).to.be.rejectedWith(/compilation error/);
   });
 
-  it('should set context `webpackOutputPath`, `originalServicePath`, `serverless.config.servicePath`', () => {
+  it('should work with multi compile', () => {
     const testWebpackConfig = 'testconfig';
+    const multiStats = [{
+      compilation: {
+        errors: [],
+        compiler: {
+          outputPath: 'statsMock-outputPath',
+        },
+      },
+      toString: sandbox.stub().returns('testStats'),
+    }];
     module.webpackConfig = testWebpackConfig;
-    const testServicePath = 'testServicePath';
-    module.serverless.config.servicePath = testServicePath;
-    const testOutputPath = 'testOutputPath';
-    webpackMock.statsMock.compilation.compiler.outputPath = testOutputPath;
+    module.multiCompile = true;
+    webpackMock.compilerMock.run.reset();
+    webpackMock.compilerMock.run.yields(null, multiStats);
     return expect(module.compile()).to.be.fulfilled
     .then(() => {
-      expect(module.webpackOutputPath).to.equal(testOutputPath);
-      expect(module.originalServicePath).to.equal(testServicePath);
-      expect(module.serverless.config.servicePath).to.equal(testOutputPath);
+      expect(webpackMock).to.have.been.calledWith(testWebpackConfig);
+      expect(webpackMock.compilerMock.run).to.have.been.calledOnce;
+      return null;
     });
   });
 });
