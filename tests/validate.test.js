@@ -142,7 +142,7 @@ describe('validate', () => {
           expect(module.webpackConfig.output).to.eql({
             libraryTarget: 'commonjs',
             path: `${testServicePath}/.webpack`,
-            filename: testEntry,
+            filename: '[name].js',
           });
         });
     });
@@ -161,7 +161,7 @@ describe('validate', () => {
           expect(module.webpackConfig.output).to.eql({
             libraryTarget: 'commonjs',
             path: `${testServicePath}/.webpack`,
-            filename: 'last',
+            filename: '[name].js',
           });
         });
     });
@@ -177,7 +177,7 @@ describe('validate', () => {
           expect(module.webpackConfig.output).to.eql({
             libraryTarget: 'commonjs',
             path: `${testServicePath}/.webpack`,
-            filename: 'handler.js',
+            filename: '[name].js',
           });
         });
     });
