@@ -9,8 +9,8 @@
 A Serverless v1.x plugin to build your lambda functions with [Webpack][link-webpack].
 
 This plugin is for you if you want to use the latest Javascript version with [Babel][link-babel];
-use custom [resource loaders][link-webpack-loaders];
-try your lambda functions locally and much more!
+use custom [resource loaders][link-webpack-loaders], optimize your packaged functions individually
+and much more!
 
 > **BREAKING CHANGE IN v2**: `webpack` must now be installed alongside `serverless-webpack` as a peer dependency. This allows more control over which version of Webpack to run.
 
@@ -55,6 +55,8 @@ module.exports = {
 
 serverless-webpack exposes a lib object, that can be used in your webpack.config.js
 to make the configuration easier and to build fully dynamic configurations.
+This is the preferred way to configure webpack - the plugin will take care of
+as much of the configuration (and subsequent changes in your services) as it can.
 
 #### Automatic entry resolution
 
@@ -154,6 +156,7 @@ custom:
   webpackIncludeModules: true # enable auto-packing of external modules
 ```
 
+
 All modules stated in `externals` will be excluded from bundled files. If an excluded module
 is stated as `dependencies` in `package.json`, it will be packed into the Serverless
 artifact under the `node_modules` directory.
@@ -170,6 +173,43 @@ custom:
 > Note that only relative path is supported at the moment.
 
 You can find an example setups in the [`examples`][link-examples] folder.
+
+#### Service level packaging
+
+If you do not enable individual packaging in your service (serverless.yml), the
+plugin creates one ZIP file for all functions (the service package) that includes
+all node modules used in the service. This is the fastest packaging, but not the
+optimal one, as node modules are always packaged, that are not needed by some
+functions.
+
+#### Optimization / Individual packaging per function
+
+A better way to do the packaging, is to enable individual packaging in your
+service:
+
+```yaml
+# serverless.yml
+...
+package:
+  individually: true
+...
+```
+
+This will switch the plugin to per function packaging which makes use of the multi-compiler
+feature of Webpack. That means, that Webpack compiles **and optimizes** each
+function individually, removing unnecessary imports and reducing code sizes
+significantly. Tree-Shaking only makes sense with this approach.
+
+Now the needed external node modules are also detected by Webpack per function
+and the plugin only packages the needed ones into the function artifacts. As a
+result, the deployed artifacts are smaller, depending on the functions and
+cold-start times (to install the functions into the cloud at runtime) are reduced
+too.
+
+The individual packaging should be combined with the _automatic entry resolution_ (see above).
+
+The individual packaging needs more time at the packaging phase, but you'll
+get that paid back twice at runtime.
 
 ## Usage
 
