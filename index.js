@@ -109,11 +109,13 @@ class ServerlessWebpack {
 
     this.hooks = {
       'before:deploy:createDeploymentArtifacts': () => BbPromise.bind(this)
+        .then(() => setEnv('SERVERLESS_WEBPACK_DEPLOY', 'true'))
         .then(this.validate)
         .then(this.compile)
         .then(this.packExternalModules),
 
       'after:deploy:createDeploymentArtifacts': () => BbPromise.bind(this)
+        .then(() => unsetEnv('SERVERLESS_WEBPACK_DEPLOY'))
         .then(this.cleanup),
 
       'before:deploy:function:packageFunction': () => BbPromise.bind(this)
