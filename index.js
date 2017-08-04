@@ -5,7 +5,6 @@ const _ = require('lodash');
 
 const validate = require('./lib/validate');
 const compile = require('./lib/compile');
-const copyFunctionArtifact = require('./lib/copyFunctionArtifact');
 const wpwatch = require('./lib/wpwatch');
 const cleanup = require('./lib/cleanup');
 const run = require('./lib/run');
@@ -35,7 +34,6 @@ class ServerlessWebpack {
       this,
       validate,
       compile,
-      copyFunctionArtifact,
       wpwatch,
       cleanup,
       run,
@@ -95,9 +93,6 @@ class ServerlessWebpack {
         .then(this.compile)
         .then(this.packExternalModules)
         .then(this.packageModules),
-
-      'after:deploy:function:packageFunction': () => BbPromise.bind(this)
-        .then(this.copyFunctionArtifact),
 
       'before:invoke:local:invoke': () => BbPromise.bind(this)
         .then(this.validate)
