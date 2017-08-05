@@ -12,7 +12,26 @@ This plugin is for you if you want to use the latest Javascript version with [Ba
 use custom [resource loaders][link-webpack-loaders], optimize your packaged functions individually
 and much more!
 
-> **BREAKING CHANGE IN v2**: `webpack` must now be installed alongside `serverless-webpack` as a peer dependency. This allows more control over which version of Webpack to run.
+## Highlights
+
+* Configuration possibilities range from zero-config to fully customizable
+* Support of `serverless package`, `serverless deploy` and `serverless deploy function`
+* Support of `serverless invoke local` and `serverless invoke local --watch`
+* Integrates with [`serverless-offline`][link-serverless-offline] to simulate local API Gateway endpoints
+* When enabled in your service configuration, functions are packaged and compiled
+individually, resulting in smaller Lambda packages that contain only the code and
+dependencies needed to run the function. This allows the plugin to fully utilize
+WebPack's [Tree-Shaking][link-webpack-tree] optimization.
+
+## New in V3
+
+* Support for individual packaging and optimization
+* Integrate with `serverless invoke local` (including watch mode)
+* Stabilized package handling
+* Improved compatibility with other plugins
+* Updated examples
+
+For the complete release notes see the end of this document.
 
 ## Install
 
@@ -373,6 +392,7 @@ Plugin commands are supported by the following providers. ⁇ indicates that com
 [link-babel]: https://babeljs.io/
 [link-webpack-loaders]: https://webpack.github.io/docs/loaders.html
 [link-webpack-libtarget]: https://webpack.github.io/docs/configuration.html#output-librarytarget
+[link-webpack-tree]: https://webpack.js.org/guides/tree-shaking/
 [link-webpack-externals]: https://webpack.github.io/docs/configuration.html#externals
 [link-examples]: ./examples
 [link-serverless-offline]: https://www.npmjs.com/package/serverless-offline
