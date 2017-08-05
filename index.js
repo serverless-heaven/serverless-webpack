@@ -1,15 +1,16 @@
 'use strict';
 
 const BbPromise = require('bluebird');
+const _ = require('lodash');
 
 const validate = require('./lib/validate');
 const compile = require('./lib/compile');
-const copyFunctionArtifact = require('./lib/copyFunctionArtifact');
 const wpwatch = require('./lib/wpwatch');
 const cleanup = require('./lib/cleanup');
 const run = require('./lib/run');
 const makePathOptionAbsolute = require('./lib/makePathOptionAbsolute');
 const packExternalModules = require('./lib/packExternalModules');
+const packageModules = require('./lib/packageModules');
 const lib = require('./lib');
 
 class ServerlessWebpack {
@@ -23,23 +24,21 @@ class ServerlessWebpack {
     this.options = options;
 
     if (
-      this.serverless.service
-      && this.serverless.service.custom
-      && this.serverless.service.custom.webpack
-      && this.serverless.service.custom.webpack.endsWith('.ts')
+      _.has(this.serverless, 'service.custom.webpack') &&
+      _.endsWith(this.serverless.service.custom.webpack, '.ts')
     ) {
       require('ts-node/register');
     }
 
-    Object.assign(
+    _.assign(
       this,
       validate,
       compile,
-      copyFunctionArtifact,
       wpwatch,
       cleanup,
       run,
       packExternalModules,
+      packageModules,
       makePathOptionAbsolute
     );
 
@@ -83,7 +82,8 @@ class ServerlessWebpack {
       'before:deploy:createDeploymentArtifacts': () => BbPromise.bind(this)
         .then(this.validate)
         .then(this.compile)
-        .then(this.packExternalModules),
+        .then(this.packExternalModules)
+        .then(this.packageModules),
 
       'after:deploy:createDeploymentArtifacts': () => BbPromise.bind(this)
         .then(this.cleanup),
@@ -91,10 +91,8 @@ class ServerlessWebpack {
       'before:deploy:function:packageFunction': () => BbPromise.bind(this)
         .then(this.validate)
         .then(this.compile)
-        .then(this.packExternalModules),
-
-      'after:deploy:function:packageFunction': () => BbPromise.bind(this)
-        .then(this.copyFunctionArtifact),
+        .then(this.packExternalModules)
+        .then(this.packageModules),
 
       'before:invoke:local:invoke': () => BbPromise.bind(this)
         .then(this.validate)
@@ -114,7 +112,8 @@ class ServerlessWebpack {
 
       'webpack:compile': () => BbPromise.bind(this)
         .then(this.compile)
-        .then(this.packExternalModules),
+        .then(this.packExternalModules)
+        .then(this.packageModules),
 
       'webpack:invoke:invoke': () => BbPromise.bind(this)
         .then(() => BbPromise.reject(new this.serverless.classes.Error('Use "serverless invoke local" instead.'))),
