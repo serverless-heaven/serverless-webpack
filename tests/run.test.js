@@ -1,6 +1,7 @@
 'use strict';
 
 const BbPromise = require('bluebird');
+const _ = require('lodash');
 const chai = require('chai');
 const sinon = require('sinon');
 const mockery = require('mockery');
@@ -10,6 +11,7 @@ const makeUtilsMock = require('./utils.mock');
 
 chai.use(require('chai-as-promised'));
 chai.use(require('sinon-chai'));
+
 const expect = chai.expect;
 
 describe('run', () => {
@@ -19,6 +21,7 @@ describe('run', () => {
   let baseModule;
   let serverless;
   let module;
+  let chdirStub;
 
   before(() => {
     sandbox = sinon.sandbox.create();
@@ -46,10 +49,12 @@ describe('run', () => {
       consoleLog: sandbox.stub()
     };
 
-    module = Object.assign({
+    module = _.assign({
       serverless,
       options: {},
     }, baseModule);
+
+    chdirStub = sandbox.stub(process, 'chdir');
   });
 
   afterEach(() => {
@@ -59,12 +64,6 @@ describe('run', () => {
 
   describe('watch', () => {
     let spawnStub;
-
-    const testEvent = {};
-    const testContext = {};
-    const testStats = {};
-    const testFunctionId = 'testFunctionId';
-    const testFunctionResult = 'testFunctionResult';
 
     beforeEach(() => {
       spawnStub = sandbox.stub(serverless.pluginManager, 'spawn');
@@ -106,6 +105,8 @@ describe('run', () => {
 
       watch();
       expect(serverless.config.servicePath).to.equal('originalPath');
+      expect(chdirStub).to.have.been.calledOnce;
+      expect(chdirStub).to.have.been.calledWithExactly('originalPath');
     });
   });
 });
