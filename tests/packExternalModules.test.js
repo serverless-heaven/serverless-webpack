@@ -143,6 +143,7 @@ describe('packExternalModules', () => {
       npmMock.install.returns(BbPromise.resolve());
       fsExtraMock.copy.yields();
       childProcessMock.exec.yields();
+      childProcessMock.execSync.returns('{}');
       return expect(module.packExternalModules(stats)).to.be.fulfilled
       .then(() => BbPromise.all([
         // npm install should have been called with all externals from the package mock
@@ -154,6 +155,7 @@ describe('packExternalModules', () => {
         ],
         {
           cwd: 'outputPath/dependencies',
+          maxBuffer: 204800,
           save: true
         }),
         // The module package JSON and the composite one should have been stored
