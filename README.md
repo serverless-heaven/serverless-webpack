@@ -359,6 +359,18 @@ Plugin commands are supported by the following providers. ⁇ indicates that com
 
 ## Release Notes
 
+* 3.0.0
+  * Integrate with `serverless invoke local` [#151][link-151]
+  * Support watch mode with `serverless invoke local --watch`
+  * Stabilized and improved the bundling of node modules [#116][link-116], [#117][link-117]
+  * Improved interoperability with Serverless and 3rd party plugins [#173][link-173]
+  * Support individual packaging of the functions in a service [#120][link-120]
+  * Allow setting stdio max buffers for NPM operations [#185][link-185]
+  * Support bundling of node modules via node-externals whitelist [#186][link-186]
+  * Removed the `webpack serve` command in favor of [`serverless-offline`][link-serverless-offline] [#152][link-152]
+  * Updated examples [#179][link-179]
+  * Added missing unit tests to improve code stability
+
 * 2.2.0
   * Allow full dynamic configurations [#158][link-158]
   * Fix a bug that prevented the entries lib export to work with TypeScript [#165][link-165]
@@ -419,3 +431,13 @@ Plugin commands are supported by the following providers. ⁇ indicates that com
 
 [link-158]: https://github.com/elastic-coders/serverless-webpack/issues/158
 [link-165]: https://github.com/elastic-coders/serverless-webpack/issues/165
+
+[link-116]: https://github.com/elastic-coders/serverless-webpack/issues/116
+[link-117]: https://github.com/elastic-coders/serverless-webpack/issues/117
+[link-120]: https://github.com/elastic-coders/serverless-webpack/issues/120
+[link-151]: https://github.com/elastic-coders/serverless-webpack/issues/151
+[link-152]: https://github.com/elastic-coders/serverless-webpack/issues/152
+[link-173]: https://github.com/elastic-coders/serverless-webpack/issues/173
+[link-179]: https://github.com/elastic-coders/serverless-webpack/pull/179
+[link-185]: https://github.com/elastic-coders/serverless-webpack/pull/185
+[link-186]: https://github.com/elastic-coders/serverless-webpack/pull/186
