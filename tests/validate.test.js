@@ -4,6 +4,7 @@ const _ = require('lodash');
 const chai = require('chai');
 const sinon = require('sinon');
 const mockery = require('mockery');
+const path = require('path');
 const Serverless = require('serverless');
 const makeFsExtraMock = require('./fs-extra.mock');
 
@@ -104,7 +105,7 @@ describe('validate', () => {
     return module
       .validate()
       .then(() => expect(module.webpackConfig.output).to.eql({
-        path: `${testServicePath}/${testOptionsOut}/service`,
+        path: path.join(testServicePath, testOptionsOut, 'service'),
         filename: 'filename',
       }));
   });
@@ -135,7 +136,7 @@ describe('validate', () => {
         .validate()
         .then(() => expect(module.webpackConfig.output).to.eql({
           libraryTarget: 'commonjs',
-          path: `${testServicePath}/.webpack/service`,
+          path: path.join(testServicePath, '.webpack', 'service'),
           filename: '[name].js',
         }));
     });
@@ -152,7 +153,7 @@ describe('validate', () => {
         .validate()
         .then(() => expect(module.webpackConfig.output).to.eql({
           libraryTarget: 'commonjs',
-          path: `${testServicePath}/.webpack/service`,
+          path: path.join(testServicePath, '.webpack', 'service'),
           filename: '[name].js',
         }));
     });
@@ -166,7 +167,7 @@ describe('validate', () => {
         .validate()
         .then(() => expect(module.webpackConfig.output).to.eql({
           libraryTarget: 'commonjs',
-          path: `${testServicePath}/.webpack/service`,
+          path: path.join(testServicePath, '.webpack', 'service'),
           filename: '[name].js',
         }));
     });
@@ -176,7 +177,7 @@ describe('validate', () => {
     it('should load a webpack config from file if `custom.webpack` is a string', () => {
       const testConfig = 'testconfig';
       const testServicePath = 'testpath';
-      const requiredPath = `${testServicePath}/${testConfig}`;
+      const requiredPath = path.join(testServicePath, testConfig);
       module.serverless.config.servicePath = testServicePath;
       module.serverless.service.custom.webpack = testConfig;
       serverless.utils.fileExistsSync = sinon.stub().returns(true);
@@ -206,7 +207,7 @@ describe('validate', () => {
     it('should load a default file if no custom config is provided', () => {
       const testConfig = 'webpack.config.js';
       const testServicePath = 'testpath';
-      const requiredPath = `${testServicePath}/${testConfig}`;
+      const requiredPath = path.join(testServicePath, testConfig);
       module.serverless.config.servicePath = testServicePath;
       serverless.utils.fileExistsSync = sinon.stub().returns(true);
       const loadedConfig = {
