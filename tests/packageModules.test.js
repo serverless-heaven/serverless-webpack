@@ -3,6 +3,7 @@
 const BbPromise = require('bluebird');
 const _ = require('lodash');
 const chai = require('chai');
+const path = require('path');
 const sinon = require('sinon');
 const mockery = require('mockery');
 const Serverless = require('serverless');
@@ -134,10 +135,12 @@ describe('packageModules', () => {
       fsMock._streamMock.on.withArgs('close').yields();
       fsMock._statMock.isDirectory.returns(false);
 
+      const expectedArtifactPath = path.join('.serverless', 'test-service.zip');
+
       return expect(module.packageModules(stats)).to.be.fulfilled
       .then(() => BbPromise.all([
-        expect(func1).to.have.a.nested.property('package.artifact').that.equals('.serverless/test-service.zip'),
-        expect(func2).to.have.a.nested.property('package.artifact').that.equals('.serverless/test-service.zip'),
+        expect(func1).to.have.a.nested.property('package.artifact').that.equals(expectedArtifactPath),
+        expect(func2).to.have.a.nested.property('package.artifact').that.equals(expectedArtifactPath),
       ]));
     });
 
@@ -205,8 +208,8 @@ describe('packageModules', () => {
 
       return expect(module.packageModules(stats)).to.be.fulfilled
       .then(() => BbPromise.all([
-        expect(func1).to.have.a.nested.property('package.artifact').that.equals('.serverless/func1.zip'),
-        expect(func2).to.have.a.nested.property('package.artifact').that.equals('.serverless/func2.zip'),
+        expect(func1).to.have.a.nested.property('package.artifact').that.equals(path.join('.serverless', 'func1.zip')),
+        expect(func2).to.have.a.nested.property('package.artifact').that.equals(path.join('.serverless', 'func2.zip')),
       ]));
     });
 
@@ -252,20 +255,22 @@ describe('packageModules', () => {
       fsMock._streamMock.on.withArgs('close').yields();
       fsMock._statMock.isDirectory.returns(false);
 
+      const expectedArtifactPath = path.join('.serverless', 'test-service.zip');
+
       return BbPromise.each([ '1.18.1', '2.17.0', '10.15.3', ], version => {
         getVersionStub.returns(version);
         return expect(module.packageModules(stats)).to.be.fulfilled
         .then(() => BbPromise.all([
-          expect(func1).to.have.a.nested.property('package.artifact').that.equals('.serverless/test-service.zip'),
-          expect(func2).to.have.a.nested.property('package.artifact').that.equals('.serverless/test-service.zip'),
+          expect(func1).to.have.a.nested.property('package.artifact').that.equals(expectedArtifactPath),
+          expect(func2).to.have.a.nested.property('package.artifact').that.equals(expectedArtifactPath),
         ]));
       })
       .then(() => BbPromise.each([ '1.17.0', '1.16.0-alpha', '1.15.3', ], version => {
         getVersionStub.returns(version);
         return expect(module.packageModules(stats)).to.be.fulfilled
         .then(() => BbPromise.all([
-          expect(func1).to.have.a.nested.property('artifact').that.equals('.serverless/test-service.zip'),
-          expect(func2).to.have.a.nested.property('artifact').that.equals('.serverless/test-service.zip'),
+          expect(func1).to.have.a.nested.property('artifact').that.equals(expectedArtifactPath),
+          expect(func2).to.have.a.nested.property('artifact').that.equals(expectedArtifactPath),
         ]));
       }));
     });

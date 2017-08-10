@@ -76,7 +76,7 @@ describe('packExternalModules', () => {
     sandbox.restore();
   });
 
-  describe('packageModules()', () => {
+  describe('packExternalModules()', () => {
     it('should do nothing if webpackIncludeModules is not set', () => {
       _.unset(serverless, 'service.custom.webpackIncludeModules');
       return expect(module.packExternalModules({ stats: [] })).to.eventually.deep.equal({ stats: [] })
@@ -154,7 +154,7 @@ describe('packExternalModules', () => {
           'bluebird@^3.4.0'
         ],
         {
-          cwd: 'outputPath/dependencies',
+          cwd: path.join('outputPath', 'dependencies'),
           maxBuffer: 204800,
           save: true
         }),
