@@ -9,10 +9,29 @@
 A Serverless v1.x plugin to build your lambda functions with [Webpack][link-webpack].
 
 This plugin is for you if you want to use the latest Javascript version with [Babel][link-babel];
-use custom [resource loaders][link-webpack-loaders];
-try your lambda functions locally and much more!
+use custom [resource loaders][link-webpack-loaders], optimize your packaged functions individually
+and much more!
 
-> **BREAKING CHANGE IN v2**: `webpack` must now be installed alongside `serverless-webpack` as a peer dependency. This allows more control over which version of Webpack to run.
+## Highlights
+
+* Configuration possibilities range from zero-config to fully customizable
+* Support of `serverless package`, `serverless deploy` and `serverless deploy function`
+* Support of `serverless invoke local` and `serverless invoke local --watch`
+* Integrates with [`serverless-offline`][link-serverless-offline] to simulate local API Gateway endpoints
+* When enabled in your service configuration, functions are packaged and compiled
+individually, resulting in smaller Lambda packages that contain only the code and
+dependencies needed to run the function. This allows the plugin to fully utilize
+WebPack's [Tree-Shaking][link-webpack-tree] optimization.
+
+## New in V3
+
+* Support for individual packaging and optimization
+* Integrate with `serverless invoke local` (including watch mode)
+* Stabilized package handling
+* Improved compatibility with other plugins
+* Updated examples
+
+For the complete release notes see the end of this document.
 
 ## Install
 
@@ -55,6 +74,8 @@ module.exports = {
 
 serverless-webpack exposes a lib object, that can be used in your webpack.config.js
 to make the configuration easier and to build fully dynamic configurations.
+This is the preferred way to configure webpack - the plugin will take care of
+as much of the configuration (and subsequent changes in your services) as it can.
 
 #### Automatic entry resolution
 
@@ -154,6 +175,7 @@ custom:
   webpackIncludeModules: true # enable auto-packing of external modules
 ```
 
+
 All modules stated in `externals` will be excluded from bundled files. If an excluded module
 is stated as `dependencies` in `package.json`, it will be packed into the Serverless
 artifact under the `node_modules` directory.
@@ -171,6 +193,43 @@ custom:
 
 You can find an example setups in the [`examples`][link-examples] folder.
 
+#### Service level packaging
+
+If you do not enable individual packaging in your service (serverless.yml), the
+plugin creates one ZIP file for all functions (the service package) that includes
+all node modules used in the service. This is the fastest packaging, but not the
+optimal one, as node modules are always packaged, that are not needed by some
+functions.
+
+#### Optimization / Individual packaging per function
+
+A better way to do the packaging, is to enable individual packaging in your
+service:
+
+```yaml
+# serverless.yml
+...
+package:
+  individually: true
+...
+```
+
+This will switch the plugin to per function packaging which makes use of the multi-compiler
+feature of Webpack. That means, that Webpack compiles **and optimizes** each
+function individually, removing unnecessary imports and reducing code sizes
+significantly. Tree-Shaking only makes sense with this approach.
+
+Now the needed external node modules are also detected by Webpack per function
+and the plugin only packages the needed ones into the function artifacts. As a
+result, the deployed artifacts are smaller, depending on the functions and
+cold-start times (to install the functions into the cloud at runtime) are reduced
+too.
+
+The individual packaging should be combined with the _automatic entry resolution_ (see above).
+
+The individual packaging needs more time at the packaging phase, but you'll
+get that paid back twice at runtime.
+
 ## Usage
 
 ### Automatic bundling
@@ -180,6 +239,43 @@ The normal Serverless deploy procedure will automatically bundle with Webpack:
 - Create the Serverless project with `serverless create -t aws-nodejs`
 - Install Serverless Webpack as above
 - Deploy with `serverless deploy`
+
+### Run a function locally
+
+The plugin fully integrates with `serverless invoke local`. To run your bundled functions
+locally you can:
+
+```bash
+$ serverless invoke local --function <function-name>
+```
+
+All options that are supported by invoke local can be used as usual:
+
+- `--function` or `-f` (required) is the name of the function to run
+- `--path` or `-p` (optional) is a JSON file path used as the function input event
+- `--data` or `-d` (optional) inline JSON data used as the function input event
+
+> :exclamation: The old `webpack invoke` command has been disabled.
+
+### Run a function locally on source changes
+
+Or to run a function every time the source files change use the `--watch` option
+together with `serverless invoke local`:
+
+```bash
+$ serverless invoke local --function <function-name> --path event.json --watch
+```
+
+Everytime the sources are changed, the function will be executed again with the
+changed sources. The command will watch until the process is terminated.
+
+All options that are supported by invoke local can be used as usual:
+
+- `--function` or `-f` (required) is the name of the function to run
+- `--path` or `-p` (optional) is a JSON file path used as the function input event
+- `--data` or `-d` (optional) inline JSON data used as the function input event
+
+> :exclamation: The old `webpack watch` command has been disabled.
 
 ### Usage with serverless-offline
 
@@ -226,32 +322,6 @@ Run `serverless offline start`.
 You can reduce the clutter generated by `serverless-offline` with `--dontPrintOutput` and
 disable timeouts with `--noTimeout`.
 
-### Run a function locally
-
-To run your bundled functions locally you can:
-
-```bash
-$ serverless webpack invoke --function <function-name>
-```
-
-Options are:
-
-- `--function` or `-f` (required) is the name of the function to run
-- `--path` or `-p` (optional) is a JSON file path used as the function input event
-
-### Run a function locally on source changes
-
-Or to run a function every time the source files change use `watch`:
-
-```bash
-$ serverless webpack watch --function <function-name> --path event.json
-```
-
-Options are:
-
-- `--function` or `-f` (required) is the name of the function to run
-- `--path` or `-p` (optional) is a JSON file path used as the function input event
-
 ### Bundle with webpack
 
 To just bundle and see the output result use:
@@ -266,35 +336,8 @@ Options are:
 
 ### Simulate API Gateway locally
 
-_The integrated simulation functionality will be removed in version 3 in favor of
-using `serverless-offline` (see [#135][link-135]) which already does the job
-perfectly and fully integrates with `serverless-webpack`.
-Please switch to `serverless-offline` if you do not use it already._
-
-To start a local server that will act like API Gateway, use the following command.
-Your code will be reloaded upon change so that every request to your local server
-will serve the latest code.
-
-```bash
-$ serverless webpack serve
-```
-
-Options are:
-
-- `--port` or `-p` (optional) The local server port. Defaults to `8000`
-
-The `serve` command will automatically look for the local `serverless.yml` and serve
-all the `http` events. For example this configuration will generate a GET endpoint:
-
-```yaml
-functions:
-  hello:
-    handler: handler.hello
-    events:
-      - http:
-          method: get
-          path: hello
-```
+:exclamation: The serve command has been removed. See above how to achieve the
+same functionality with the [`serverless-offline`][link-serverless-offline] plugin.
 
 ## Example with Babel
 
@@ -302,20 +345,31 @@ In the [`examples`][link-examples] folder there is a Serverless project using th
 plugin with Babel. To try it, from inside the example folder:
 
 - `npm install` to install dependencies
-- `serverless webpack run -f hello` to run the example function
+- `serverless invoke local -f hello` to run the example function
 
 ## Provider Support
 
 Plugin commands are supported by the following providers. ⁇ indicates that command has not been tested with that provider.
 
-|                | AWS Lambda | Apache OpenWhisk | Azure Functions | Google Cloud Functions |
-|----------------|------------|------------------|-----------------|------------------------|
-| webpack        |      ✔︎     |         ✔︎        |        ⁇        |            ⁇           |
-| webpack invoke |      ✔︎     |         ✘        |        ⁇        |            ⁇           |
-| webpack watch  |      ✔︎     |         ✔︎        |        ⁇        |            ⁇           |
-| webpack serve  |      ✔︎     |         ✘        |        ⁇        |            ⁇           |
+|                       | AWS Lambda | Apache OpenWhisk | Azure Functions | Google Cloud Functions |
+|-----------------------|------------|------------------|-----------------|------------------------|
+| webpack               |      ✔︎     |         ✔︎        |        ⁇        |            ⁇           |
+| invoke local          |      ✔︎     |         ⁇        |        ⁇        |            ⁇           |
+| invoke local --watch  |      ✔︎     |         ⁇        |        ⁇        |            ⁇           |
 
 ## Release Notes
+
+* 3.0.0
+  * Integrate with `serverless invoke local` [#151][link-151]
+  * Support watch mode with `serverless invoke local --watch`
+  * Stabilized and improved the bundling of node modules [#116][link-116], [#117][link-117]
+  * Improved interoperability with Serverless and 3rd party plugins [#173][link-173]
+  * Support individual packaging of the functions in a service [#120][link-120]
+  * Allow setting stdio max buffers for NPM operations [#185][link-185]
+  * Support bundling of node modules via node-externals whitelist [#186][link-186]
+  * Removed the `webpack serve` command in favor of [`serverless-offline`][link-serverless-offline] [#152][link-152]
+  * Updated examples [#179][link-179]
+  * Added missing unit tests to improve code stability
 
 * 2.2.0
   * Allow full dynamic configurations [#158][link-158]
@@ -350,6 +404,7 @@ Plugin commands are supported by the following providers. ⁇ indicates that com
 [link-babel]: https://babeljs.io/
 [link-webpack-loaders]: https://webpack.github.io/docs/loaders.html
 [link-webpack-libtarget]: https://webpack.github.io/docs/configuration.html#output-librarytarget
+[link-webpack-tree]: https://webpack.js.org/guides/tree-shaking/
 [link-webpack-externals]: https://webpack.github.io/docs/configuration.html#externals
 [link-examples]: ./examples
 [link-serverless-offline]: https://www.npmjs.com/package/serverless-offline
@@ -376,3 +431,13 @@ Plugin commands are supported by the following providers. ⁇ indicates that com
 
 [link-158]: https://github.com/elastic-coders/serverless-webpack/issues/158
 [link-165]: https://github.com/elastic-coders/serverless-webpack/issues/165
+
+[link-116]: https://github.com/elastic-coders/serverless-webpack/issues/116
+[link-117]: https://github.com/elastic-coders/serverless-webpack/issues/117
+[link-120]: https://github.com/elastic-coders/serverless-webpack/issues/120
+[link-151]: https://github.com/elastic-coders/serverless-webpack/issues/151
+[link-152]: https://github.com/elastic-coders/serverless-webpack/issues/152
+[link-173]: https://github.com/elastic-coders/serverless-webpack/issues/173
+[link-179]: https://github.com/elastic-coders/serverless-webpack/pull/179
+[link-185]: https://github.com/elastic-coders/serverless-webpack/pull/185
+[link-186]: https://github.com/elastic-coders/serverless-webpack/pull/186
