@@ -9,6 +9,7 @@ const wpwatch = require('./lib/wpwatch');
 const cleanup = require('./lib/cleanup');
 const run = require('./lib/run');
 const prepareLocalInvoke = require('./lib/prepareLocalInvoke');
+const prepareOfflineInvoke = require('./lib/prepareOfflineInvoke');
 const packExternalModules = require('./lib/packExternalModules');
 const packageModules = require('./lib/packageModules');
 const lib = require('./lib');
@@ -39,7 +40,8 @@ class ServerlessWebpack {
       run,
       packExternalModules,
       packageModules,
-      prepareLocalInvoke
+      prepareLocalInvoke,
+      prepareOfflineInvoke
     );
 
     this.commands = {
@@ -125,12 +127,12 @@ class ServerlessWebpack {
         .then(() => BbPromise.reject(new this.serverless.classes.Error('serve has been removed. Use serverless-offline instead.'))),
 
       'before:offline:start': () => BbPromise.bind(this)
-        .then(this.validate)
+        .then(this.prepareOfflineInvoke)
         .then(this.compile)
         .then(this.wpwatch),
 
       'before:offline:start:init': () => BbPromise.bind(this)
-        .then(this.validate)
+        .then(this.prepareOfflineInvoke)
         .then(this.compile)
         .then(this.wpwatch),
 
