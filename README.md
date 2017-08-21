@@ -371,6 +371,9 @@ Plugin commands are supported by the following providers. ⁇ indicates that com
   * Updated examples [#179][link-179]
   * Added missing unit tests to improve code stability
 
+* 2.2.1
+  * Restore functionality for Google provider [#193][link-193]
+
 * 2.2.0
   * Allow full dynamic configurations [#158][link-158]
   * Fix a bug that prevented the entries lib export to work with TypeScript [#165][link-165]
@@ -431,6 +434,8 @@ Plugin commands are supported by the following providers. ⁇ indicates that com
 
 [link-158]: https://github.com/elastic-coders/serverless-webpack/issues/158
 [link-165]: https://github.com/elastic-coders/serverless-webpack/issues/165
+
+[link-193]: https://github.com/elastic-coders/serverless-webpack/issues/193
 
 [link-116]: https://github.com/elastic-coders/serverless-webpack/issues/116
 [link-117]: https://github.com/elastic-coders/serverless-webpack/issues/117
