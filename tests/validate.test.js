@@ -318,6 +318,18 @@ describe('validate', () => {
         },
       };
 
+      const testFunctionsGoogleConfig = {
+        func1: {
+          handler: 'func1handler',
+          events: [{
+            http: {
+              method: 'get',
+              path: 'func1path',
+            },
+          }],
+        },
+      };
+
       it('should expose all functions if `options.function` is not defined', () => {
         const testOutPath = 'test';
         const testConfig = {
@@ -370,6 +382,33 @@ describe('validate', () => {
 
           expect(lib.entries).to.deep.equal(expectedLibEntries);
           expect(globSyncStub).to.have.been.calledOnce;
+          expect(serverless.cli.log).to.not.have.been.called;
+          return null;
+        });
+      });
+
+      it('should ignore entry points for the Google provider', () => {
+        const testOutPath = 'test';
+        const testFunction = 'func1';
+        const testConfig = {
+          entry: './index.js',
+          target: 'node',
+          output: {
+            path: testOutPath,
+            filename: 'index.js'
+          },
+        };
+        sandbox.stub(module.serverless, 'service.provider.name').value('google');
+        module.serverless.service.custom.webpack = testConfig;
+        module.serverless.service.functions = testFunctionsGoogleConfig;
+        module.options.function = testFunction;
+        globSyncStub.returns([]);
+        return expect(module.validate()).to.be.fulfilled
+        .then(() => {
+          const lib = require('../lib/index');
+
+          expect(lib.entries).to.deep.equal({});
+          expect(globSyncStub).to.not.have.been.called;
           expect(serverless.cli.log).to.not.have.been.called;
           return null;
         });

@@ -144,6 +144,56 @@ describe('packageModules', () => {
       ]));
     });
 
+    it('should set the service artifact path with the Google provider', () => {
+      // Test data
+      const stats = {
+        stats: [
+          {
+            compilation: {
+              compiler: {
+                outputPath: '/my/Service/Path/.webpack/service'
+              }
+            }
+          }
+        ]
+      };
+      const files = [
+        'README.md', 'index.js'
+      ];
+      const allFunctions = [ 'func1', 'func2' ];
+      const func1 = {
+        handler: 'handler1',
+        events: []
+      };
+      const func2 = {
+        handler: 'handler2',
+        events: []
+      };
+      // Setup sandbox and behavior for service packaging
+      sandbox.stub(module, 'entryFunctions').value(undefined);
+      // Serverless behavior
+      sandbox.stub(serverless.service.provider, 'name').value('google');
+      sandbox.stub(serverless.config, 'servicePath').value('/my/Service/Path');
+      sandbox.stub(serverless.service.package, 'individually').value(false);
+      getVersionStub.returns('1.18.0');
+      getServiceObjectStub.returns({
+        name: 'test-service'
+      });
+      getAllFunctionsStub.returns(allFunctions);
+      getFunctionStub.withArgs('func1').returns(func1);
+      getFunctionStub.withArgs('func2').returns(func2);
+      // Mock behavior
+      globMock.sync.returns(files);
+      fsMock._streamMock.on.withArgs('open').yields();
+      fsMock._streamMock.on.withArgs('close').yields();
+      fsMock._statMock.isDirectory.returns(false);
+
+      const expectedArtifactPath = path.join('.serverless', 'test-service.zip');
+
+      return expect(module.packageModules(stats)).to.be.fulfilled
+      .then(() => expect(serverless.service).to.have.a.nested.property('package.artifact').that.equals(expectedArtifactPath));
+    });
+
     it('should package with individual packaging', () => {
       // Test data
       const stats = {
