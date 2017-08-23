@@ -317,6 +317,9 @@ Plugin commands are supported by the following providers. ⁇ indicates that com
 
 ## Release Notes
 
+* 2.2.2
+  * Reverted breaking change introduced in default output config [#202][link-202]
+
 * 2.2.1
   * Restore functionality for Google provider [#193][link-193]
 
