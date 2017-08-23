@@ -384,3 +384,5 @@ Plugin commands are supported by the following providers. ⁇ indicates that com
 [link-165]: https://github.com/elastic-coders/serverless-webpack/issues/165
 
 [link-193]: https://github.com/elastic-coders/serverless-webpack/issues/193
+
+[link-202]: https://github.com/elastic-coders/serverless-webpack/issues/202
