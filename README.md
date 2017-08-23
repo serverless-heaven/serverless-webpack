@@ -372,6 +372,9 @@ Plugin commands are supported by the following providers. ⁇ indicates that com
   * Added missing unit tests to improve code stability
   * Fixed unit tests to run on Windows [#145][link-145]
 
+* 2.2.2
+  * Reverted breaking change introduced in default output config [#202][link-202]
+
 * 2.2.1
   * Restore functionality for Google provider [#193][link-193]
 
@@ -448,3 +451,5 @@ Plugin commands are supported by the following providers. ⁇ indicates that com
 [link-179]: https://github.com/elastic-coders/serverless-webpack/pull/179
 [link-185]: https://github.com/elastic-coders/serverless-webpack/pull/185
 [link-186]: https://github.com/elastic-coders/serverless-webpack/pull/186
+
+[link-202]: https://github.com/elastic-coders/serverless-webpack/issues/202
