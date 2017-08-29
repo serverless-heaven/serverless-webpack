@@ -321,6 +321,8 @@ describe('packageModules', () => {
         .then(() => BbPromise.all([
           expect(func1).to.have.a.nested.property('artifact').that.equals(expectedArtifactPath),
           expect(func2).to.have.a.nested.property('artifact').that.equals(expectedArtifactPath),
+          expect(func1).to.have.a.nested.property('package.disable').that.is.true,
+          expect(func2).to.have.a.nested.property('package.disable').that.is.true,
         ]));
       }));
     });
