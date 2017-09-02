@@ -162,7 +162,7 @@ option in `serverless.yml`:
 // webpack.config.js
 var nodeExternals = require('webpack-node-externals')
 
-modules.export = {
+module.exports = {
   // we use webpack-node-externals to excludes all node deps.
   // You can manually set the externals too.
   externals: [nodeExternals()],
