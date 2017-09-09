@@ -2,7 +2,6 @@
 
 [![Serverless][ico-serverless]][link-serverless]
 [![License][ico-license]][link-license]
-[![CircleCI][ico-circleci]][link-circleci]
 [![NPM][ico-npm]][link-npm]
 [![Contributors][ico-contributors]][link-contributors]
 
@@ -396,16 +395,15 @@ Plugin commands are supported by the following providers. ⁇ indicates that com
   * Print Webpack stats on recompile [#127][link-127]
 
 [ico-serverless]: http://public.serverless.com/badges/v3.svg
-[ico-license]: https://img.shields.io/github/license/elastic-coders/serverless-webpack.svg
-[ico-circleci]: https://img.shields.io/circleci/project/github/elastic-coders/serverless-webpack.svg
+[ico-license]: https://img.shields.io/github/license/serverless-heaven/serverless-webpack.svg
 [ico-npm]: https://img.shields.io/npm/v/serverless-webpack.svg
-[ico-contributors]: https://img.shields.io/github/contributors/elastic-coders/serverless-webpack.svg
+[ico-contributors]: https://img.shields.io/github/contributors/serverless-heaven/serverless-webpack.svg
 
 [link-serverless]: http://www.serverless.com/
 [link-license]: ./blob/master/LICENSE
-[link-circleci]: https://circleci.com/gh/elastic-coders/serverless-webpack/
+[link-circleci]: https://circleci.com/gh/serverless-heaven/serverless-webpack/
 [link-npm]: https://www.npmjs.com/package/serverless-webpack
-[link-contributors]: https://github.com/elastic-coders/serverless-webpack/graphs/contributors
+[link-contributors]: https://github.com/serverless-heaven/serverless-webpack/graphs/contributors
 
 [link-webpack]: https://webpack.github.io/
 [link-babel]: https://babeljs.io/
@@ -419,37 +417,37 @@ Plugin commands are supported by the following providers. ⁇ indicates that com
 
 [comment]: # (Referenced issues)
 
-[link-135]: https://github.com/elastic-coders/serverless-webpack/issues/135
+[link-135]: https://github.com/serverless-heaven/serverless-webpack/issues/135
 
-[link-83]: https://github.com/elastic-coders/serverless-webpack/pull/83
-[link-88]: https://github.com/elastic-coders/serverless-webpack/pull/88
-[link-127]: https://github.com/elastic-coders/serverless-webpack/pull/127
-[link-131]: https://github.com/elastic-coders/serverless-webpack/pull/131
-[link-132]: https://github.com/elastic-coders/serverless-webpack/pull/132
-[link-140]: https://github.com/elastic-coders/serverless-webpack/pull/140
-[link-141]: https://github.com/elastic-coders/serverless-webpack/issues/141
-[link-144]: https://github.com/elastic-coders/serverless-webpack/issues/144
+[link-83]: https://github.com/serverless-heaven/serverless-webpack/pull/83
+[link-88]: https://github.com/serverless-heaven/serverless-webpack/pull/88
+[link-127]: https://github.com/serverless-heaven/serverless-webpack/pull/127
+[link-131]: https://github.com/serverless-heaven/serverless-webpack/pull/131
+[link-132]: https://github.com/serverless-heaven/serverless-webpack/pull/132
+[link-140]: https://github.com/serverless-heaven/serverless-webpack/pull/140
+[link-141]: https://github.com/serverless-heaven/serverless-webpack/issues/141
+[link-144]: https://github.com/serverless-heaven/serverless-webpack/issues/144
 
-[link-11]: https://github.com/elastic-coders/serverless-webpack/issues/11
-[link-107]: https://github.com/elastic-coders/serverless-webpack/issues/107
-[link-129]: https://github.com/elastic-coders/serverless-webpack/pull/129
-[link-154]: https://github.com/elastic-coders/serverless-webpack/issues/154
-[link-159]: https://github.com/elastic-coders/serverless-webpack/issues/159
+[link-11]: https://github.com/serverless-heaven/serverless-webpack/issues/11
+[link-107]: https://github.com/serverless-heaven/serverless-webpack/issues/107
+[link-129]: https://github.com/serverless-heaven/serverless-webpack/pull/129
+[link-154]: https://github.com/serverless-heaven/serverless-webpack/issues/154
+[link-159]: https://github.com/serverless-heaven/serverless-webpack/issues/159
 
-[link-158]: https://github.com/elastic-coders/serverless-webpack/issues/158
-[link-165]: https://github.com/elastic-coders/serverless-webpack/issues/165
+[link-158]: https://github.com/serverless-heaven/serverless-webpack/issues/158
+[link-165]: https://github.com/serverless-heaven/serverless-webpack/issues/165
 
-[link-193]: https://github.com/elastic-coders/serverless-webpack/issues/193
+[link-193]: https://github.com/serverless-heaven/serverless-webpack/issues/193
 
-[link-116]: https://github.com/elastic-coders/serverless-webpack/issues/116
-[link-117]: https://github.com/elastic-coders/serverless-webpack/issues/117
-[link-120]: https://github.com/elastic-coders/serverless-webpack/issues/120
-[link-145]: https://github.com/elastic-coders/serverless-webpack/issues/145
-[link-151]: https://github.com/elastic-coders/serverless-webpack/issues/151
-[link-152]: https://github.com/elastic-coders/serverless-webpack/issues/152
-[link-173]: https://github.com/elastic-coders/serverless-webpack/issues/173
-[link-179]: https://github.com/elastic-coders/serverless-webpack/pull/179
-[link-185]: https://github.com/elastic-coders/serverless-webpack/pull/185
-[link-186]: https://github.com/elastic-coders/serverless-webpack/pull/186
+[link-116]: https://github.com/serverless-heaven/serverless-webpack/issues/116
+[link-117]: https://github.com/serverless-heaven/serverless-webpack/issues/117
+[link-120]: https://github.com/serverless-heaven/serverless-webpack/issues/120
+[link-145]: https://github.com/serverless-heaven/serverless-webpack/issues/145
+[link-151]: https://github.com/serverless-heaven/serverless-webpack/issues/151
+[link-152]: https://github.com/serverless-heaven/serverless-webpack/issues/152
+[link-173]: https://github.com/serverless-heaven/serverless-webpack/issues/173
+[link-179]: https://github.com/serverless-heaven/serverless-webpack/pull/179
+[link-185]: https://github.com/serverless-heaven/serverless-webpack/pull/185
+[link-186]: https://github.com/serverless-heaven/serverless-webpack/pull/186
 
-[link-202]: https://github.com/elastic-coders/serverless-webpack/issues/202
+[link-202]: https://github.com/serverless-heaven/serverless-webpack/issues/202
