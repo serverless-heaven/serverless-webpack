@@ -3,6 +3,8 @@
 [![Serverless][ico-serverless]][link-serverless]
 [![License][ico-license]][link-license]
 [![NPM][ico-npm]][link-npm]
+[![Build Status][ico-build]][link-build]
+[![Coverage Status][ico-coverage]][link-coverage]
 [![Contributors][ico-contributors]][link-contributors]
 
 A Serverless v1.x plugin to build your lambda functions with [Webpack][link-webpack].
@@ -397,12 +399,15 @@ Plugin commands are supported by the following providers. ⁇ indicates that com
 [ico-serverless]: http://public.serverless.com/badges/v3.svg
 [ico-license]: https://img.shields.io/github/license/serverless-heaven/serverless-webpack.svg
 [ico-npm]: https://img.shields.io/npm/v/serverless-webpack.svg
+[ico-build]: https://travis-ci.org/serverless-heaven/serverless-webpack.svg?branch=master
+[ico-coverage]: https://coveralls.io/repos/github/serverless-heaven/serverless-webpack/badge.svg?branch=master
 [ico-contributors]: https://img.shields.io/github/contributors/serverless-heaven/serverless-webpack.svg
 
 [link-serverless]: http://www.serverless.com/
 [link-license]: ./blob/master/LICENSE
-[link-circleci]: https://circleci.com/gh/serverless-heaven/serverless-webpack/
 [link-npm]: https://www.npmjs.com/package/serverless-webpack
+[link-build]: https://travis-ci.org/serverless-heaven/serverless-webpack
+[link-coverage]: https://coveralls.io/github/serverless-heaven/serverless-webpack?branch=master
 [link-contributors]: https://github.com/serverless-heaven/serverless-webpack/graphs/contributors
 
 [link-webpack]: https://webpack.github.io/
