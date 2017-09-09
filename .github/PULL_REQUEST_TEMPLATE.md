@@ -37,8 +37,8 @@ Examples:
 
 - [ ] Write tests
 - [ ] Write documentation
-- Fix linting errors (not yet implemented)
-- Make sure code coverage hasn't dropped (not yet implemented)
+- [ ] Fix linting errors
+- [ ] Make sure code coverage hasn't dropped
 - [ ] Provide verification config / commands / resources
 - [ ] Enable "Allow edits from maintainers" for this PR
 - [ ] Update the messages below
