@@ -1,12 +1,12 @@
 {
   "name": "serverless-webpack",
-  "version": "2.2.2",
+  "version": "2.2.3",
   "description": "Serverless plugin to bundle your javascript with Webpack",
   "main": "index.js",
   "author": "Nicola Peduzzi <nicola.peduzzi@elastic-coders.com> (http://elastic-coders.com)",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/elastic-coders/serverless-webpack.git"
+    "url": "git+https://github.com/serverless-heaven/serverless-webpack.git"
   },
   "keywords": [
     "serverless",
@@ -20,9 +20,9 @@
   ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/elastic-coders/serverless-webpack/issues"
+    "url": "https://github.com/serverless-heaven/serverless-webpack/issues"
   },
-  "homepage": "https://github.com/elastic-coders/serverless-webpack#readme",
+  "homepage": "https://github.com/serverless-heaven/serverless-webpack#readme",
   "scripts": {
     "test": "istanbul cover ./node_modules/mocha/bin/_mocha tests/all -- -R spec --recursive"
   },
