@@ -24,7 +24,8 @@
   },
   "homepage": "https://github.com/serverless-heaven/serverless-webpack#readme",
   "scripts": {
-    "test": "istanbul cover ./node_modules/mocha/bin/_mocha tests/all -- -R spec --recursive"
+    "test": "istanbul cover -x tests ./node_modules/mocha/bin/_mocha tests/all -- -R spec --recursive",
+    "eslint": "node node_modules/eslint/bin/eslint.js --ext .js lib"
   },
   "dependencies": {
     "archiver": "^2.0.0",
