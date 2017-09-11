@@ -355,8 +355,8 @@ Plugin commands are supported by the following providers. ⁇ indicates that com
 |                       | AWS Lambda | Apache OpenWhisk | Azure Functions | Google Cloud Functions |
 |-----------------------|------------|------------------|-----------------|------------------------|
 | webpack               |      ✔︎     |         ✔︎        |        ⁇        |            ⁇           |
-| invoke local          |      ✔︎     |         ⁇        |        ⁇        |            ⁇           |
-| invoke local --watch  |      ✔︎     |         ⁇        |        ⁇        |            ⁇           |
+| invoke local          |      ✔︎     |         ✔︎        |        ⁇        |            ⁇           |
+| invoke local --watch  |      ✔︎     |         ✔︎        |        ⁇        |            ⁇           |
 
 ## Release Notes
 
