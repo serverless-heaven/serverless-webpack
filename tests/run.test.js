@@ -108,5 +108,25 @@ describe('run', () => {
       expect(chdirStub).to.have.been.calledOnce;
       expect(chdirStub).to.have.been.calledWithExactly('originalPath');
     });
+
+    it('should turn on polling and set the default poll interval', () => {
+      module.isWatching = false;
+      const watch = module.watch.bind(module);
+      webpackMock.compilerMock.watch = sandbox.stub().yields(null, {});
+      module.options['webpack-use-polling'] = true;
+
+      watch();
+      expect(webpackMock.compilerMock.watch).to.have.been.calledWith({ poll: 3000 });
+    });
+
+    it('should turn on polling and set the specified poll interval', () => {
+      module.isWatching = false;
+      const watch = module.watch.bind(module);
+      webpackMock.compilerMock.watch = sandbox.stub().yields(null, {});
+      const interval = module.options['webpack-use-polling'] = _.now() % 10000;
+
+      watch();
+      expect(webpackMock.compilerMock.watch).to.have.been.calledWith({ poll: interval });
+    });
   });
 });
