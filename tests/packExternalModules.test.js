@@ -349,5 +349,107 @@ describe('packExternalModules', () => {
         expect(childProcessMock.exec).to.have.been.calledOnce,
       ]));
     });
+
+    it('should install external modules when forced', () => {
+      const expectedPackageJSON = {
+        dependencies: {
+          '@scoped/vendor': '1.0.0',
+          uuid: '^5.4.1',
+          bluebird: '^3.4.0',
+          pg: '^4.3.5'
+        }
+      };
+      serverless.service.custom = {
+        webpackIncludeModules: {
+          forceInclude: ['pg']
+        }
+      };
+      module.webpackOutputPath = 'outputPath';
+      npmMock.install.returns(BbPromise.resolve());
+      fsExtraMock.copy.yields();
+      childProcessMock.exec.onFirstCall().yields(null, '{}', '');
+      childProcessMock.exec.onSecondCall().yields();
+      return expect(module.packExternalModules(stats)).to.be.fulfilled
+      .then(() => BbPromise.all([
+        // npm install should have been called with all externals from the package mock
+        expect(npmMock.install).to.have.been.calledOnce,
+        expect(npmMock.install).to.have.been.calledWithExactly([
+          '@scoped/vendor@1.0.0',
+          'uuid@^5.4.1',
+          'bluebird@^3.4.0',
+          'pg@^4.3.5'
+        ],
+        {
+          cwd: path.join('outputPath', 'dependencies'),
+          maxBuffer: 204800,
+          save: true
+        }),
+        // The module package JSON and the composite one should have been stored
+        expect(writeFileSyncStub).to.have.been.calledTwice,
+        expect(writeFileSyncStub.firstCall.args[1]).to.equal('{}'),
+        expect(writeFileSyncStub.secondCall.args[1]).to.equal(JSON.stringify(expectedPackageJSON, null, 2)),
+        // The modules should have been copied
+        expect(fsExtraMock.copy).to.have.been.calledOnce,
+        // npm ls and npm prune should have been called
+        expect(childProcessMock.exec).to.have.been.calledTwice,
+        expect(childProcessMock.exec.firstCall).to.have.been.calledWith(
+          'npm ls -prod -json -depth=1'
+        ),
+        expect(childProcessMock.exec.secondCall).to.have.been.calledWith(
+          'npm prune'
+        )
+      ]));
+    });
+
+    it('should add forced external modules without version when not in production dependencies', () => {
+      const expectedPackageJSON = {
+        dependencies: {
+          '@scoped/vendor': '1.0.0',
+          uuid: '^5.4.1',
+          bluebird: '^3.4.0',
+          'not-in-prod-deps': ''
+        }
+      };
+      serverless.service.custom = {
+        webpackIncludeModules: {
+          forceInclude: ['not-in-prod-deps']
+        }
+      };
+      module.webpackOutputPath = 'outputPath';
+      npmMock.install.returns(BbPromise.resolve());
+      fsExtraMock.copy.yields();
+      childProcessMock.exec.onFirstCall().yields(null, '{}', '');
+      childProcessMock.exec.onSecondCall().yields();
+      return expect(module.packExternalModules(stats)).to.be.fulfilled
+      .then(() => BbPromise.all([
+        // npm install should have been called with all externals from the package mock
+        expect(npmMock.install).to.have.been.calledOnce,
+        expect(npmMock.install).to.have.been.calledWithExactly([
+          '@scoped/vendor@1.0.0',
+          'uuid@^5.4.1',
+          'bluebird@^3.4.0',
+          'not-in-prod-deps'
+        ],
+        {
+          cwd: path.join('outputPath', 'dependencies'),
+          maxBuffer: 204800,
+          save: true
+        }),
+        // The module package JSON and the composite one should have been stored
+        expect(writeFileSyncStub).to.have.been.calledTwice,
+        expect(writeFileSyncStub.firstCall.args[1]).to.equal('{}'),
+        expect(writeFileSyncStub.secondCall.args[1]).to.equal(JSON.stringify(expectedPackageJSON, null, 2)),
+        // The modules should have been copied
+        expect(fsExtraMock.copy).to.have.been.calledOnce,
+        // npm ls and npm prune should have been called
+        expect(childProcessMock.exec).to.have.been.calledTwice,
+        expect(childProcessMock.exec.firstCall).to.have.been.calledWith(
+          'npm ls -prod -json -depth=1'
+        ),
+        expect(childProcessMock.exec.secondCall).to.have.been.calledWith(
+          'npm prune'
+        )
+      ]));
+    });
   });
 });

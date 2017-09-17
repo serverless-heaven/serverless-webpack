@@ -8,7 +8,8 @@
     "npm-programmatic": "0.0.5",
     "uuid": "^5.4.1",
     "ts-node": "^3.2.0",
-    "@scoped/vendor": "1.0.0"
+    "@scoped/vendor": "1.0.0",
+    "pg": "^4.3.5"
   },
   "devDependencies": {
     "babel-eslint": "^7.2.3",
