@@ -270,6 +270,10 @@ $ serverless invoke local --function <function-name> --path event.json --watch
 Everytime the sources are changed, the function will be executed again with the
 changed sources. The command will watch until the process is terminated.
 
+If you have your sources located on a file system that does not offer events,
+you can enable polling with the `--webpack-use-polling=<time in ms>` option.
+If you omit the value, it defaults to 3000 ms.
+
 All options that are supported by invoke local can be used as usual:
 
 - `--function` or `-f` (required) is the name of the function to run
@@ -299,6 +303,11 @@ Run `serverless offline` or `serverless offline start` to start the Lambda/API s
 In comparison to `serverless offline`, the `start` command will fire an `init` and a `end` lifecycle hook which is needed for `serverless-offline` and e.g. `serverless-dynamodb-local` to switch off resources (see below).
 
 You can find an example setup in the [`examples`][link-examples] folder.
+
+If you have your sources located on a file system that does not offer events,
+e.g. a mounted volume in a Docker container, you can enable polling with the
+`--webpack-use-polling=<time in ms>` option. If you omit the value, it defaults
+to 3000 ms.
 
 #### Custom paths
 
