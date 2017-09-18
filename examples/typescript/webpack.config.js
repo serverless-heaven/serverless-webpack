@@ -5,9 +5,6 @@ module.exports = {
   entry: slsw.lib.entries,
   resolve: {
     extensions: [
-      '',
-      '.webpack.js',
-      '.web.js',
       '.js',
       '.json',
       '.ts',
