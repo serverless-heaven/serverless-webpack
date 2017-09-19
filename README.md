@@ -192,6 +192,24 @@ custom:
 ```
 > Note that only relative path is supported at the moment.
 
+
+Sometimes it might happen that you use dynamic requires in your code, i.e. you
+require modules that are only known at runtime. Webpack is not able to detect
+such externals and the compiled package will miss the needed dependencies.
+In such cases you can force the plugin to include certain modules by setting
+them in the `forceInclude` array property. However the module must appear in
+your service's production dependencies in `package.json`.
+
+```yaml
+# serverless.yml
+custom:
+  webpackIncludeModules:
+    forceInclude:
+      - module1
+      - module2
+```
+
+
 You can find an example setups in the [`examples`][link-examples] folder.
 
 #### Service level packaging
