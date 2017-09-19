@@ -387,6 +387,15 @@ Plugin commands are supported by the following providers. ⁇ indicates that com
 
 ## Release Notes
 
+* 3.1.0
+  * Allow filesystem polling in watch mode (`--webpack-use-polling`) [#215][link-215]
+  * Allow forced include of not referenced modules [#217][link-217]
+  * Automatically include peer dependencies of used modules [#223][link-223]
+  * Show explicit message if the provided webpack config can not be loaded [#234][link-234]
+  * Improve examples [#227][link-227]
+  * Update 3rd party provider compatibility table [#221][link-221]
+  * Added automatic Travis and Coveralls builds to increase stability 
+
 * 3.0.0
   * Integrate with `serverless invoke local` [#151][link-151]
   * Support watch mode with `serverless invoke local --watch`
@@ -483,3 +492,10 @@ Plugin commands are supported by the following providers. ⁇ indicates that com
 [link-186]: https://github.com/serverless-heaven/serverless-webpack/pull/186
 
 [link-202]: https://github.com/serverless-heaven/serverless-webpack/issues/202
+
+[link-215]: https://github.com/serverless-heaven/serverless-webpack/issues/215
+[link-217]: https://github.com/serverless-heaven/serverless-webpack/issues/217
+[link-221]: https://github.com/serverless-heaven/serverless-webpack/pull/221
+[link-223]: https://github.com/serverless-heaven/serverless-webpack/issues/223
+[link-227]: https://github.com/serverless-heaven/serverless-webpack/pull/227
+[link-234]: https://github.com/serverless-heaven/serverless-webpack/pull/234
