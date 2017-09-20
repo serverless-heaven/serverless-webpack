@@ -1,0 +1,155 @@
+{
+  "name": "serverless-webpack-babel-example",
+  "version": "1.0.0",
+  "dependencies": {
+    "bluebird": {
+      "version": "3.5.0",
+      "from": "bluebird",
+      "resolved": "https://registry.npmjs.org/bluebird/-/bluebird-3.5.0.tgz"
+    },
+    "request": {
+      "version": "2.82.0",
+      "from": "request@^2.34",
+      "resolved": "https://registry.npmjs.org/request/-/request-2.82.0.tgz",
+      "dependencies": {
+        "aws-sign2": {
+          "version": "0.7.0",
+          "from": "aws-sign2@~0.7.0",
+          "resolved": "https://registry.npmjs.org/aws-sign2/-/aws-sign2-0.7.0.tgz"
+        },
+        "aws4": {
+          "version": "1.6.0",
+          "from": "aws4@^1.6.0",
+          "resolved": "https://registry.npmjs.org/aws4/-/aws4-1.6.0.tgz"
+        },
+        "caseless": {
+          "version": "0.12.0",
+          "from": "caseless@~0.12.0",
+          "resolved": "https://registry.npmjs.org/caseless/-/caseless-0.12.0.tgz"
+        },
+        "combined-stream": {
+          "version": "1.0.5",
+          "from": "combined-stream@^1.0.5",
+          "resolved": "https://registry.npmjs.org/combined-stream/-/combined-stream-1.0.5.tgz"
+        },
+        "extend": {
+          "version": "3.0.1",
+          "from": "extend@3",
+          "resolved": "https://registry.npmjs.org/extend/-/extend-3.0.1.tgz"
+        },
+        "forever-agent": {
+          "version": "0.6.1",
+          "from": "forever-agent@~0.6.1",
+          "resolved": "https://registry.npmjs.org/forever-agent/-/forever-agent-0.6.1.tgz"
+        },
+        "form-data": {
+          "version": "2.3.1",
+          "from": "form-data@^2.1.1",
+          "resolved": "https://registry.npmjs.org/form-data/-/form-data-2.3.1.tgz"
+        },
+        "har-validator": {
+          "version": "5.0.3",
+          "from": "har-validator@~5.0.3",
+          "resolved": "https://registry.npmjs.org/har-validator/-/har-validator-5.0.3.tgz"
+        },
+        "hawk": {
+          "version": "6.0.2",
+          "from": "hawk@~6.0.2",
+          "resolved": "https://registry.npmjs.org/hawk/-/hawk-6.0.2.tgz"
+        },
+        "http-signature": {
+          "version": "1.2.0",
+          "from": "http-signature@~1.2.0",
+          "resolved": "https://registry.npmjs.org/http-signature/-/http-signature-1.2.0.tgz"
+        },
+        "is-typedarray": {
+          "version": "1.0.0",
+          "from": "is-typedarray@~1.0.0",
+          "resolved": "https://registry.npmjs.org/is-typedarray/-/is-typedarray-1.0.0.tgz"
+        },
+        "isstream": {
+          "version": "0.1.2",
+          "from": "isstream@~0.1.2",
+          "resolved": "https://registry.npmjs.org/isstream/-/isstream-0.1.2.tgz"
+        },
+        "json-stringify-safe": {
+          "version": "5.0.1",
+          "from": "json-stringify-safe@5.0.1",
+          "resolved": "https://registry.npmjs.org/json-stringify-safe/-/json-stringify-safe-5.0.1.tgz"
+        },
+        "mime-types": {
+          "version": "2.1.17",
+          "from": "mime-types@^2.1.12",
+          "resolved": "https://registry.npmjs.org/mime-types/-/mime-types-2.1.17.tgz"
+        },
+        "oauth-sign": {
+          "version": "0.8.2",
+          "from": "oauth-sign@~0.8.2",
+          "resolved": "https://registry.npmjs.org/oauth-sign/-/oauth-sign-0.8.2.tgz"
+        },
+        "performance-now": {
+          "version": "2.1.0",
+          "from": "performance-now@^2.1.0",
+          "resolved": "https://registry.npmjs.org/performance-now/-/performance-now-2.1.0.tgz"
+        },
+        "qs": {
+          "version": "6.5.1",
+          "from": "qs@^6.4.0",
+          "resolved": "https://registry.npmjs.org/qs/-/qs-6.5.1.tgz"
+        },
+        "uuid": {
+          "version": "3.1.0",
+          "from": "uuid@^3.1.0",
+          "resolved": "https://registry.npmjs.org/uuid/-/uuid-3.1.0.tgz"
+        },
+        "safe-buffer": {
+          "version": "5.1.1",
+          "from": "safe-buffer@~5.1.1",
+          "resolved": "https://registry.npmjs.org/safe-buffer/-/safe-buffer-5.1.1.tgz"
+        },
+        "stringstream": {
+          "version": "0.0.5",
+          "from": "stringstream@~0.0.5",
+          "resolved": "https://registry.npmjs.org/stringstream/-/stringstream-0.0.5.tgz"
+        },
+        "tough-cookie": {
+          "version": "2.3.2",
+          "from": "tough-cookie@>=2.3.0",
+          "resolved": "https://registry.npmjs.org/tough-cookie/-/tough-cookie-2.3.2.tgz"
+        },
+        "tunnel-agent": {
+          "version": "0.6.0",
+          "from": "tunnel-agent@^0.6.0",
+          "resolved": "https://registry.npmjs.org/tunnel-agent/-/tunnel-agent-0.6.0.tgz"
+        }
+      }
+    },
+    "request-promise": {
+      "version": "4.2.1",
+      "from": "request-promise",
+      "resolved": "https://registry.npmjs.org/request-promise/-/request-promise-4.2.1.tgz",
+      "dependencies": {
+        "bluebird": {
+          "version": "3.5.0",
+          "from": "bluebird",
+          "resolved": "https://registry.npmjs.org/bluebird/-/bluebird-3.5.0.tgz"
+        },
+        "request-promise-core": {
+          "version": "1.1.1",
+          "from": "request-promise-core@1.1.1",
+          "resolved": "https://registry.npmjs.org/request-promise-core/-/request-promise-core-1.1.1.tgz"
+        },
+        "stealthy-require": {
+          "version": "1.1.1",
+          "from": "stealthy-require@^1.1.0",
+          "resolved": "https://registry.npmjs.org/stealthy-require/-/stealthy-require-1.1.1.tgz"
+        },
+        "tough-cookie": {
+          "version": "2.3.2",
+          "from": "tough-cookie@>=2.3.0",
+          "resolved": "https://registry.npmjs.org/tough-cookie/-/tough-cookie-2.3.2.tgz"
+        }
+      }
+    }
+  }
+}

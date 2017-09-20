@@ -66,7 +66,9 @@ describe('packExternalModules', () => {
 
     module = _.assign({
       serverless,
-      options: {},
+      options: {
+        verbose: true
+      },
     }, baseModule);
   });
 
@@ -245,7 +247,7 @@ describe('packExternalModules', () => {
       ]));
     });
 
-    it('should reject if npm returns critical and minior errors', () => {
+    it('should reject if npm returns critical and minor errors', () => {
       const stderr = 'ENOENT: No such file\nnpm ERR! extraneous: sinon@2.3.8 ./babel-dynamically-entries/node_modules/serverless-webpack/node_modules/sinon\n\n';
       module.webpackOutputPath = 'outputPath';
       npmMock.install.returns(BbPromise.resolve());
@@ -450,6 +452,84 @@ describe('packExternalModules', () => {
           'npm prune'
         )
       ]));
+    });
+
+    describe('peer dependencies', () => {
+      before(() => {
+        const peerDepPackageJson = require('./data/package-peerdeps.json');
+        mockery.deregisterMock(path.join(process.cwd(), 'package.json'));
+        mockery.registerMock(path.join(process.cwd(), 'package.json'), peerDepPackageJson);
+        // Mock request-promise package.json
+        const rpPackageJson = require('./data/rp-package.json');
+        const rpPackagePath = path.join(
+          process.cwd(),
+          'node_modules',
+          'request-promise',
+          'package.json'
+        );
+        mockery.registerMock(rpPackagePath, rpPackageJson);
+      });
+
+      after(() => {
+        mockery.deregisterMock(path.join(process.cwd(), 'package.json'));
+        mockery.registerMock(path.join(process.cwd(), 'package.json'), packageMock);
+        const rpPackagePath = path.join(
+          process.cwd(),
+          'node_modules',
+          'request-promise',
+          'package.json'
+        );
+        mockery.deregisterMock(rpPackagePath);
+      });
+
+      it('should install external peer dependencies', () => {
+        const expectedPackageJSON = {
+          dependencies: {
+            bluebird: '^3.5.0',
+            'request-promise': '^4.2.1',
+            request: '^2.82.0'
+          }
+        };
+
+        const dependencyGraph = require('./data/npm-ls-peerdeps.json');
+        const peerDepStats = require('./data/stats-peerdeps.js');
+
+        module.webpackOutputPath = 'outputPath';
+        npmMock.install.returns(BbPromise.resolve());
+        fsExtraMock.copy.yields();
+        childProcessMock.exec.onFirstCall().yields(null, JSON.stringify(dependencyGraph), '');
+        childProcessMock.exec.onSecondCall().yields();
+        return expect(module.packExternalModules(peerDepStats)).to.be.fulfilled
+        .then(() => BbPromise.all([
+          // npm install should have been called with all externals from the package mock
+          // and should additionally add request as peer dependency of request-promise
+          expect(npmMock.install).to.have.been.calledOnce,
+          expect(npmMock.install).to.have.been.calledWithExactly([
+            'bluebird@^3.5.0',
+            'request-promise@^4.2.1',
+            'request@^2.82.0'
+          ],
+          {
+            cwd: path.join('outputPath', 'dependencies'),
+            maxBuffer: 204800,
+            save: true
+          }),
+          // The module package JSON and the composite one should have been stored
+          expect(writeFileSyncStub).to.have.been.calledTwice,
+          expect(writeFileSyncStub.firstCall.args[1]).to.equal('{}'),
+          expect(writeFileSyncStub.secondCall.args[1]).to.equal(JSON.stringify(expectedPackageJSON, null, 2)),
+          // The modules should have been copied
+          expect(fsExtraMock.copy).to.have.been.calledOnce,
+          // npm ls and npm prune should have been called
+          expect(childProcessMock.exec).to.have.been.calledTwice,
+          expect(childProcessMock.exec.firstCall).to.have.been.calledWith(
+            'npm ls -prod -json -depth=1'
+          ),
+          expect(childProcessMock.exec.secondCall).to.have.been.calledWith(
+            'npm prune'
+          )
+        ]));
+      });
     });
   });
 });
