@@ -223,6 +223,16 @@ describe('validate', () => {
           return null;
         });
     });
+
+    it('should fail when importing a broken configuration file', () => {
+      const testConfig = 'invalid.webpack.config.js';
+      const testServicePath = 'testpath';
+      module.serverless.config.servicePath = testServicePath;
+      module.serverless.service.custom.webpack = testConfig;
+      serverless.utils.fileExistsSync = sinon.stub().returns(true);
+      return expect(module.validate()).to.be.rejected
+      .then(() => expect(serverless.cli.log).to.have.been.calledWith(sinon.match(/^Could not load webpack config/)));
+    });
   });
 
   describe('lib', () => {
