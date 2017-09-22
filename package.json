@@ -24,13 +24,24 @@
   },
   "homepage": "https://github.com/serverless-heaven/serverless-webpack#readme",
   "scripts": {
-    "test": "istanbul cover -x tests ./node_modules/mocha/bin/_mocha tests/all -- -R spec --recursive",
+    "test": "nyc ./node_modules/mocha/bin/_mocha tests/all -R spec --recursive",
     "eslint": "node node_modules/eslint/bin/eslint.js --ext .js lib"
+  },
+  "nyc": {
+    "exclude": [
+      "tests/**/*.*"
+    ],
+    "reporter": [
+      "lcov",
+      "clover",
+      "text-summary"
+    ],
+    "report-dir": "./coverage"
   },
   "dependencies": {
     "archiver": "^2.0.0",
-    "bluebird": "^3.4.0",
-    "fs-extra": "^0.26.7",
+    "bluebird": "^3.5.0",
+    "fs-extra": "^4.0.2",
     "glob": "^7.1.2",
     "is-builtin-module": "^1.0.0",
     "lodash": "^4.17.4",
@@ -40,19 +51,19 @@
   },
   "devDependencies": {
     "babel-eslint": "^7.2.3",
-    "chai": "^4.1.0",
+    "chai": "^4.1.2",
     "chai-as-promised": "^7.1.1",
     "coveralls": "^2.13.1",
-    "eslint": "^4.3.0",
+    "eslint": "^4.7.2",
     "eslint-plugin-import": "^2.7.0",
-    "eslint-plugin-lodash": "^2.4.4",
+    "eslint-plugin-lodash": "^2.4.5",
     "eslint-plugin-promise": "^3.5.0",
-    "istanbul": "^0.4.5",
-    "mocha": "^3.4.2",
+    "mocha": "^3.5.3",
     "mockery": "^2.1.0",
-    "serverless": "^1.17.0",
-    "sinon": "^2.3.8",
-    "sinon-chai": "^2.12.0"
+    "nyc": "^11.2.1",
+    "serverless": "^1.23.0",
+    "sinon": "^3.3.0",
+    "sinon-chai": "^2.13.0"
   },
   "peerDependencies": {
     "webpack": "*"
