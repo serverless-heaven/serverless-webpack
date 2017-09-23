@@ -397,30 +397,40 @@ describe('validate', () => {
         });
       });
 
-      it('should ignore entry points for the Google provider', () => {
-        const testOutPath = 'test';
-        const testFunction = 'func1';
-        const testConfig = {
-          entry: './index.js',
-          target: 'node',
-          output: {
-            path: testOutPath,
-            filename: 'index.js'
-          },
-        };
-        sandbox.stub(module.serverless, 'service.provider.name').value('google');
-        module.serverless.service.custom.webpack = testConfig;
-        module.serverless.service.functions = testFunctionsGoogleConfig;
-        module.options.function = testFunction;
-        globSyncStub.returns([]);
-        return expect(module.validate()).to.be.fulfilled
-        .then(() => {
-          const lib = require('../lib/index');
+      describe('google provider', () => {
+        beforeEach(() => {
+          _.set(module.serverless, 'service.provider.name', 'google');
 
-          expect(lib.entries).to.deep.equal({});
-          expect(globSyncStub).to.not.have.been.called;
-          expect(serverless.cli.log).to.not.have.been.called;
-          return null;
+        });
+
+        afterEach(() => {
+          _.unset(module.serverless, 'service.provider.name');
+        });
+
+        it('should ignore entry points for the Google provider', () => {
+          const testOutPath = 'test';
+          const testFunction = 'func1';
+          const testConfig = {
+            entry: './index.js',
+            target: 'node',
+            output: {
+              path: testOutPath,
+              filename: 'index.js'
+            },
+          };
+          module.serverless.service.custom.webpack = testConfig;
+          module.serverless.service.functions = testFunctionsGoogleConfig;
+          module.options.function = testFunction;
+          globSyncStub.returns([]);
+          return expect(module.validate()).to.be.fulfilled
+          .then(() => {
+            const lib = require('../lib/index');
+
+            expect(lib.entries).to.deep.equal({});
+            expect(globSyncStub).to.not.have.been.called;
+            expect(serverless.cli.log).to.not.have.been.called;
+            return null;
+          });
         });
       });
 
