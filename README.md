@@ -24,7 +24,7 @@ individually, resulting in smaller Lambda packages that contain only the code an
 dependencies needed to run the function. This allows the plugin to fully utilize
 WebPack's [Tree-Shaking][link-webpack-tree] optimization.
 
-## New in V3
+## Recent improvements
 
 * Support for individual packaging and optimization
 * Integrate with `serverless invoke local` (including watch mode)
@@ -387,6 +387,9 @@ Plugin commands are supported by the following providers. ⁇ indicates that com
 
 ## Release Notes
 
+* 3.1.2
+  * Fix issue where dependencies with dots in their names would not be installed [#251][link-251]
+
 * 3.1.1
   * Fix issue where locked dependencies (package-lock.json) were ignored [#245][link-245]
 
@@ -504,3 +507,5 @@ Plugin commands are supported by the following providers. ⁇ indicates that com
 [link-234]: https://github.com/serverless-heaven/serverless-webpack/pull/234
 
 [link-245]: https://github.com/serverless-heaven/serverless-webpack/issues/245
+
+[link-251]: https://github.com/serverless-heaven/serverless-webpack/issues/251
