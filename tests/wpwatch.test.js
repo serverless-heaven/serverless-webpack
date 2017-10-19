@@ -59,7 +59,8 @@ describe('wpwatch', function() {
     spawnStub = sandbox.stub(serverless.pluginManager, 'spawn');
 
     const webpackConfig = {
-      stats: 'minimal'
+      stats: 'minimal',
+      entry: { not: 'empty' }
     };
     _.set(module, 'webpackConfig', webpackConfig);
   });

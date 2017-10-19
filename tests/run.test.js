@@ -81,6 +81,7 @@ describe('run', () => {
       const watch = module.watch.bind(module);
       webpackMock.compilerMock.watch = sandbox.stub().yields(null, {});
       _.set(module, 'options.function', 'myFunction');
+      _.set(module, 'serverless.service.functions', { 'myFunction': {} });
 
       watch('invoke:local');
       expect(spawnStub).to.not.have.been.called;

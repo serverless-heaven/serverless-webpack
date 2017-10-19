@@ -385,6 +385,18 @@ describe('validate', () => {
         },
       };
 
+      const testFunctionsWebpackFalseConfig = {
+        func1: {
+          handler: 'module1.func1handler',
+          artifact: 'artifact-func1.zip',
+        },
+        func2: {
+          handler: 'module2.func2handler',
+          artifact: 'artifact-func2.zip',
+          runtime: 'python2.7',
+        },
+      };
+
       it('should expose all functions if `options.function` is not defined', () => {
         const testOutPath = 'test';
         const testConfig = {
@@ -409,6 +421,32 @@ describe('validate', () => {
 
           expect(lib.entries).to.deep.equal(expectedLibEntries);
           expect(globSyncStub).to.have.callCount(4);
+          expect(serverless.cli.log).to.not.have.been.called;
+          return null;
+        });
+      });
+
+      it('should not expose any functions where a node based runtime isn\'t being used', () => {
+        const testOutPath = 'test';
+        const testConfig = {
+          entry: 'test',
+          context: 'testcontext',
+          output: {
+            path: testOutPath,
+          },
+        };
+        module.serverless.service.custom.webpack = testConfig;
+        module.serverless.service.functions = testFunctionsWebpackFalseConfig;
+        globSyncStub.callsFake(filename => [_.replace(filename, '*', 'js')]);
+        return expect(module.validate()).to.be.fulfilled
+        .then(() => {
+          const lib = require('../lib/index');
+          const expectedLibEntries = {
+            'module1': './module1.js',
+          };
+
+          expect(lib.entries).to.deep.equal(expectedLibEntries);
+          expect(globSyncStub).to.have.callCount(1);
           expect(serverless.cli.log).to.not.have.been.called;
           return null;
         });

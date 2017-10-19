@@ -60,7 +60,7 @@ describe('compile', () => {
   });
 
   it('should compile with webpack from a context configuration', () => {
-    const testWebpackConfig = 'testconfig';
+    const testWebpackConfig = [{ not: 'empty' }];
     module.webpackConfig = testWebpackConfig;
     return expect(module.compile()).to.be.fulfilled
     .then(() => {
@@ -71,14 +71,14 @@ describe('compile', () => {
   });
 
   it('should fail if there are compilation errors', () => {
-    module.webpackConfig = 'testconfig';
+    module.webpackConfig = [{ not: 'empty' }];
     // We stub errors here. It will be reset again in afterEach()
     sandbox.stub(webpackMock.statsMock.compilation, 'errors').value(['error']);
     return expect(module.compile()).to.be.rejectedWith(/compilation error/);
   });
 
   it('should work with multi compile', () => {
-    const testWebpackConfig = 'testconfig';
+    const testWebpackConfig = [{ not: 'empty' }];
     const multiStats = [{
       compilation: {
         errors: [],
@@ -102,7 +102,8 @@ describe('compile', () => {
 
   it('should use correct stats option', () => {
     const testWebpackConfig = {
-      stats: 'minimal'
+      stats: 'minimal',
+      entry: { not: 'empty' }
     };
     const mockStats = {
       compilation: {

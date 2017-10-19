@@ -72,6 +72,7 @@ describe('packageModules', () => {
     module = _.assign({
       serverless,
       options: {},
+      webpackConfig: [{ not: 'empty' }],
     }, baseModule);
   });
 

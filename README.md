@@ -108,6 +108,20 @@ module.exports = {
 };
 ```
 
+#### Non JS functions
+
+You can mix and match a project with different runtimes and serverless-webpack
+will do the right thing. However, you must package individually for this to
+work.
+
+```yaml
+# serverless.yml
+...
+package:
+  individually: true
+...
+```
+
 #### Full customization (for experts)
 
 The lib export also provides the `serverless` and `options` properties, through

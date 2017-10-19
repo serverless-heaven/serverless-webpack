@@ -66,6 +66,7 @@ describe('packExternalModules', () => {
       options: {
         verbose: true
       },
+      webpackConfig: [{ not: 'empty' }],
     }, baseModule);
   });
 
