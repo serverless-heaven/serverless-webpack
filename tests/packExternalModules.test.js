@@ -497,7 +497,8 @@ describe('packExternalModules', () => {
       childProcessMock.exec.onFirstCall().yields(null, '{}', '');
       childProcessMock.exec.onSecondCall().yields(null, '', '');
       childProcessMock.exec.onThirdCall().yields();
-      return expect(module.packExternalModules(stats)).to.be.fulfilled
+      module.compileStats = stats;
+      return expect(module.packExternalModules()).to.be.fulfilled
       .then(() => BbPromise.all([
         // The module package JSON and the composite one should have been stored
         expect(writeFileSyncStub).to.have.been.calledTwice,
