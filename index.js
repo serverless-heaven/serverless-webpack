@@ -95,8 +95,8 @@ class ServerlessWebpack {
         .then(() => this.serverless.pluginManager.spawn('webpack:package')),
 
       'before:invoke:local:invoke': () => BbPromise.bind(this)
-        .then(this.validate)
-        .then(this.compile)
+        .then(() => this.serverless.pluginManager.spawn('webpack:validate'))
+        .then(() => this.serverless.pluginManager.spawn('webpack:compile'))
         .then(this.prepareLocalInvoke),
 
       'after:invoke:local:invoke': () => BbPromise.bind(this)
@@ -129,12 +129,12 @@ class ServerlessWebpack {
 
       'before:offline:start': () => BbPromise.bind(this)
         .then(this.prepareOfflineInvoke)
-        .then(this.compile)
+        .then(() => this.serverless.pluginManager.spawn('webpack:compile'))
         .then(this.wpwatch),
 
       'before:offline:start:init': () => BbPromise.bind(this)
         .then(this.prepareOfflineInvoke)
-        .then(this.compile)
+        .then(() => this.serverless.pluginManager.spawn('webpack:compile'))
         .then(this.wpwatch),
 
     };
