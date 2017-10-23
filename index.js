@@ -81,12 +81,12 @@ class ServerlessWebpack {
     };
 
     this.hooks = {
-      'before:deploy:createDeploymentArtifacts': () => BbPromise.bind(this)
+      'before:package:createDeploymentArtifacts': () => BbPromise.bind(this)
         .then(() => this.serverless.pluginManager.spawn('webpack:validate'))
         .then(() => this.serverless.pluginManager.spawn('webpack:compile'))
         .then(() => this.serverless.pluginManager.spawn('webpack:package')),
 
-      'after:deploy:createDeploymentArtifacts': () => BbPromise.bind(this)
+      'after:package:createDeploymentArtifacts': () => BbPromise.bind(this)
         .then(this.cleanup),
 
       'before:deploy:function:packageFunction': () => BbPromise.bind(this)

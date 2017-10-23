@@ -192,6 +192,7 @@ custom:
 ```
 > Note that only relative path is supported at the moment.
 
+#### Forced inclusion
 
 Sometimes it might happen that you use dynamic requires in your code, i.e. you
 require modules that are only known at runtime. Webpack is not able to detect
@@ -209,6 +210,26 @@ custom:
       - module2
 ```
 
+#### Forced exclusion
+
+You can forcefully exclude detected external modules, e.g. if you have a module
+in your dependencies that is already installed at your provider's environment.
+
+Just add them to the `forceExclude` array property and they will not be packaged.
+
+```yaml
+# serverless.yml
+custom:
+  webpackIncludeModules:
+    forceExclude:
+      - module1
+      - module2
+```
+
+If you specify a module in both arrays, `forceInclude` and `forceExclude`, the
+exclude wins and the module will not be packaged.
+
+#### Examples
 
 You can find an example setups in the [`examples`][link-examples] folder.
 
