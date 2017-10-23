@@ -83,7 +83,8 @@ describe('packageModules', () => {
 
   describe('packageModules()', () => {
     it('should do nothing if no compile stats are available', () => {
-      return expect(module.packageModules({ stats: [] })).to.be.fulfilled
+      module.compileStats = { stats: [] };
+      return expect(module.packageModules()).to.be.fulfilled
       .then(() => BbPromise.all([
         expect(archiverMock.create).to.not.have.been.called,
         expect(writeFileDirStub).to.not.have.been.called,
@@ -141,7 +142,8 @@ describe('packageModules', () => {
 
         const expectedArtifactPath = path.join('.serverless', 'test-service.zip');
 
-        return expect(module.packageModules(stats)).to.be.fulfilled
+        module.compileStats = stats;
+        return expect(module.packageModules()).to.be.fulfilled
         .then(() => BbPromise.all([
           expect(func1).to.have.a.nested.property('package.artifact').that.equals(expectedArtifactPath),
           expect(func2).to.have.a.nested.property('package.artifact').that.equals(expectedArtifactPath),
@@ -206,7 +208,8 @@ describe('packageModules', () => {
 
           const expectedArtifactPath = path.join('.serverless', 'test-service.zip');
 
-          return expect(module.packageModules(stats)).to.be.fulfilled
+          module.compileStats = stats;
+          return expect(module.packageModules()).to.be.fulfilled
           .then(() => expect(serverless.service).to.have.a.nested.property('package.artifact').that.equals(expectedArtifactPath));
         });
       });
@@ -252,9 +255,10 @@ describe('packageModules', () => {
 
         const expectedArtifactPath = path.join('.serverless', 'test-service.zip');
 
+        module.compileStats = stats;
         return BbPromise.each([ '1.18.1', '2.17.0', '10.15.3', ], version => {
           getVersionStub.returns(version);
-          return expect(module.packageModules(stats)).to.be.fulfilled
+          return expect(module.packageModules()).to.be.fulfilled
           .then(() => BbPromise.all([
             expect(func1).to.have.a.nested.property('package.artifact').that.equals(expectedArtifactPath),
             expect(func2).to.have.a.nested.property('package.artifact').that.equals(expectedArtifactPath),
@@ -262,7 +266,7 @@ describe('packageModules', () => {
         })
         .then(() => BbPromise.each([ '1.17.0', '1.16.0-alpha', '1.15.3', ], version => {
           getVersionStub.returns(version);
-          return expect(module.packageModules(stats)).to.be.fulfilled
+          return expect(module.packageModules()).to.be.fulfilled
           .then(() => BbPromise.all([
             expect(func1).to.have.a.nested.property('artifact').that.equals(expectedArtifactPath),
             expect(func2).to.have.a.nested.property('artifact').that.equals(expectedArtifactPath),
@@ -310,7 +314,8 @@ describe('packageModules', () => {
         fsMock._streamMock.on.withArgs('close').yields();
         fsMock._statMock.isDirectory.returns(false);
 
-        return expect(module.packageModules(stats)).to.be.rejectedWith('Packaging: No files found');
+        module.compileStats = stats;
+        return expect(module.packageModules()).to.be.rejectedWith('Packaging: No files found');
       });
     });
 
@@ -381,7 +386,8 @@ describe('packageModules', () => {
         fsMock._streamMock.on.withArgs('close').yields();
         fsMock._statMock.isDirectory.returns(false);
 
-        return expect(module.packageModules(stats)).to.be.fulfilled
+        module.compileStats = stats;
+        return expect(module.packageModules()).to.be.fulfilled
         .then(() => BbPromise.all([
           expect(func1).to.have.a.nested.property('package.artifact').that.equals(path.join('.serverless', 'func1.zip')),
           expect(func2).to.have.a.nested.property('package.artifact').that.equals(path.join('.serverless', 'func2.zip')),

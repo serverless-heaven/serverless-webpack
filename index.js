@@ -48,8 +48,7 @@ class ServerlessWebpack {
       webpack: {
         usage: 'Bundle with Webpack',
         lifecycleEvents: [
-          'validate',
-          'compile',
+          'webpack'
         ],
         options: {
           out: {
@@ -58,22 +57,23 @@ class ServerlessWebpack {
           },
         },
         commands: {
-          invoke: {
-            usage: 'Run a function locally from the webpack output bundle',
+          validate: {
+            type: 'entrypoint',
             lifecycleEvents: [
-              'invoke',
+              'validate',
             ],
           },
-          watch: {
-            usage: 'Run a function from the webpack output bundle every time the source is changed',
+          compile: {
+            type: 'entrypoint',
             lifecycleEvents: [
-              'watch',
+              'compile',
             ],
           },
-          serve: {
-            usage: 'Simulate the API Gateway and serves lambdas locally',
+          package: {
+            type: 'entrypoint',
             lifecycleEvents: [
-              'serve',
+              'packExternalModules',
+              'packageModules'
             ],
           },
         },
@@ -82,23 +82,21 @@ class ServerlessWebpack {
 
     this.hooks = {
       'before:package:createDeploymentArtifacts': () => BbPromise.bind(this)
-        .then(this.validate)
-        .then(this.compile)
-        .then(this.packExternalModules)
-        .then(this.packageModules),
+        .then(() => this.serverless.pluginManager.spawn('webpack:validate'))
+        .then(() => this.serverless.pluginManager.spawn('webpack:compile'))
+        .then(() => this.serverless.pluginManager.spawn('webpack:package')),
 
       'after:package:createDeploymentArtifacts': () => BbPromise.bind(this)
         .then(this.cleanup),
 
       'before:deploy:function:packageFunction': () => BbPromise.bind(this)
-        .then(this.validate)
-        .then(this.compile)
-        .then(this.packExternalModules)
-        .then(this.packageModules),
+        .then(() => this.serverless.pluginManager.spawn('webpack:validate'))
+        .then(() => this.serverless.pluginManager.spawn('webpack:compile'))
+        .then(() => this.serverless.pluginManager.spawn('webpack:package')),
 
       'before:invoke:local:invoke': () => BbPromise.bind(this)
-        .then(this.validate)
-        .then(this.compile)
+        .then(() => this.serverless.pluginManager.spawn('webpack:validate'))
+        .then(() => this.serverless.pluginManager.spawn('webpack:compile'))
         .then(this.prepareLocalInvoke),
 
       'after:invoke:local:invoke': () => BbPromise.bind(this)
@@ -109,31 +107,34 @@ class ServerlessWebpack {
           return BbPromise.resolve();
         }),
 
-      'webpack:validate': () => BbPromise.bind(this)
+      'webpack:webpack': () => BbPromise.bind(this)
+        .then(() => this.serverless.pluginManager.spawn('webpack:validate'))
+        .then(() => this.serverless.pluginManager.spawn('webpack:compile'))
+        .then(() => this.serverless.pluginManager.spawn('webpack:package')),
+
+      /*
+       * Internal webpack events (can be hooked by plugins)
+       */
+      'webpack:validate:validate': () => BbPromise.bind(this)
         .then(this.validate),
 
-      'webpack:compile': () => BbPromise.bind(this)
-        .then(this.compile)
-        .then(this.packExternalModules)
+      'webpack:compile:compile': () => BbPromise.bind(this)
+        .then(this.compile),
+
+      'webpack:package:packExternalModules': () => BbPromise.bind(this)
+        .then(this.packExternalModules),
+
+      'webpack:package:packageModules': () => BbPromise.bind(this)
         .then(this.packageModules),
-
-      'webpack:invoke:invoke': () => BbPromise.bind(this)
-        .then(() => BbPromise.reject(new this.serverless.classes.Error('Use "serverless invoke local" instead.'))),
-
-      'webpack:watch:watch': () => BbPromise.bind(this)
-        .then(() => BbPromise.reject(new this.serverless.classes.Error('Use "serverless invoke local --watch" instead.'))),
-
-      'webpack:serve:serve': () => BbPromise.bind(this)
-        .then(() => BbPromise.reject(new this.serverless.classes.Error('serve has been removed. Use serverless-offline instead.'))),
 
       'before:offline:start': () => BbPromise.bind(this)
         .then(this.prepareOfflineInvoke)
-        .then(this.compile)
+        .then(() => this.serverless.pluginManager.spawn('webpack:compile'))
         .then(this.wpwatch),
 
       'before:offline:start:init': () => BbPromise.bind(this)
         .then(this.prepareOfflineInvoke)
-        .then(this.compile)
+        .then(() => this.serverless.pluginManager.spawn('webpack:compile'))
         .then(this.wpwatch),
 
     };

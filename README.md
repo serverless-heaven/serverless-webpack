@@ -26,11 +26,7 @@ WebPack's [Tree-Shaking][link-webpack-tree] optimization.
 
 ## Recent improvements
 
-* Support for individual packaging and optimization
-* Integrate with `serverless invoke local` (including watch mode)
-* Stabilized package handling
-* Improved compatibility with other plugins
-* Updated examples
+* Improved extensibility for plugin authors (see _For Developers_ section)
 
 For the complete release notes see the end of this document.
 
@@ -405,6 +401,59 @@ Plugin commands are supported by the following providers. ⁇ indicates that com
 | webpack               |      ✔︎     |         ✔︎        |        ⁇        |            ⁇           |
 | invoke local          |      ✔︎     |         ✔︎        |        ⁇        |            ⁇           |
 | invoke local --watch  |      ✔︎     |         ✔︎        |        ⁇        |            ⁇           |
+
+## For developers
+
+The plugin exposes a complete lifecycle model that can be hooked by other plugins to extend
+the functionality of the plugin or add additional actions.
+
+### The event lifecycles and their hookable events (H)
+
+All events (H) can be hooked by a plugin.
+
+```
+-> webpack:validate
+   -> webpack:validate:validate (H)
+-> webpack:compile
+   -> webpack:compile:compile (H)
+-> webpack:package
+   -> webpack:package:packExternalModules (H)
+   -> webpack:package:packageModules (H)
+```
+
+### Integration of the lifecycles into the command invocations and hooks
+
+The following list shows all lifecycles that are invoked/started by the
+plugin when running a command or invoked by a hook.
+
+```
+-> before:package:createDeploymentArtifacts
+   -> webpack:validate
+   -> webpack:compile
+   -> webpack:package
+
+-> before:deploy:function:packageFunction
+   -> webpack:validate
+   -> webpack:compile
+   -> webpack:package
+
+-> before:invoke:local:invoke
+   -> webpack:validate
+   -> webpack:compile
+
+-> webpack
+   -> webpack:validate
+   -> webpack:compile
+   -> webpack:package
+
+-> before:offline:start
+   -> webpack:validate
+   -> webpack:compile
+
+-> before:offline:start:init
+   -> webpack:validate
+   -> webpack:compile
+```
 
 ## Release Notes
 

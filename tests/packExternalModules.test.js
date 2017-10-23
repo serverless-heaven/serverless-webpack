@@ -154,7 +154,8 @@ describe('packExternalModules', () => {
 
     it('should do nothing if webpackIncludeModules is not set', () => {
       _.unset(serverless, 'service.custom.webpackIncludeModules');
-      return expect(module.packExternalModules({ stats: [] })).to.eventually.deep.equal({ stats: [] })
+      module.compileStats = { stats: [] };
+      return expect(module.packExternalModules()).to.be.fulfilled
       .then(() => BbPromise.all([
         expect(fsExtraMock.copy).to.not.have.been.called,
         expect(childProcessMock.exec).to.not.have.been.called,
@@ -188,7 +189,8 @@ describe('packExternalModules', () => {
       childProcessMock.exec.onFirstCall().yields(null, '{}', '');
       childProcessMock.exec.onSecondCall().yields(null, '', '');
       childProcessMock.exec.onThirdCall().yields();
-      return expect(module.packExternalModules(stats)).to.be.fulfilled
+      module.compileStats = stats;
+      return expect(module.packExternalModules()).to.be.fulfilled
       .then(() => BbPromise.all([
         // The module package JSON and the composite one should have been stored
         expect(writeFileSyncStub).to.have.been.calledTwice,
@@ -217,7 +219,8 @@ describe('packExternalModules', () => {
       childProcessMock.exec.onFirstCall().yields(null, '{}', '');
       childProcessMock.exec.onSecondCall().yields(new Error('npm install failed'));
       childProcessMock.exec.onThirdCall().yields();
-      return expect(module.packExternalModules(stats)).to.be.rejectedWith('npm install failed')
+      module.compileStats = stats;
+      return expect(module.packExternalModules()).to.be.rejectedWith('npm install failed')
       .then(() => BbPromise.all([
         // npm ls and npm install should have been called
         expect(childProcessMock.exec).to.have.been.calledTwice,
@@ -230,7 +233,8 @@ describe('packExternalModules', () => {
       fsExtraMock.pathExists.yields(null, false);
       fsExtraMock.copy.yields();
       childProcessMock.exec.yields(new Error('something went wrong'), '{}', stderr);
-      return expect(module.packExternalModules(stats)).to.be.rejectedWith('something went wrong')
+      module.compileStats = stats;
+      return expect(module.packExternalModules()).to.be.rejectedWith('something went wrong')
       .then(() => BbPromise.all([
         // The module package JSON and the composite one should have been stored
         expect(writeFileSyncStub).to.not.have.been.called,
@@ -250,7 +254,8 @@ describe('packExternalModules', () => {
       fsExtraMock.pathExists.yields(null, false);
       fsExtraMock.copy.yields();
       childProcessMock.exec.yields(new Error('something went wrong'), '{}', stderr);
-      return expect(module.packExternalModules(stats)).to.be.rejectedWith('something went wrong')
+      module.compileStats = stats;
+      return expect(module.packExternalModules()).to.be.rejectedWith('something went wrong')
       .then(() => BbPromise.all([
         // The module package JSON and the composite one should have been stored
         expect(writeFileSyncStub).to.not.have.been.called,
@@ -311,7 +316,8 @@ describe('packExternalModules', () => {
       childProcessMock.exec.onFirstCall().yields(new Error('NPM error'), JSON.stringify(lsResult), stderr);
       childProcessMock.exec.onSecondCall().yields(null, '', '');
       childProcessMock.exec.onThirdCall().yields();
-      return expect(module.packExternalModules(stats)).to.be.fulfilled
+      module.compileStats = stats;
+      return expect(module.packExternalModules()).to.be.fulfilled
       .then(() => BbPromise.all([
         // The module package JSON and the composite one should have been stored
         expect(writeFileSyncStub).to.have.been.calledTwice,
@@ -338,9 +344,9 @@ describe('packExternalModules', () => {
       module.webpackOutputPath = 'outputPath';
       fsExtraMock.copy.yields();
       childProcessMock.exec.yields(null, '{}', '');
-      return expect(module.packExternalModules(noExtStats)).to.be.fulfilled
-      .then(stats => BbPromise.all([
-        expect(stats).to.deep.equal(noExtStats),
+      module.compileStats = noExtStats;
+      return expect(module.packExternalModules()).to.be.fulfilled
+      .then(() => BbPromise.all([
         // The module package JSON and the composite one should have been stored
         expect(writeFileSyncStub).to.not.have.been.called,
         // The modules should have been copied
@@ -382,7 +388,8 @@ describe('packExternalModules', () => {
       childProcessMock.exec.onFirstCall().yields(null, '{}', '');
       childProcessMock.exec.onSecondCall().yields(null, '', '');
       childProcessMock.exec.onThirdCall().yields();
-      return expect(module.packExternalModules(stats)).to.be.fulfilled
+      module.compileStats = stats;
+      return expect(module.packExternalModules()).to.be.fulfilled
       .then(() => BbPromise.all([
         // The module package JSON and the composite one should have been stored
         expect(writeFileSyncStub).to.have.been.calledTwice,
@@ -436,7 +443,8 @@ describe('packExternalModules', () => {
       childProcessMock.exec.onFirstCall().yields(null, '{}', '');
       childProcessMock.exec.onSecondCall().yields(null, '', '');
       childProcessMock.exec.onThirdCall().yields();
-      return expect(module.packExternalModules(stats)).to.be.fulfilled
+      module.compileStats = stats;
+      return expect(module.packExternalModules()).to.be.fulfilled
       .then(() => BbPromise.all([
         // The module package JSON and the composite one should have been stored
         expect(writeFileSyncStub).to.have.been.calledTwice,
@@ -489,7 +497,8 @@ describe('packExternalModules', () => {
       childProcessMock.exec.onFirstCall().yields(null, '{}', '');
       childProcessMock.exec.onSecondCall().yields(null, '', '');
       childProcessMock.exec.onThirdCall().yields();
-      return expect(module.packExternalModules(stats)).to.be.fulfilled
+      module.compileStats = stats;
+      return expect(module.packExternalModules()).to.be.fulfilled
       .then(() => BbPromise.all([
         // The module package JSON and the composite one should have been stored
         expect(writeFileSyncStub).to.have.been.calledTwice,
@@ -537,7 +546,8 @@ describe('packExternalModules', () => {
       childProcessMock.exec.onFirstCall().yields(null, '{}', '');
       childProcessMock.exec.onSecondCall().yields(null, '', '');
       childProcessMock.exec.onThirdCall().yields();
-      return expect(module.packExternalModules(stats)).to.be.fulfilled
+      module.compileStats = stats;
+      return expect(module.packExternalModules()).to.be.fulfilled
       .then(() => BbPromise.all([
         // The module package JSON and the composite one should have been stored
         expect(writeFileSyncStub).to.have.been.calledTwice,
@@ -589,7 +599,8 @@ describe('packExternalModules', () => {
       childProcessMock.exec.onFirstCall().yields(null, '{}', '');
       childProcessMock.exec.onSecondCall().yields(null, '', '');
       childProcessMock.exec.onThirdCall().yields();
-      return expect(module.packExternalModules(stats)).to.be.fulfilled
+      module.compileStats = stats;
+      return expect(module.packExternalModules()).to.be.fulfilled
       .then(() => BbPromise.all([
         // The module package JSON and the composite one should have been stored
         expect(writeFileSyncStub).to.have.been.calledTwice,
@@ -671,7 +682,8 @@ describe('packExternalModules', () => {
         childProcessMock.exec.onFirstCall().yields(null, JSON.stringify(dependencyGraph), '');
         childProcessMock.exec.onSecondCall().yields(null, '', '');
         childProcessMock.exec.onThirdCall().yields();
-        return expect(module.packExternalModules(peerDepStats)).to.be.fulfilled
+        module.compileStats = peerDepStats;
+        return expect(module.packExternalModules()).to.be.fulfilled
         .then(() => BbPromise.all([
           // The module package JSON and the composite one should have been stored
           expect(writeFileSyncStub).to.have.been.calledTwice,
