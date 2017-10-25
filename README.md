@@ -24,9 +24,10 @@ individually, resulting in smaller Lambda packages that contain only the code an
 dependencies needed to run the function. This allows the plugin to fully utilize
 WebPack's [Tree-Shaking][link-webpack-tree] optimization.
 
-## Recent improvements
+## Recent improvements and important changes
 
 * Improved extensibility for plugin authors (see _For Developers_ section)
+* Serverless 1.12+ is now required
 
 For the complete release notes see the end of this document.
 
@@ -476,6 +477,15 @@ plugin when running a command or invoked by a hook.
 
 ## Release Notes
 
+* 4.0.0
+  * BREAKING: Expose lifecycle events for plugin authors [#254][link-254]
+  * Fixed deprecated hook warning [#126][link-126]
+  * Support forceExclude option for external modules [#247][link-247]
+  * Support stats output configuration in webpack config [#260][link-260]
+  * Google: Only integrate package.json but not node modules into artifact [#264][link-264]
+  * Documentation fixes and updates [#265][link-265]
+  * Updated examples [#250][link-250]
+
 * 3.1.2
   * Fix issue where dependencies with dots in their names would not be installed [#251][link-251]
 
@@ -598,3 +608,11 @@ plugin when running a command or invoked by a hook.
 [link-245]: https://github.com/serverless-heaven/serverless-webpack/issues/245
 
 [link-251]: https://github.com/serverless-heaven/serverless-webpack/issues/251
+
+[link-126]: https://github.com/serverless-heaven/serverless-webpack/issues/126
+[link-247]: https://github.com/serverless-heaven/serverless-webpack/issues/247
+[link-250]: https://github.com/serverless-heaven/serverless-webpack/issues/250
+[link-254]: https://github.com/serverless-heaven/serverless-webpack/pull/254
+[link-260]: https://github.com/serverless-heaven/serverless-webpack/issues/260
+[link-264]: https://github.com/serverless-heaven/serverless-webpack/pull/264
+[link-265]: https://github.com/serverless-heaven/serverless-webpack/pull/265
