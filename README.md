@@ -144,6 +144,24 @@ module.exports = {
 };
 ```
 
+### Stats
+
+By default, the plugin will print a quite verbose bundle information to your console. However, if 
+you are not satisfy with the current output info, you can overwrite it in your `webpack.config.js`
+
+```js
+// webpack.config.js
+
+module.export = {
+  // ...
+  stats: 'minimal'
+  // ...
+}
+```
+
+All the stats config can be found in [webpack's documentation](https://webpack.js.org/configuration/stats/)
+
+
 ### Node modules / externals
 
 By default, the plugin will try to bundle all dependencies. However, you don't
