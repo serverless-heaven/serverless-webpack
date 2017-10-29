@@ -1,7 +1,8 @@
-var nodeExternals = require('webpack-node-externals');
+const slsw = require('serverless-webpack');
+const nodeExternals = require('webpack-node-externals');
 
 module.exports = {
-  entry: './handler.js',
+  entry: slsw.lib.entries,
   target: 'node',
   externals: [nodeExternals()] // exclude external modules
 };
