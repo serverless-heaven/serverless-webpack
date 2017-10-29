@@ -8,6 +8,10 @@ provider:
   name: aws
   runtime: nodejs6.10
 
+  # Individual packaging MUST NOT be enabled as we use static entry definitions!
+  # package:
+  #   individually: true
+
 functions:
   first:
     handler: first.hello
