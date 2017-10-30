@@ -132,12 +132,13 @@ for best compatibility with external dependencies:
 
 ```js
 // webpack.config.js
+const path = require('path');
 
 module.exports = {
   // ...
   output: {
     libraryTarget: 'commonjs',
-    path: '.webpack',
+    path: path.resolve(__dirname, '.webpack'),
     filename: 'handler.js', // this should match the first part of function handler in `serverless.yml`
   },
   // ...
