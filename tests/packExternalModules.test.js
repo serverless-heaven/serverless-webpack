@@ -212,6 +212,53 @@ describe('packExternalModules', () => {
       ]));
     });
 
+    it('should skip module copy for Google provider', () => {
+      const expectedCompositePackageJSON = {
+        name: 'test-service',
+        version: '1.0.0',
+        description: 'Packaged externals for test-service',
+        private: true,
+        dependencies: {
+          '@scoped/vendor': '1.0.0',
+          uuid: '^5.4.1',
+          bluebird: '^3.4.0'
+        }
+      };
+      const expectedPackageJSON = {
+        dependencies: {
+          '@scoped/vendor': '1.0.0',
+          uuid: '^5.4.1',
+          bluebird: '^3.4.0'
+        }
+      };
+
+      _.set(serverless, 'service.provider.name', 'google');
+      module.webpackOutputPath = 'outputPath';
+      fsExtraMock.pathExists.yields(null, false);
+      fsExtraMock.copy.yields();
+      childProcessMock.exec.onFirstCall().yields(null, '{}', '');
+      childProcessMock.exec.onSecondCall().yields(null, '', '');
+      childProcessMock.exec.onThirdCall().yields();
+      module.compileStats = stats;
+      return expect(module.packExternalModules()).to.be.fulfilled
+      .then(() => BbPromise.all([
+        // The module package JSON and the composite one should have been stored
+        expect(writeFileSyncStub).to.have.been.calledTwice,
+        expect(writeFileSyncStub.firstCall.args[1]).to.equal(JSON.stringify(expectedCompositePackageJSON, null, 2)),
+        expect(writeFileSyncStub.secondCall.args[1]).to.equal(JSON.stringify(expectedPackageJSON, null, 2)),
+        // The modules should have been copied
+        expect(fsExtraMock.copy).to.have.not.been.called,
+        // npm ls and npm prune should have been called
+        expect(childProcessMock.exec).to.have.been.calledTwice,
+        expect(childProcessMock.exec.firstCall).to.have.been.calledWith(
+          'npm ls -prod -json -depth=1'
+        ),
+        expect(childProcessMock.exec.secondCall).to.have.been.calledWith(
+          'npm install'
+        )
+      ]));
+    });
+
     it('should reject if npm install fails', () => {
       module.webpackOutputPath = 'outputPath';
       fsExtraMock.pathExists.yields(null, false);
