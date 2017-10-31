@@ -10,6 +10,17 @@ provider:
 
 custom:
   webpackIncludeModules: true # enable auto including modules
+  # You also can forcefully include or exclude modules by defining it this way.
+  # Be aware that this only should be done for packages that webpack does not
+  # correctly detect as dependencies.
+  #
+  # webpackIncludeModules:
+  #   forceInclude:
+  #     - myModule1
+  #   forceExclude:
+  #     - myModule2
+  #
+  # This can be used to exclude aws-sdk even if it is present in the production dependencies
 
 functions:
   first:

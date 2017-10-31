@@ -6,18 +6,3 @@
  * does not work with individual packaging of functions and prevents you to
  * use optimizations like Webpack's tree shaking.
  */
-
-const path = require('path');
-
-module.exports = {
-  entry: {
-    first: './first.js',
-    second: './second.js'
-  },
-  target: 'node',
-  output: {
-    libraryTarget: 'commonjs',
-    path: path.join(__dirname, '.webpack'),
-    filename: '[name].js'
-  },
-};

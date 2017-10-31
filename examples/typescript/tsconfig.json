@@ -1,5 +1,12 @@
 {
   "compilerOptions": {
-    "sourceMap": true
+    "sourceMap": true,
+    "lib": [
+      "es5",
+      "es6",
+      "dom",
+      "es2015",
+      "esnext.asynciterable"
+    ]
   }
 }
