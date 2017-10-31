@@ -132,13 +132,14 @@ for best compatibility with external dependencies:
 
 ```js
 // webpack.config.js
+const path = require('path');
 
 module.exports = {
   // ...
   output: {
     libraryTarget: 'commonjs',
-    path: '.webpack',
-    filename: 'handler.js', // this should match the first part of function handler in `serverless.yml`
+    path: path.resolve(__dirname, '.webpack'),
+    filename: '[name].js',
   },
   // ...
 };
@@ -146,7 +147,7 @@ module.exports = {
 
 ### Stats
 
-By default, the plugin will print a quite verbose bundle information to your console. However, if 
+By default, the plugin will print a quite verbose bundle information to your console. However, if
 you are not satisfy with the current output info, you can overwrite it in your `webpack.config.js`
 
 ```js
