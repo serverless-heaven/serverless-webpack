@@ -511,7 +511,7 @@ describe('validate', () => {
           globSyncStub.callsFake(filename => [_.replace(filename, '*', 'js')]);
           return expect(module.validate()).to.be.fulfilled
           .then(() => {
-            expect(module.webpackConfig.length).to.equal(4);
+            expect(module.webpackConfig).to.have.lengthOf(4);
             expect(module.webpackConfig[0].output.path).to.equal('output/func1');
             expect(module.webpackConfig[1].output.path).to.equal('output/func2');
             expect(module.webpackConfig[2].output.path).to.equal('output/func3');
@@ -533,7 +533,7 @@ describe('validate', () => {
           globSyncStub.callsFake(filename => [_.replace(filename, '*', 'js')]);
           return expect(module.validate()).to.be.fulfilled
           .then(() => {
-            expect(module.webpackConfig.length).to.equal(4);
+            expect(module.webpackConfig).to.have.lengthOf(4);
             expect(module.webpackConfig[0].devtool).to.equal('source-map');
             expect(module.webpackConfig[1].devtool).to.equal('source-map');
             expect(module.webpackConfig[2].devtool).to.equal('source-map');
