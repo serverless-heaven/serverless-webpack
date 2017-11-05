@@ -434,6 +434,123 @@ describe('validate', () => {
         });
       });
 
+      describe('package individually', () => {
+        const testConfig = {
+          entry: {
+            module1: './module1.js',
+            module2: './module2.js',
+            'handlers/func3/module2': './handlers/func3/module2.js',
+            'handlers/module2/func3/module2': './handlers/module2/func3/module2.js'
+          },
+          output: {
+            path: 'output',
+          },
+        };
+
+        beforeEach(() => {
+          _.set(module.serverless, 'service.package.individually', 'true');
+        });
+
+        afterEach(() => {
+          _.unset(module.serverless, 'service.package.individually');
+        });
+
+        it('should enable multiCompile', () => {
+          module.serverless.service.custom.webpack = testConfig;
+          module.serverless.service.functions = testFunctionsConfig;
+          globSyncStub.callsFake(filename => [_.replace(filename, '*', 'js')]);
+
+          expect(module.multiCompile).to.be.undefined;
+          return expect(module.validate()).to.be.fulfilled
+          .then(() => {
+            expect(module.multiCompile).to.be.true;
+
+            return null;
+          });
+        });
+
+        it('should expose all functions details in entryFunctions property', () => {
+          module.serverless.service.custom.webpack = testConfig;
+          module.serverless.service.functions = testFunctionsConfig;
+          globSyncStub.callsFake(filename => [_.replace(filename, '*', 'js')]);
+          return expect(module.validate()).to.be.fulfilled
+          .then(() => {
+            expect(module.entryFunctions).to.deep.equal([
+              {
+                handlerFile: 'module1',
+                funcName: 'func1',
+                func: testFunctionsConfig.func1,
+                entry: { key: 'module1', value: './module1.js' }
+              },
+              {
+                handlerFile: 'module2',
+                funcName: 'func2',
+                func: testFunctionsConfig.func2,
+                entry: { key: 'module2', value: './module2.js' }
+              },
+              {
+                handlerFile: 'handlers/func3/module2',
+                funcName: 'func3',
+                func: testFunctionsConfig.func3,
+                entry: { key: 'handlers/func3/module2', value: './handlers/func3/module2.js' }
+              },
+              {
+                handlerFile: 'handlers/module2/func3/module2',
+                funcName: 'func4',
+                func: testFunctionsConfig.func4,
+                entry: { key: 'handlers/module2/func3/module2', value: './handlers/module2/func3/module2.js' }
+              }
+            ]);
+            return null;
+          });
+        });
+
+        it('should set webpackConfig output path for every functions', () => {
+          module.serverless.service.custom.webpack = testConfig;
+          module.serverless.service.functions = testFunctionsConfig;
+          globSyncStub.callsFake(filename => [_.replace(filename, '*', 'js')]);
+          return expect(module.validate()).to.be.fulfilled
+          .then(() => {
+            expect(module.webpackConfig).to.have.lengthOf(4);
+            expect(module.webpackConfig[0].output.path).to.equal('output/func1');
+            expect(module.webpackConfig[1].output.path).to.equal('output/func2');
+            expect(module.webpackConfig[2].output.path).to.equal('output/func3');
+            expect(module.webpackConfig[3].output.path).to.equal('output/func4');
+
+            return null;
+          });
+        });
+
+        it('should clone other webpackConfig options without modification', () => {
+          module.serverless.service.custom.webpack = _.merge({}, testConfig, {
+            devtool: 'source-map',
+            context: 'some context',
+            output: {
+              libraryTarget: 'commonjs'
+            }
+          });
+          module.serverless.service.functions = testFunctionsConfig;
+          globSyncStub.callsFake(filename => [_.replace(filename, '*', 'js')]);
+          return expect(module.validate()).to.be.fulfilled
+          .then(() => {
+            expect(module.webpackConfig).to.have.lengthOf(4);
+            expect(module.webpackConfig[0].devtool).to.equal('source-map');
+            expect(module.webpackConfig[1].devtool).to.equal('source-map');
+            expect(module.webpackConfig[2].devtool).to.equal('source-map');
+            expect(module.webpackConfig[3].devtool).to.equal('source-map');
+            expect(module.webpackConfig[0].context).to.equal('some context');
+            expect(module.webpackConfig[1].context).to.equal('some context');
+            expect(module.webpackConfig[2].context).to.equal('some context');
+            expect(module.webpackConfig[3].context).to.equal('some context');
+            expect(module.webpackConfig[0].output.libraryTarget).to.equal('commonjs');
+            expect(module.webpackConfig[1].output.libraryTarget).to.equal('commonjs');
+            expect(module.webpackConfig[2].output.libraryTarget).to.equal('commonjs');
+            expect(module.webpackConfig[3].output.libraryTarget).to.equal('commonjs');
+            return null;
+          });
+        });
+      });
+
       it('should show a warning if more than one matching handler is found', () => {
         const testOutPath = 'test';
         const testFunction = 'func1';
