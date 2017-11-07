@@ -8,4 +8,5 @@ describe('serverless-webpack', () => {
   require('./run.test');
   require('./cleanup.test');
   require('./wpwatch.test');
+  require('./runPluginSupport.test');
 });

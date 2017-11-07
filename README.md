@@ -18,6 +18,7 @@ and much more!
 * Configuration possibilities range from zero-config to fully customizable
 * Support of `serverless package`, `serverless deploy` and `serverless deploy function`
 * Support of `serverless invoke local` and `serverless invoke local --watch`
+* Support of `serverless run` and `serverless run --watch`
 * Integrates with [`serverless-offline`][link-serverless-offline] to simulate local API Gateway endpoints
 * When enabled in your service configuration, functions are packaged and compiled
 individually, resulting in smaller Lambda packages that contain only the code and
@@ -338,6 +339,19 @@ All options that are supported by invoke local can be used as usual:
 - `--data` or `-d` (optional) inline JSON data used as the function input event
 
 > :exclamation: The old `webpack watch` command has been disabled.
+
+### Usage with serverless run (Serverless Event Gateway)
+
+The `serverless run` command is supported with the plugin. To test a local
+service with the Serverless Emulator, you can use the `serverless run`
+command as documented by Serverless. The command will compile the code before
+it uploads it into the event gateway.
+
+#### Serverless run with webpack watch mode
+
+You can enable source watch mode with `serverless run --watch`. The plugin will
+then watch for any source changes, recompile and redeploy the code to the event
+gateway. So you can just keep the event gateway running and test new code immediately.
 
 ### Usage with serverless-offline
 

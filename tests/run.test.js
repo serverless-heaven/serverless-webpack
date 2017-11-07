@@ -80,8 +80,9 @@ describe('run', () => {
       module.isWatching = false;
       const watch = module.watch.bind(module);
       webpackMock.compilerMock.watch = sandbox.stub().yields(null, {});
+      _.set(module, 'options.function', 'myFunction');
 
-      watch();
+      watch('invoke:local');
       expect(spawnStub).to.not.have.been.called;
       expect(module.isWatching).to.be.true;
     });
@@ -91,9 +92,33 @@ describe('run', () => {
       const watch = module.watch.bind(module);
       webpackMock.compilerMock.watch = sandbox.stub().yields(null, {});
 
-      watch();
+      watch('invoke:local');
       expect(spawnStub).to.have.been.calledOnce;
       expect(spawnStub).to.have.been.calledWith('invoke:local');
+      expect(module.isWatching).to.be.true;
+    });
+
+    it('should not call given handler function on first run', () => {
+      module.isWatching = false;
+      const watch = module.watch.bind(module);
+      const watchHandler = sandbox.stub().returns(BbPromise.resolve());
+      webpackMock.compilerMock.watch = sandbox.stub().yields(null, {});
+
+      watch(watchHandler);
+      expect(spawnStub).to.not.have.been.called;
+      expect(watchHandler).to.not.have.been.called;
+      expect(module.isWatching).to.be.true;
+    });
+
+    it('should call given handler function on subsequent runs', () => {
+      module.isWatching = true;
+      const watch = module.watch.bind(module);
+      const watchHandler = sandbox.stub().returns(BbPromise.resolve());
+      webpackMock.compilerMock.watch = sandbox.stub().yields(null, {});
+
+      watch(watchHandler);
+      expect(spawnStub).to.have.not.been.called;
+      expect(watchHandler).to.have.been.calledOnce;
       expect(module.isWatching).to.be.true;
     });
 
