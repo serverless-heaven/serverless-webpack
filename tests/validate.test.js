@@ -436,12 +436,6 @@ describe('validate', () => {
 
       describe('package individually', () => {
         const testConfig = {
-          entry: {
-            module1: './module1.js',
-            module2: './module2.js',
-            'handlers/func3/module2': './handlers/func3/module2.js',
-            'handlers/module2/func3/module2': './handlers/module2/func3/module2.js'
-          },
           output: {
             path: 'output',
           },
