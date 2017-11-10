@@ -463,6 +463,32 @@ describe('validate', () => {
           });
         });
 
+        it('should throw an exception if webpackConfig.entry is customised', () => {
+          module.serverless.service.custom.webpack = _.merge({}, testConfig, {
+            entry: {
+              module1: './module1.js',
+              module2: './module2.js'
+            }
+          });
+          module.serverless.service.functions = testFunctionsConfig;
+          globSyncStub.callsFake(filename => [_.replace(filename, '*', 'js')]);
+          expect(() => {
+            module.validate();
+          }).to.throw(/Webpack entry must be automatically resolved when package.individually is set to true/);
+        });
+
+        it('should not throw an exception if webpackConfig.entry is set to lib.entries for backward compatibility', () => {
+          const lib = require('../lib/index');
+          module.serverless.service.custom.webpack = _.merge({}, testConfig, {
+            entry: lib.entries
+          });
+          module.serverless.service.functions = testFunctionsConfig;
+          globSyncStub.callsFake(filename => [_.replace(filename, '*', 'js')]);
+          expect(() => {
+            module.validate();
+          }).to.not.throw();
+        });
+
         it('should expose all functions details in entryFunctions property', () => {
           module.serverless.service.custom.webpack = testConfig;
           module.serverless.service.functions = testFunctionsConfig;

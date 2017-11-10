@@ -281,7 +281,9 @@ result, the deployed artifacts are smaller, depending on the functions and
 cold-start times (to install the functions into the cloud at runtime) are reduced
 too.
 
-The individual packaging should be combined with the _automatic entry resolution_ (see above).
+The individual packaging will automatically apply the _automatic entry resolution_ (see above) and
+you will not be able to configure the entry config in webpack. An error will be thrown
+if you are trying to override the entry in webpack.config.js with other unsupported values.
 
 The individual packaging needs more time at the packaging phase, but you'll
 get that paid back twice at runtime.
