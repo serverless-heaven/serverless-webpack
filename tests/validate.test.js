@@ -436,12 +436,6 @@ describe('validate', () => {
 
       describe('package individually', () => {
         const testConfig = {
-          entry: {
-            module1: './module1.js',
-            module2: './module2.js',
-            'handlers/func3/module2': './handlers/func3/module2.js',
-            'handlers/module2/func3/module2': './handlers/module2/func3/module2.js'
-          },
           output: {
             path: 'output',
           },
@@ -467,6 +461,29 @@ describe('validate', () => {
 
             return null;
           });
+        });
+
+        it('should fail if webpackConfig.entry is customised', () => {
+          module.serverless.service.custom.webpack = _.merge({}, testConfig, {
+            entry: {
+              module1: './module1.js',
+              module2: './module2.js'
+            }
+          });
+          module.serverless.service.functions = testFunctionsConfig;
+          globSyncStub.callsFake(filename => [_.replace(filename, '*', 'js')]);
+          return expect(module.validate()).to.be.rejectedWith(
+            /Webpack entry must be automatically resolved when package.individually is set to true/);
+        });
+
+        it('should not fail if webpackConfig.entry is set to lib.entries for backward compatibility', () => {
+          const lib = require('../lib/index');
+          module.serverless.service.custom.webpack = _.merge({}, testConfig, {
+            entry: lib.entries
+          });
+          module.serverless.service.functions = testFunctionsConfig;
+          globSyncStub.callsFake(filename => [_.replace(filename, '*', 'js')]);
+          return expect(module.validate()).to.be.fulfilled;
         });
 
         it('should expose all functions details in entryFunctions property', () => {
