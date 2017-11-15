@@ -99,4 +99,31 @@ describe('compile', () => {
       return null;
     });
   });
+
+  it('should use correct stats option', () => {
+    const testWebpackConfig = {
+      stats: 'minimal'
+    };
+    let mockStats = {
+      compilation: {
+        errors: [],
+        compiler: {
+          outputPath: 'statsMock-outputPath'
+        }
+      },
+      toString: sandbox.stub().returns('testStats')
+    };
+
+    module.webpackConfig = testWebpackConfig;
+    webpackMock.compilerMock.run.reset();
+    webpackMock.compilerMock.run.yields(null, mockStats);
+    return (expect(module.compile()).to.be.fulfilled)
+    .then(() => {
+      module.webpackConfig = [testWebpackConfig];
+      return (expect(module.compile()).to.be.fulfilled);
+    })
+    .then(() => {
+      expect(mockStats.toString.args).to.eql([[testWebpackConfig.stats], [testWebpackConfig.stats]]);
+    });
+  });
 });
