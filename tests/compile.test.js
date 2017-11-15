@@ -104,7 +104,7 @@ describe('compile', () => {
     const testWebpackConfig = {
       stats: 'minimal'
     };
-    let mockStats = {
+    const mockStats = {
       compilation: {
         errors: [],
         compiler: {
@@ -119,10 +119,13 @@ describe('compile', () => {
     webpackMock.compilerMock.run.yields(null, mockStats);
     return (expect(module.compile()).to.be.fulfilled)
     .then(() => {
+      expect(webpackMock).to.have.been.calledWith(testWebpackConfig);
+      expect(mockStats.toString.firstCall.args).to.eql([testWebpackConfig.stats]);
       module.webpackConfig = [testWebpackConfig];
       return (expect(module.compile()).to.be.fulfilled);
     })
     .then(() => {
+      expect(webpackMock).to.have.been.calledWith([testWebpackConfig]);
       expect(mockStats.toString.args).to.eql([[testWebpackConfig.stats], [testWebpackConfig.stats]]);
     });
   });
