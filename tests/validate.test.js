@@ -506,13 +506,13 @@ describe('validate', () => {
                 entry: { key: 'module2', value: './module2.js' }
               },
               {
-                handlerFile: 'handlers/func3/module2',
+                handlerFile: path.join('handlers', 'func3', 'module2'),
                 funcName: 'func3',
                 func: testFunctionsConfig.func3,
                 entry: { key: 'handlers/func3/module2', value: './handlers/func3/module2.js' }
               },
               {
-                handlerFile: 'handlers/module2/func3/module2',
+                handlerFile: path.join('handlers', 'module2', 'func3', 'module2'),
                 funcName: 'func4',
                 func: testFunctionsConfig.func4,
                 entry: { key: 'handlers/module2/func3/module2', value: './handlers/module2/func3/module2.js' }
@@ -529,10 +529,10 @@ describe('validate', () => {
           return expect(module.validate()).to.be.fulfilled
           .then(() => {
             expect(module.webpackConfig).to.have.lengthOf(4);
-            expect(module.webpackConfig[0].output.path).to.equal('output/func1');
-            expect(module.webpackConfig[1].output.path).to.equal('output/func2');
-            expect(module.webpackConfig[2].output.path).to.equal('output/func3');
-            expect(module.webpackConfig[3].output.path).to.equal('output/func4');
+            expect(module.webpackConfig[0].output.path).to.equal(path.join('output', 'func1'));
+            expect(module.webpackConfig[1].output.path).to.equal(path.join('output', 'func2'));
+            expect(module.webpackConfig[2].output.path).to.equal(path.join('output', 'func3'));
+            expect(module.webpackConfig[3].output.path).to.equal(path.join('output', 'func4'));
 
             return null;
           });
