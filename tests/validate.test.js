@@ -6,7 +6,7 @@ const sinon = require('sinon');
 const mockery = require('mockery');
 const path = require('path');
 const Serverless = require('serverless');
-const makeFsExtraMock = require('./fs-extra.mock');
+const fsExtraMockFactory = require('./mocks/fs-extra.mock');
 
 chai.use(require('sinon-chai'));
 
@@ -27,7 +27,7 @@ describe('validate', () => {
     sandbox = sinon.sandbox.create();
 
     mockery.enable({ warnOnUnregistered: false });
-    fsExtraMock = makeFsExtraMock();
+    fsExtraMock = fsExtraMockFactory.create(sandbox);
     mockery.registerMock('fs-extra', fsExtraMock);
     mockery.registerMock('glob', globMock);
     baseModule = require('../lib/validate');
@@ -44,7 +44,6 @@ describe('validate', () => {
     serverless.cli = {
       log: sandbox.stub()
     };
-    fsExtraMock._resetSpies();
     module = _.assign({
       serverless,
       options: {},
