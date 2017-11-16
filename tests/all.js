@@ -7,4 +7,5 @@ describe('serverless-webpack', () => {
   require('./packExternalModules.test');
   require('./run.test');
   require('./cleanup.test');
+  require('./wpwatch.test');
 });
