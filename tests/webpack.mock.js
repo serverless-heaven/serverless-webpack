@@ -1,13 +1,15 @@
 'use strict';
 
-const StatsMock = sandbox => ({
+const sinon = require('sinon');
+
+const StatsMock = () => ({
   compilation: {
     errors: [],
     compiler: {
       outputPath: 'statsMock-outputPath',
     },
   },
-  toString: sandbox.stub().returns('testStats'),
+  toString: sinon.stub().returns('testStats'),
 });
 
 const CompilerMock = (sandbox, statsMock) => ({
@@ -18,7 +20,7 @@ const CompilerMock = (sandbox, statsMock) => ({
 const webpackMock = sandbox => {
   const statsMock = StatsMock(sandbox);
   const compilerMock = CompilerMock(sandbox, statsMock);
-  const mock = sandbox.stub().returns(compilerMock);
+  const mock = sinon.stub().returns(compilerMock);
   mock.compilerMock = compilerMock;
   mock.statsMock = statsMock;
   return mock;

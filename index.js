@@ -129,12 +129,10 @@ class ServerlessWebpack {
 
       'before:offline:start': () => BbPromise.bind(this)
         .then(this.prepareOfflineInvoke)
-        .then(() => this.serverless.pluginManager.spawn('webpack:compile'))
         .then(this.wpwatch),
 
       'before:offline:start:init': () => BbPromise.bind(this)
         .then(this.prepareOfflineInvoke)
-        .then(() => this.serverless.pluginManager.spawn('webpack:compile'))
         .then(this.wpwatch),
 
     };
