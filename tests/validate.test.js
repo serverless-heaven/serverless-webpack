@@ -122,6 +122,35 @@ describe('validate', () => {
       .then(() => expect(module.webpackConfig.context).to.equal(testServicePath));
   });
 
+  describe('default target', () => {
+    it('should set a default `webpackConfig.target` if not present', () => {
+      const testConfig = {
+        entry: 'test',
+        output: {},
+      };
+      const testServicePath = 'testpath';
+      module.serverless.config.servicePath = testServicePath;
+      module.serverless.service.custom.webpack = testConfig;
+      return module
+      .validate()
+      .then(() => expect(module.webpackConfig.target).to.equal('node'));
+    });
+
+    it('should not change `webpackConfig.target` if one is present', () => {
+      const testConfig = {
+        entry: 'test',
+        target: 'myTarget',
+        output: {},
+      };
+      const testServicePath = 'testpath';
+      module.serverless.config.servicePath = testServicePath;
+      module.serverless.service.custom.webpack = testConfig;
+      return module
+      .validate()
+      .then(() => expect(module.webpackConfig.target).to.equal('myTarget'));
+    });
+  });
+
   describe('default output', () => {
     it('should set a default `webpackConfig.output` if not present', () => {
       const testEntry = 'testentry';
