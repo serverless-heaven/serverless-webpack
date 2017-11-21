@@ -500,6 +500,13 @@ plugin when running a command or invoked by a hook.
 
 ## Release Notes
 
+* 4.1.0
+  * Prohibit manual entry configuration with individual packaging [#272][link-272]
+  * Fixed bug with stats in webpack config for individual packaging [#278][link-278]
+  * Fixed bug with startup order in combination with serverless-offline [#279][link-279]
+  * Default target to "node" if not set [#276][link-276]
+  * Support `serverless run` including watch mode [#269][link-269]
+
 * 4.0.0
   * BREAKING: Expose lifecycle events for plugin authors [#254][link-254]
   * Fixed deprecated hook warning [#126][link-126]
@@ -639,3 +646,9 @@ plugin when running a command or invoked by a hook.
 [link-260]: https://github.com/serverless-heaven/serverless-webpack/issues/260
 [link-264]: https://github.com/serverless-heaven/serverless-webpack/pull/264
 [link-265]: https://github.com/serverless-heaven/serverless-webpack/pull/265
+
+[link-272]: https://github.com/serverless-heaven/serverless-webpack/issues/272
+[link-278]: https://github.com/serverless-heaven/serverless-webpack/pull/278
+[link-279]: https://github.com/serverless-heaven/serverless-webpack/issues/279
+[link-276]: https://github.com/serverless-heaven/serverless-webpack/issues/276
+[link-269]: https://github.com/serverless-heaven/serverless-webpack/issues/269
