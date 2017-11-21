@@ -51,6 +51,7 @@ describe('validate', () => {
   });
 
   afterEach(() => {
+    fsExtraMock.removeSync.reset();
     sandbox.restore();
   });
 
@@ -85,6 +86,22 @@ describe('validate', () => {
     return module
       .validate()
       .then(() => expect(fsExtraMock.removeSync).to.have.been.calledWith(testOutPath));
+  });
+
+  it('should keep the output path if requested', () => {
+    const testOutPath = 'test';
+    const testConfig = {
+      entry: 'test',
+      context: 'testcontext',
+      output: {
+        path: testOutPath,
+      },
+    };
+    _.set(module, 'keepOutputDirectory', true);
+    module.serverless.service.custom.webpack = testConfig;
+    return module
+      .validate()
+      .then(() => expect(fsExtraMock.removeSync).to.not.have.been.called);
   });
 
   it('should override the output path if `out` option is specified', () => {

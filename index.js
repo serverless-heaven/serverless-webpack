@@ -2,6 +2,7 @@
 
 const BbPromise = require('bluebird');
 const _ = require('lodash');
+const path = require('path');
 
 const validate = require('./lib/validate');
 const compile = require('./lib/compile');
@@ -9,6 +10,7 @@ const wpwatch = require('./lib/wpwatch');
 const cleanup = require('./lib/cleanup');
 const run = require('./lib/run');
 const prepareLocalInvoke = require('./lib/prepareLocalInvoke');
+const runPluginSupport = require('./lib/runPluginSupport');
 const prepareOfflineInvoke = require('./lib/prepareOfflineInvoke');
 const packExternalModules = require('./lib/packExternalModules');
 const packageModules = require('./lib/packageModules');
@@ -41,6 +43,7 @@ class ServerlessWebpack {
       packExternalModules,
       packageModules,
       prepareLocalInvoke,
+      runPluginSupport,
       prepareOfflineInvoke
     );
 
@@ -102,7 +105,22 @@ class ServerlessWebpack {
       'after:invoke:local:invoke': () => BbPromise.bind(this)
         .then(() => {
           if (this.options.watch && !this.isWatching) {
-            return this.watch();
+            return this.watch('invoke:local');
+          }
+          return BbPromise.resolve();
+        }),
+
+      'before:run:run': () => BbPromise.bind(this)
+        .then(() => _.set(this.serverless, 'service.package.individually', false))
+        .then(() => this.serverless.pluginManager.spawn('webpack:validate'))
+        .then(() => this.serverless.pluginManager.spawn('webpack:compile'))
+        .then(this.packExternalModules)
+        .then(this.prepareRun),
+
+      'after:run:run': () => BbPromise.bind(this)
+        .then(() => {
+          if (this.options.watch && !this.isWatching) {
+            return this.watch(this.watchRun.bind(this));
           }
           return BbPromise.resolve();
         }),
