@@ -49,20 +49,20 @@
     "ts-node": "^3.2.0"
   },
   "devDependencies": {
-    "babel-eslint": "^7.2.3",
+    "babel-eslint": "^8.0.2",
     "chai": "^4.1.2",
     "chai-as-promised": "^7.1.1",
-    "coveralls": "^2.13.1",
-    "eslint": "^4.7.2",
-    "eslint-plugin-import": "^2.7.0",
-    "eslint-plugin-lodash": "^2.4.5",
-    "eslint-plugin-promise": "^3.5.0",
-    "mocha": "^3.5.3",
+    "coveralls": "^3.0.0",
+    "eslint": "^4.11.0",
+    "eslint-plugin-import": "^2.8.0",
+    "eslint-plugin-lodash": "^2.5.0",
+    "eslint-plugin-promise": "^3.6.0",
+    "mocha": "^4.0.1",
     "mockery": "^2.1.0",
-    "nyc": "^11.2.1",
-    "serverless": "^1.23.0",
-    "sinon": "^3.3.0",
-    "sinon-chai": "^2.13.0"
+    "nyc": "^11.3.0",
+    "serverless": "^1.24.1",
+    "sinon": "^4.1.2",
+    "sinon-chai": "^2.14.0"
   },
   "peerDependencies": {
     "webpack": "*"
