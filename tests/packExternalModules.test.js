@@ -261,6 +261,7 @@ describe('packExternalModules', () => {
     });
 
     it('should rebase file references', () => {
+      const expectedLocalModule = 'file:../../locals/../../mymodule';
       const expectedCompositePackageJSON = {
         name: 'test-service',
         version: '1.0.0',
@@ -277,14 +278,52 @@ describe('packExternalModules', () => {
         dependencies: {
           '@scoped/vendor': '1.0.0',
           uuid: '^5.4.1',
-          localmodule: 'file:../../locals/../../mymodule',
+          localmodule: expectedLocalModule,
           bluebird: '^3.4.0'
+        }
+      };
+
+      const fakePackageLockJSON = {
+        name: 'test-service',
+        version: '1.0.0',
+        description: 'Packaged externals for test-service',
+        private: true,
+        dependencies: {
+          '@scoped/vendor': '1.0.0',
+          uuid: {
+            version: '^5.4.1'
+          },
+          bluebird: {
+            version: '^3.4.0'
+          },
+          localmodule: {
+            version: 'file:../../mymodule'
+          }
+        }
+      };
+      const expectedPackageLockJSON = {
+        name: 'test-service',
+        version: '1.0.0',
+        description: 'Packaged externals for test-service',
+        private: true,
+        dependencies: {
+          '@scoped/vendor': '1.0.0',
+          uuid: {
+            version: '^5.4.1'
+          },
+          bluebird: {
+            version: '^3.4.0'
+          },
+          localmodule: {
+            version: expectedLocalModule
+          }
         }
       };
 
       _.set(serverless, 'service.custom.webpackIncludeModules.packagePath', path.join('locals', 'package.json'));
       module.webpackOutputPath = 'outputPath';
-      fsExtraMock.pathExists.yields(null, false);
+      readFileSyncStub.returns(fakePackageLockJSON);
+      fsExtraMock.pathExists.yields(null, true);
       fsExtraMock.copy.yields();
       childProcessMock.exec.onFirstCall().yields(null, '{}', '');
       childProcessMock.exec.onSecondCall().yields(null, '', '');
@@ -297,9 +336,10 @@ describe('packExternalModules', () => {
       return expect(module.packExternalModules()).to.be.fulfilled
       .then(() => BbPromise.all([
         // The module package JSON and the composite one should have been stored
-        expect(writeFileSyncStub).to.have.been.calledTwice,
+        expect(writeFileSyncStub).to.have.been.calledThrice,
         expect(writeFileSyncStub.firstCall.args[1]).to.equal(JSON.stringify(expectedCompositePackageJSON, null, 2)),
-        expect(writeFileSyncStub.secondCall.args[1]).to.equal(JSON.stringify(expectedPackageJSON, null, 2)),
+        expect(writeFileSyncStub.secondCall.args[1]).to.equal(JSON.stringify(expectedPackageLockJSON, null, 2)),
+        expect(writeFileSyncStub.thirdCall.args[1]).to.equal(JSON.stringify(expectedPackageJSON, null, 2)),
         // The modules should have been copied
         expect(fsExtraMock.copy).to.have.been.calledOnce,
         // npm ls and npm prune should have been called
