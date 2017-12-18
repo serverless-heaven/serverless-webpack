@@ -30,6 +30,7 @@ describe('packExternalModules', () => {
   let fsExtraMock;
   // Serverless stubs
   let writeFileSyncStub;
+  let readFileSyncStub;
 
   before(() => {
     sandbox = sinon.sandbox.create();
@@ -60,6 +61,7 @@ describe('packExternalModules', () => {
     _.set(serverless, 'service.service', 'test-service');
 
     writeFileSyncStub = sandbox.stub(serverless.utils, 'writeFileSync');
+    readFileSyncStub = sandbox.stub(serverless.utils, 'readFileSync');
     _.set(serverless, 'service.custom.webpackIncludeModules', true);
 
     module = _.assign({
@@ -73,6 +75,7 @@ describe('packExternalModules', () => {
   afterEach(() => {
     // Reset all counters and restore all stubbed functions
     writeFileSyncStub.reset();
+    readFileSyncStub.reset();
     childProcessMock.exec.reset();
     fsExtraMock.pathExists.reset();
     fsExtraMock.copy.reset();
@@ -702,10 +705,7 @@ describe('packExternalModules', () => {
         expect(writeFileSyncStub.firstCall.args[1]).to.equal(JSON.stringify(expectedCompositePackageJSON, null, 2)),
         expect(writeFileSyncStub.secondCall.args[1]).to.equal(JSON.stringify(expectedPackageJSON, null, 2)),
         // The modules should have been copied
-        expect(fsExtraMock.copy).to.have.been.calledTwice,
-        expect(fsExtraMock.copy.firstCall).to.have.been.calledWith(
-          sinon.match(/package-lock.json$/)
-        ),
+        expect(fsExtraMock.copy).to.have.been.calledOnce,
         // npm ls and npm prune should have been called
         expect(childProcessMock.exec).to.have.been.calledThrice,
         expect(childProcessMock.exec.firstCall).to.have.been.calledWith(
@@ -741,9 +741,9 @@ describe('packExternalModules', () => {
       };
 
       module.webpackOutputPath = 'outputPath';
+      readFileSyncStub.throws(new Error('Failed to read package-lock.json'));
       fsExtraMock.pathExists.yields(null, true);
-      fsExtraMock.copy.onFirstCall().yields(new Error('Failed to read package-lock.json'));
-      fsExtraMock.copy.onSecondCall().yields();
+      fsExtraMock.copy.onFirstCall().yields();
       childProcessMock.exec.onFirstCall().yields(null, '{}', '');
       childProcessMock.exec.onSecondCall().yields(null, '', '');
       childProcessMock.exec.onThirdCall().yields();
@@ -755,10 +755,7 @@ describe('packExternalModules', () => {
         expect(writeFileSyncStub.firstCall.args[1]).to.equal(JSON.stringify(expectedCompositePackageJSON, null, 2)),
         expect(writeFileSyncStub.secondCall.args[1]).to.equal(JSON.stringify(expectedPackageJSON, null, 2)),
         // The modules should have been copied
-        expect(fsExtraMock.copy).to.have.been.calledTwice,
-        expect(fsExtraMock.copy.firstCall).to.have.been.calledWith(
-          sinon.match(/package-lock.json$/)
-        ),
+        expect(fsExtraMock.copy).to.have.been.calledOnce,
         // npm ls and npm prune should have been called
         expect(childProcessMock.exec).to.have.been.calledThrice,
         expect(childProcessMock.exec.firstCall).to.have.been.calledWith(
