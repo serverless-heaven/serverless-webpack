@@ -12,6 +12,7 @@ const Serverless = require('serverless');
 const childProcessMockFactory = require('./mocks/child_process.mock');
 const fsExtraMockFactory = require('./mocks/fs-extra.mock');
 const packageMock = require('./mocks/package.mock.json');
+const packageLocalRefMock = require('./mocks/packageLocalRef.mock.json');
 
 chai.use(require('chai-as-promised'));
 chai.use(require('sinon-chai'));
@@ -29,6 +30,7 @@ describe('packExternalModules', () => {
   let fsExtraMock;
   // Serverless stubs
   let writeFileSyncStub;
+  let readFileSyncStub;
 
   before(() => {
     sandbox = sinon.sandbox.create();
@@ -59,6 +61,7 @@ describe('packExternalModules', () => {
     _.set(serverless, 'service.service', 'test-service');
 
     writeFileSyncStub = sandbox.stub(serverless.utils, 'writeFileSync');
+    readFileSyncStub = sandbox.stub(serverless.utils, 'readFileSync');
     _.set(serverless, 'service.custom.webpackIncludeModules', true);
 
     module = _.assign({
@@ -72,6 +75,7 @@ describe('packExternalModules', () => {
   afterEach(() => {
     // Reset all counters and restore all stubbed functions
     writeFileSyncStub.reset();
+    readFileSyncStub.reset();
     childProcessMock.exec.reset();
     fsExtraMock.pathExists.reset();
     fsExtraMock.copy.reset();
@@ -151,6 +155,50 @@ describe('packExternalModules', () => {
         }
       ]
     };
+    const statsWithFileRef = {
+      stats: [
+        {
+          compilation: {
+            chunks: [
+              {
+                modules: [
+                  {
+                    identifier: _.constant('"crypto"')
+                  },
+                  {
+                    identifier: _.constant('"uuid/v4"')
+                  },
+                  {
+                    identifier: _.constant('external "eslint"')
+                  },
+                  {
+                    identifier: _.constant('"mockery"')
+                  },
+                  {
+                    identifier: _.constant('"@scoped/vendor/module1"')
+                  },
+                  {
+                    identifier: _.constant('external "@scoped/vendor/module2"')
+                  },
+                  {
+                    identifier: _.constant('external "uuid/v4"')
+                  },
+                  {
+                    identifier: _.constant('external "localmodule"')
+                  },
+                  {
+                    identifier: _.constant('external "bluebird"')
+                  },
+                ]
+              }
+            ],
+            compiler: {
+              outputPath: '/my/Service/Path/.webpack/service'
+            }
+          }
+        }
+      ]
+    };
 
     it('should do nothing if webpackIncludeModules is not set', () => {
       _.unset(serverless, 'service.custom.webpackIncludeModules');
@@ -196,6 +244,102 @@ describe('packExternalModules', () => {
         expect(writeFileSyncStub).to.have.been.calledTwice,
         expect(writeFileSyncStub.firstCall.args[1]).to.equal(JSON.stringify(expectedCompositePackageJSON, null, 2)),
         expect(writeFileSyncStub.secondCall.args[1]).to.equal(JSON.stringify(expectedPackageJSON, null, 2)),
+        // The modules should have been copied
+        expect(fsExtraMock.copy).to.have.been.calledOnce,
+        // npm ls and npm prune should have been called
+        expect(childProcessMock.exec).to.have.been.calledThrice,
+        expect(childProcessMock.exec.firstCall).to.have.been.calledWith(
+          'npm ls -prod -json -depth=1'
+        ),
+        expect(childProcessMock.exec.secondCall).to.have.been.calledWith(
+          'npm install'
+        ),
+        expect(childProcessMock.exec.thirdCall).to.have.been.calledWith(
+          'npm prune'
+        )
+      ]));
+    });
+
+    it('should rebase file references', () => {
+      const expectedLocalModule = 'file:../../locals/../../mymodule';
+      const expectedCompositePackageJSON = {
+        name: 'test-service',
+        version: '1.0.0',
+        description: 'Packaged externals for test-service',
+        private: true,
+        dependencies: {
+          '@scoped/vendor': '1.0.0',
+          uuid: '^5.4.1',
+          localmodule: 'file:../../locals/../../mymodule',
+          bluebird: '^3.4.0'
+        }
+      };
+      const expectedPackageJSON = {
+        dependencies: {
+          '@scoped/vendor': '1.0.0',
+          uuid: '^5.4.1',
+          localmodule: expectedLocalModule,
+          bluebird: '^3.4.0'
+        }
+      };
+
+      const fakePackageLockJSON = {
+        name: 'test-service',
+        version: '1.0.0',
+        description: 'Packaged externals for test-service',
+        private: true,
+        dependencies: {
+          '@scoped/vendor': '1.0.0',
+          uuid: {
+            version: '^5.4.1'
+          },
+          bluebird: {
+            version: '^3.4.0'
+          },
+          localmodule: {
+            version: 'file:../../mymodule'
+          }
+        }
+      };
+      const expectedPackageLockJSON = {
+        name: 'test-service',
+        version: '1.0.0',
+        description: 'Packaged externals for test-service',
+        private: true,
+        dependencies: {
+          '@scoped/vendor': '1.0.0',
+          uuid: {
+            version: '^5.4.1'
+          },
+          bluebird: {
+            version: '^3.4.0'
+          },
+          localmodule: {
+            version: expectedLocalModule
+          }
+        }
+      };
+
+      _.set(serverless, 'service.custom.webpackIncludeModules.packagePath', path.join('locals', 'package.json'));
+      module.webpackOutputPath = 'outputPath';
+      readFileSyncStub.returns(fakePackageLockJSON);
+      fsExtraMock.pathExists.yields(null, true);
+      fsExtraMock.copy.yields();
+      childProcessMock.exec.onFirstCall().yields(null, '{}', '');
+      childProcessMock.exec.onSecondCall().yields(null, '', '');
+      childProcessMock.exec.onThirdCall().yields();
+      module.compileStats = statsWithFileRef;
+
+      sandbox.stub(process, 'cwd').returns(path.join('/my/Service/Path'));
+      mockery.registerMock(path.join(process.cwd(), 'locals', 'package.json'), packageLocalRefMock);
+      
+      return expect(module.packExternalModules()).to.be.fulfilled
+      .then(() => BbPromise.all([
+        // The module package JSON and the composite one should have been stored
+        expect(writeFileSyncStub).to.have.been.calledThrice,
+        expect(writeFileSyncStub.firstCall.args[1]).to.equal(JSON.stringify(expectedCompositePackageJSON, null, 2)),
+        expect(writeFileSyncStub.secondCall.args[1]).to.equal(JSON.stringify(expectedPackageLockJSON, null, 2)),
+        expect(writeFileSyncStub.thirdCall.args[1]).to.equal(JSON.stringify(expectedPackageJSON, null, 2)),
         // The modules should have been copied
         expect(fsExtraMock.copy).to.have.been.calledOnce,
         // npm ls and npm prune should have been called
@@ -601,10 +745,7 @@ describe('packExternalModules', () => {
         expect(writeFileSyncStub.firstCall.args[1]).to.equal(JSON.stringify(expectedCompositePackageJSON, null, 2)),
         expect(writeFileSyncStub.secondCall.args[1]).to.equal(JSON.stringify(expectedPackageJSON, null, 2)),
         // The modules should have been copied
-        expect(fsExtraMock.copy).to.have.been.calledTwice,
-        expect(fsExtraMock.copy.firstCall).to.have.been.calledWith(
-          sinon.match(/package-lock.json$/)
-        ),
+        expect(fsExtraMock.copy).to.have.been.calledOnce,
         // npm ls and npm prune should have been called
         expect(childProcessMock.exec).to.have.been.calledThrice,
         expect(childProcessMock.exec.firstCall).to.have.been.calledWith(
@@ -640,9 +781,9 @@ describe('packExternalModules', () => {
       };
 
       module.webpackOutputPath = 'outputPath';
+      readFileSyncStub.throws(new Error('Failed to read package-lock.json'));
       fsExtraMock.pathExists.yields(null, true);
-      fsExtraMock.copy.onFirstCall().yields(new Error('Failed to read package-lock.json'));
-      fsExtraMock.copy.onSecondCall().yields();
+      fsExtraMock.copy.onFirstCall().yields();
       childProcessMock.exec.onFirstCall().yields(null, '{}', '');
       childProcessMock.exec.onSecondCall().yields(null, '', '');
       childProcessMock.exec.onThirdCall().yields();
@@ -654,10 +795,7 @@ describe('packExternalModules', () => {
         expect(writeFileSyncStub.firstCall.args[1]).to.equal(JSON.stringify(expectedCompositePackageJSON, null, 2)),
         expect(writeFileSyncStub.secondCall.args[1]).to.equal(JSON.stringify(expectedPackageJSON, null, 2)),
         // The modules should have been copied
-        expect(fsExtraMock.copy).to.have.been.calledTwice,
-        expect(fsExtraMock.copy.firstCall).to.have.been.calledWith(
-          sinon.match(/package-lock.json$/)
-        ),
+        expect(fsExtraMock.copy).to.have.been.calledOnce,
         // npm ls and npm prune should have been called
         expect(childProcessMock.exec).to.have.been.calledThrice,
         expect(childProcessMock.exec.firstCall).to.have.been.calledWith(

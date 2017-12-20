@@ -246,6 +246,13 @@ custom:
 If you specify a module in both arrays, `forceInclude` and `forceExclude`, the
 exclude wins and the module will not be packaged.
 
+#### Local modules
+
+You can use `file:` version references in your `package.json` to use a node module
+from a local folder (e.g. `"mymodule": "file:../../myOtherProject/mymodule"`).
+With that you can do test deployments from the local machine with different
+module versions or modules before they are published officially.
+
 #### Examples
 
 You can find an example setups in the [`examples`][link-examples] folder.
