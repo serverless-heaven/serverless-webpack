@@ -153,6 +153,9 @@ class ServerlessWebpack {
         .then(this.prepareOfflineInvoke)
         .then(this.wpwatch),
 
+      'before:step-functions-offline:start': () => BbPromise.bind(this)
+        .then(this.validate)
+        .then(this.wpwatch)
     };
   }
 }
