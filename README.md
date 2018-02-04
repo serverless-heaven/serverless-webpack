@@ -56,7 +56,7 @@ custom:
   webpack: ./folder/my-webpack.config.js
 ```
 
-An base Webpack configuration might look like this:
+A base Webpack configuration might look like this:
 
 ```js
 // webpack.config.js
