@@ -72,6 +72,12 @@ class ServerlessWebpack {
               'compile',
             ],
           },
+          "watch-compile": {
+            type: 'entrypoint',
+            lifecycleEvents: [
+              'watch-compile',
+            ],
+          },
           package: {
             type: 'entrypoint',
             lifecycleEvents: [
