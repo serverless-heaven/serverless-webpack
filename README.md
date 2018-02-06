@@ -210,6 +210,12 @@ custom:
 ```
 > Note that only relative path is supported at the moment.
 
+#### Usage with yarn
+
+Note that if auto-packing is enabled, the plugin will call `npm install`. If you are using yarn your `yarn.lock` file will be not be honored, which might lead to unexpected results as your dependencies will most likely not match (or be missing, as npm does not install packages in the same way as yarn).
+
+Yarn support is planned [#286][link-286]. Until then we recommend using npm when using auto-packing.
+
 #### Forced inclusion
 
 Sometimes it might happen that you use dynamic requires in your code, i.e. you
@@ -666,3 +672,5 @@ plugin when running a command or invoked by a hook.
 [link-269]: https://github.com/serverless-heaven/serverless-webpack/issues/269
 
 [link-263]: https://github.com/serverless-heaven/serverless-webpack/issues/263
+
+[link-286]: https://github.com/serverless-heaven/serverless-webpack/issues/286
