@@ -467,6 +467,7 @@ All events (H) can be hooked by a plugin.
    -> webpack:validate:validate (H)
 -> webpack:compile
    -> webpack:compile:compile (H)
+   -> webpack:compile:watch:compile (H)
 -> webpack:package
    -> webpack:package:packExternalModules (H)
    -> webpack:package:packageModules (H)
