@@ -1,0 +1,1 @@
+This is the default babel example to look at, because only dynamic entry point resolution lets you use Serverless completely. Individual packaging with a per-function dependency optimization is only available with that approach.
