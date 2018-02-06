@@ -596,7 +596,7 @@ plugin when running a command or invoked by a hook.
 [link-webpack]: https://webpack.github.io/
 [link-babel]: https://babeljs.io/
 [link-webpack-loaders]: https://webpack.github.io/docs/loaders.html
-[link-webpack-libtarget]: https://webpack.github.io/docs/configuration.html#output-librarytarget
+[link-webpack-libtarget]: https://webpack.js.org/configuration/output/#output-librarytarget
 [link-webpack-tree]: https://webpack.js.org/guides/tree-shaking/
 [link-webpack-externals]: https://webpack.github.io/docs/configuration.html#externals
 [link-examples]: ./examples
