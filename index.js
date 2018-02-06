@@ -71,12 +71,14 @@ class ServerlessWebpack {
             lifecycleEvents: [
               'compile',
             ],
-          },
-          "watch-compile": {
-            type: 'entrypoint',
-            lifecycleEvents: [
-              'watch-compile',
-            ],
+            commands: {
+              watch: {
+                type: 'entrypoint',
+                lifecycleEvents: [
+                  'compile'
+                ]
+              }
+            }
           },
           package: {
             type: 'entrypoint',
@@ -144,6 +146,8 @@ class ServerlessWebpack {
 
       'webpack:compile:compile': () => BbPromise.bind(this)
         .then(this.compile),
+
+      'webpack:compile:watch:compile': () => BbPromise.resolve(),
 
       'webpack:package:packExternalModules': () => BbPromise.bind(this)
         .then(this.packExternalModules),

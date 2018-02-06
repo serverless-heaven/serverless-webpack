@@ -160,7 +160,7 @@ describe('wpwatch', function() {
     return expect(wpwatch()).to.be.fulfilled
     .then(() => BbPromise.delay(3000))
     .then(() => BbPromise.join(
-      expect(spawnStub).to.not.have.been.called,
+      expect(spawnStub).to.have.been.calledOnce,
       expect(webpackMock.compilerMock.watch).to.have.been.calledOnce,
       expect(watchCallbackSpy).to.have.been.calledTwice
     ));
