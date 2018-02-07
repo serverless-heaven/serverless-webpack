@@ -145,23 +145,26 @@ describe('wpwatch', function() {
   it('should call callback on subsequent runs', () => {
     const wpwatch = module.wpwatch.bind(module);
     let watchCallbackSpy;
-    webpackMock.compilerMock.watch.callsFake((options, cb) => {
+    webpackMock.compilerMock.watch.onFirstCall().callsFake((options, cb) => {
       // We'll spy the callback registered for watch
       watchCallbackSpy = sandbox.spy(cb);
 
       // Schedule second call after 2 seconds
       setTimeout(() => {
-        watchCallbackSpy(null, { call: 2 });
+        process.nextTick(() => watchCallbackSpy(null, { call: 2, hash: '2' }));
       }, 2000);
-      process.nextTick(() => watchCallbackSpy(null, { call: 1 }));
+      process.nextTick(() => watchCallbackSpy(null, { call: 1, hash: '1' }));
+      return webpackMock.watchMock;
     });
     spawnStub.resolves();
 
     return expect(wpwatch()).to.be.fulfilled
     .then(() => BbPromise.delay(3000))
     .then(() => BbPromise.join(
-      expect(spawnStub).to.not.have.been.called,
-      expect(webpackMock.compilerMock.watch).to.have.been.calledOnce,
+      expect(spawnStub).to.have.been.calledOnce,
+      expect(spawnStub).to.have.been.calledWithExactly('webpack:compile:watch'),
+      expect(webpackMock.compilerMock.watch).to.have.been.calledTwice,
+      expect(webpackMock.watchMock.close).to.have.been.calledOnce,
       expect(watchCallbackSpy).to.have.been.calledTwice
     ));
   });
@@ -181,7 +184,7 @@ describe('wpwatch', function() {
           // Ignore the exception. The spy will record it.
         }
       }, 2000);
-      process.nextTick(() => watchCallbackSpy(null, { call: 1 }));
+      process.nextTick(() => watchCallbackSpy(null, { call: 3, hash: '3' }));
     });
     spawnStub.resolves();
 
