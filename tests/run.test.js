@@ -87,6 +87,29 @@ describe('run', () => {
       expect(module.isWatching).to.be.true;
     });
 
+    it('should not spawn on watch first run', () => {
+      module.isWatching = false;
+      const watch = module.watch.bind(module);
+      webpackMock.compilerMock.watch = sandbox.stub().yields(null, {});
+      _.set(module, 'options.function', 'myFunction');
+
+      watch('compile:watch:compile');
+      expect(spawnStub).to.not.have.been.called;
+      expect(module.isWatching).to.be.true;
+    });
+
+    it('should spawn on watch second run', () => {
+      module.isWatching = false;
+      const watch = module.watch.bind(module);
+      webpackMock.compilerMock.watch = sandbox.stub().yields(null, {});
+      _.set(module, 'options.function', 'myFunction');
+
+      watch('compile:watch:compile');
+      watch('compile:watch:compile');
+      expect(spawnStub).to.have.been.calledOnce;
+      expect(module.isWatching).to.be.true;
+    });
+
     it('should spawn invoke local on subsequent runs', () => {
       module.isWatching = true;
       const watch = module.watch.bind(module);
