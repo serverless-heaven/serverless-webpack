@@ -515,6 +515,12 @@ plugin when running a command or invoked by a hook.
 
 ## Release Notes
 
+* 4.3.0
+  * Add new `webpack:compile:watch:compile` event [#315][link-315]
+  * Added note to README about using yarn [#316][link-316]
+  * Made babel dynamic example the default babel example [#253][link-253]
+  * Documentation fixes [#317][link-317] [#321][link-321]
+
 * 4.2.0
   * Support local file references in package.json [#263][link-263]
   * Updated used tools (dev dependencies)
@@ -675,3 +681,9 @@ plugin when running a command or invoked by a hook.
 [link-263]: https://github.com/serverless-heaven/serverless-webpack/issues/263
 
 [link-286]: https://github.com/serverless-heaven/serverless-webpack/issues/286
+
+[link-315]: https://github.com/serverless-heaven/serverless-webpack/issues/315
+[link-316]: https://github.com/serverless-heaven/serverless-webpack/issues/316
+[link-253]: https://github.com/serverless-heaven/serverless-webpack/issues/253
+[link-317]: https://github.com/serverless-heaven/serverless-webpack/pull/317
+[link-321]: https://github.com/serverless-heaven/serverless-webpack/pull/321
