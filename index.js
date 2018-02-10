@@ -12,6 +12,7 @@ const run = require('./lib/run');
 const prepareLocalInvoke = require('./lib/prepareLocalInvoke');
 const runPluginSupport = require('./lib/runPluginSupport');
 const prepareOfflineInvoke = require('./lib/prepareOfflineInvoke');
+const prepareStepOfflineInvoke = require('./lib/prepareStepOfflineInvoke');
 const packExternalModules = require('./lib/packExternalModules');
 const packageModules = require('./lib/packageModules');
 const lib = require('./lib');
@@ -44,7 +45,8 @@ class ServerlessWebpack {
       packageModules,
       prepareLocalInvoke,
       runPluginSupport,
-      prepareOfflineInvoke
+      prepareOfflineInvoke,
+      prepareStepOfflineInvoke
     );
 
     this.commands = {
@@ -154,8 +156,9 @@ class ServerlessWebpack {
         .then(this.wpwatch),
 
       'before:step-functions-offline:start': () => BbPromise.bind(this)
-        .then(this.validate)
-        .then(this.compile)
+         .then(this.validate)
+         .then(this.prepareStepOfflineInvoke)
+         .then(this.compile)
     };
   }
 }
