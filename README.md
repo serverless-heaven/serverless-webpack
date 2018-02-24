@@ -163,7 +163,7 @@ module.export = {
 }
 ```
 
-All the stats config can be found in [webpack's documentation](https://webpack.js.org/configuration/stats/)
+All the stats config can be found in [webpack's documentation][link-webpack-stats]
 
 
 ### Node modules / externals
@@ -608,10 +608,11 @@ plugin when running a command or invoked by a hook.
 
 [link-webpack]: https://webpack.github.io/
 [link-babel]: https://babeljs.io/
-[link-webpack-loaders]: https://webpack.github.io/docs/loaders.html
+[link-webpack-stats]: https://webpack.js.org/configuration/stats/
+[link-webpack-loaders]: https://webpack.js.org/concepts/loaders/
 [link-webpack-libtarget]: https://webpack.js.org/configuration/output/#output-librarytarget
 [link-webpack-tree]: https://webpack.js.org/guides/tree-shaking/
-[link-webpack-externals]: https://webpack.github.io/docs/configuration.html#externals
+[link-webpack-externals]: https://webpack.js.org/configuration/externals/
 [link-examples]: ./examples
 [link-serverless-offline]: https://www.npmjs.com/package/serverless-offline
 [link-serverless-dynamodb-local]: https://www.npmjs.com/package/serverless-dynamodb-local
