@@ -13,7 +13,7 @@ chai.use(require('sinon-chai'));
 
 const expect = chai.expect;
 
-const globMock = {
+const globbyMock = {
   sync: _.noop
 };
 
@@ -30,7 +30,7 @@ describe('validate', () => {
     mockery.enable({ warnOnUnregistered: false });
     fsExtraMock = fsExtraMockFactory.create(sandbox);
     mockery.registerMock('fs-extra', fsExtraMock);
-    mockery.registerMock('glob', globMock);
+    mockery.registerMock('globby', globbyMock);
     baseModule = require('../lib/validate');
     Object.freeze(baseModule);
   });
@@ -328,10 +328,10 @@ describe('validate', () => {
     });
 
     describe('entries', () => {
-      let globSyncStub;
+      let globbySyncStub;
 
       beforeEach(() => {
-        globSyncStub = sandbox.stub(globMock, 'sync');
+        globbySyncStub = sandbox.stub(globbyMock, 'sync');
       });
 
       const testFunctionsConfig = {
@@ -398,7 +398,7 @@ describe('validate', () => {
         };
         _.set(module.serverless.service, 'custom.webpack.config', testConfig);
         module.serverless.service.functions = testFunctionsConfig;
-        globSyncStub.callsFake(filename => [_.replace(filename, '*', 'js')]);
+        globbySyncStub.callsFake(filename => [_.replace(filename, '*', 'js')]);
         return expect(module.validate()).to.be.fulfilled
         .then(() => {
           const lib = require('../lib/index');
@@ -410,7 +410,7 @@ describe('validate', () => {
           };
 
           expect(lib.entries).to.deep.equal(expectedLibEntries);
-          expect(globSyncStub).to.have.callCount(4);
+          expect(globbySyncStub).to.have.callCount(4);
           expect(serverless.cli.log).to.not.have.been.called;
           return null;
         });
@@ -429,7 +429,7 @@ describe('validate', () => {
         _.set(module.serverless.service, 'custom.webpack.config', testConfig);
         module.serverless.service.functions = testFunctionsConfig;
         module.options.function = testFunction;
-        globSyncStub.callsFake(filename => [_.replace(filename, '*', 'js')]);
+        globbySyncStub.callsFake(filename => [_.replace(filename, '*', 'js')]);
         return expect(module.validate()).to.be.fulfilled
         .then(() => {
           const lib = require('../lib/index');
@@ -438,7 +438,7 @@ describe('validate', () => {
           };
 
           expect(lib.entries).to.deep.equal(expectedLibEntries);
-          expect(globSyncStub).to.have.been.calledOnce;
+          expect(globbySyncStub).to.have.been.calledOnce;
           expect(serverless.cli.log).to.not.have.been.called;
           return null;
         });
@@ -468,13 +468,13 @@ describe('validate', () => {
           _.set(module.serverless.service, 'custom.webpack.config', testConfig);
           module.serverless.service.functions = testFunctionsGoogleConfig;
           module.options.function = testFunction;
-          globSyncStub.returns([]);
+          globbySyncStub.returns([]);
           return expect(module.validate()).to.be.fulfilled
           .then(() => {
             const lib = require('../lib/index');
 
             expect(lib.entries).to.deep.equal({});
-            expect(globSyncStub).to.not.have.been.called;
+            expect(globbySyncStub).to.not.have.been.called;
             expect(serverless.cli.log).to.not.have.been.called;
             return null;
           });
@@ -499,7 +499,7 @@ describe('validate', () => {
         it('should enable multiCompile', () => {
           _.set(module.serverless.service, 'custom.webpack.config', testConfig);
           module.serverless.service.functions = testFunctionsConfig;
-          globSyncStub.callsFake(filename => [_.replace(filename, '*', 'js')]);
+          globbySyncStub.callsFake(filename => [_.replace(filename, '*', 'js')]);
 
           expect(module.multiCompile).to.be.undefined;
           return expect(module.validate()).to.be.fulfilled
@@ -518,7 +518,7 @@ describe('validate', () => {
             }
           }));
           module.serverless.service.functions = testFunctionsConfig;
-          globSyncStub.callsFake(filename => [_.replace(filename, '*', 'js')]);
+          globbySyncStub.callsFake(filename => [_.replace(filename, '*', 'js')]);
           return expect(module.validate()).to.be.rejectedWith(
             /Webpack entry must be automatically resolved when package.individually is set to true/);
         });
@@ -529,14 +529,14 @@ describe('validate', () => {
             entry: lib.entries
           }));
           module.serverless.service.functions = testFunctionsConfig;
-          globSyncStub.callsFake(filename => [_.replace(filename, '*', 'js')]);
+          globbySyncStub.callsFake(filename => [_.replace(filename, '*', 'js')]);
           return expect(module.validate()).to.be.fulfilled;
         });
 
         it('should expose all functions details in entryFunctions property', () => {
           _.set(module.serverless.service, 'custom.webpack.config', testConfig);
           module.serverless.service.functions = testFunctionsConfig;
-          globSyncStub.callsFake(filename => [_.replace(filename, '*', 'js')]);
+          globbySyncStub.callsFake(filename => [_.replace(filename, '*', 'js')]);
           return expect(module.validate()).to.be.fulfilled
           .then(() => {
             expect(module.entryFunctions).to.deep.equal([
@@ -572,7 +572,7 @@ describe('validate', () => {
         it('should set webpackConfig output path for every functions', () => {
           _.set(module.serverless.service, 'custom.webpack.config', testConfig);
           module.serverless.service.functions = testFunctionsConfig;
-          globSyncStub.callsFake(filename => [_.replace(filename, '*', 'js')]);
+          globbySyncStub.callsFake(filename => [_.replace(filename, '*', 'js')]);
           return expect(module.validate()).to.be.fulfilled
           .then(() => {
             expect(module.webpackConfig).to.have.lengthOf(4);
@@ -594,7 +594,7 @@ describe('validate', () => {
             }
           }));
           module.serverless.service.functions = testFunctionsConfig;
-          globSyncStub.callsFake(filename => [_.replace(filename, '*', 'js')]);
+          globbySyncStub.callsFake(filename => [_.replace(filename, '*', 'js')]);
           return expect(module.validate()).to.be.fulfilled
           .then(() => {
             expect(module.webpackConfig).to.have.lengthOf(4);
@@ -628,7 +628,7 @@ describe('validate', () => {
         _.set(module.serverless.service, 'custom.webpack.config', testConfig);
         module.serverless.service.functions = testFunctionsConfig;
         module.options.function = testFunction;
-        globSyncStub.returns([ 'module1.ts', 'module1.js' ]);
+        globbySyncStub.returns([ 'module1.ts', 'module1.js' ]);
         return expect(module.validate()).to.be.fulfilled
         .then(() => {
           const lib = require('../lib/index');
@@ -637,7 +637,7 @@ describe('validate', () => {
           };
 
           expect(lib.entries).to.deep.equal(expectedLibEntries);
-          expect(globSyncStub).to.have.been.calledOnce;
+          expect(globbySyncStub).to.have.been.calledOnce;
           expect(serverless.cli.log).to.have.been.calledOnce;
           expect(serverless.cli.log).to.have.been.calledWith(
             'WARNING: More than one matching handlers found for \'module1\'. Using \'module1.ts\'.'
@@ -659,7 +659,7 @@ describe('validate', () => {
         _.set(module.serverless.service, 'custom.webpack.config', testConfig);
         module.serverless.service.functions = testFunctionsConfig;
         module.options.function = testFunction;
-        globSyncStub.returns([ 'module1.doc', 'module1.json', 'module1.test.js', 'module1.ts', 'module1.js' ]);
+        globbySyncStub.returns([ 'module1.doc', 'module1.json', 'module1.test.js', 'module1.ts', 'module1.js' ]);
         return expect(module.validate()).to.be.fulfilled
         .then(() => {
           const lib = require('../lib/index');
@@ -668,7 +668,7 @@ describe('validate', () => {
           };
 
           expect(lib.entries).to.deep.equal(expectedLibEntries);
-          expect(globSyncStub).to.have.been.calledOnce;
+          expect(globbySyncStub).to.have.been.calledOnce;
           expect(serverless.cli.log).to.have.been.calledOnce;
           expect(serverless.cli.log).to.have.been.calledWith(
             'WARNING: More than one matching handlers found for \'module1\'. Using \'module1.ts\'.'
@@ -690,7 +690,7 @@ describe('validate', () => {
         _.set(module.serverless.service, 'custom.webpack.config', testConfig);
         module.serverless.service.functions = testFunctionsConfig;
         module.options.function = testFunction;
-        globSyncStub.returns([]);
+        globbySyncStub.returns([]);
         expect(() => {
           module.validate();
         }).to.throw(/No matching handler found for/);

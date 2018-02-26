@@ -10,7 +10,7 @@ const Serverless = require('serverless');
 
 // Mocks
 const fsMockFactory = require('./mocks/fs.mock');
-const globMockFactory = require('./mocks/glob.mock');
+const globbyMockFactory = require('./mocks/globby.mock');
 const archiverMockFactory = require('./mocks/archiver.mock');
 
 chai.use(require('chai-as-promised'));
@@ -26,7 +26,7 @@ describe('packageModules', () => {
 
   // Mocks
   let fsMock;
-  let globMock;
+  let globbyMock;
   let archiverMock;
   // Serverless stubs
   let writeFileDirStub;
@@ -41,12 +41,12 @@ describe('packageModules', () => {
 
     fsMock = fsMockFactory.create(sandbox);
     archiverMock = archiverMockFactory.create(sandbox);
-    globMock = globMockFactory.create(sandbox);
+    globbyMock = globbyMockFactory.create(sandbox);
 
     mockery.enable({ warnOnUnregistered: false });
     mockery.registerMock('archiver', archiverMock);
     mockery.registerMock('fs', fsMock);
-    mockery.registerMock('glob', globMock);
+    mockery.registerMock('globby', globbyMock);
     baseModule = require('../lib/packageModules');
     Object.freeze(baseModule);
   });
@@ -89,7 +89,7 @@ describe('packageModules', () => {
         expect(archiverMock.create).to.not.have.been.called,
         expect(writeFileDirStub).to.not.have.been.called,
         expect(fsMock.createWriteStream).to.not.have.been.called,
-        expect(globMock.sync).to.not.have.been.called
+        expect(globbyMock.sync).to.not.have.been.called
       ]));
     });
 
@@ -135,7 +135,7 @@ describe('packageModules', () => {
         getFunctionStub.withArgs('func1').returns(func1);
         getFunctionStub.withArgs('func2').returns(func2);
         // Mock behavior
-        globMock.sync.returns(files);
+        globbyMock.sync.returns(files);
         fsMock._streamMock.on.withArgs('open').yields();
         fsMock._streamMock.on.withArgs('close').yields();
         fsMock._statMock.isDirectory.returns(false);
@@ -201,7 +201,7 @@ describe('packageModules', () => {
           getFunctionStub.withArgs('func1').returns(func1);
           getFunctionStub.withArgs('func2').returns(func2);
           // Mock behavior
-          globMock.sync.returns(files);
+          globbyMock.sync.returns(files);
           fsMock._streamMock.on.withArgs('open').yields();
           fsMock._streamMock.on.withArgs('close').yields();
           fsMock._statMock.isDirectory.returns(false);
@@ -248,7 +248,7 @@ describe('packageModules', () => {
         getFunctionStub.withArgs('func1').returns(func1);
         getFunctionStub.withArgs('func2').returns(func2);
         // Mock behavior
-        globMock.sync.returns(files);
+        globbyMock.sync.returns(files);
         fsMock._streamMock.on.withArgs('open').yields();
         fsMock._streamMock.on.withArgs('close').yields();
         fsMock._statMock.isDirectory.returns(false);
@@ -309,7 +309,7 @@ describe('packageModules', () => {
         getFunctionStub.withArgs('func1').returns(func1);
         getFunctionStub.withArgs('func2').returns(func2);
         // Mock behavior
-        globMock.sync.returns(files);
+        globbyMock.sync.returns(files);
         fsMock._streamMock.on.withArgs('open').yields();
         fsMock._streamMock.on.withArgs('close').yields();
         fsMock._statMock.isDirectory.returns(false);
@@ -317,6 +317,54 @@ describe('packageModules', () => {
         module.compileStats = stats;
         return expect(module.packageModules()).to.be.rejectedWith('Packaging: No files found');
       });
+    });
+
+    it('should respect package.include and package.exclude', () => {
+      _.set(serverless.service.package, 'include', ['*.js']);
+      _.set(serverless.service.package, 'exclude', ['*.map', '!special.map']);
+
+      // Test data
+      const stats = {
+        stats: [
+          {
+            compilation: {
+              compiler: {
+                outputPath: '/my/Service/Path/.webpack/service'
+              }
+            }
+          }
+        ]
+      };
+      const files = [
+        'README.md', 'src/handler1.js', 'src/handler1.js.map', 'src/handler2.js', 'src/handler2.js.map'
+      ];
+      const allFunctions = [ 'func1', 'func2' ];
+      const func1 = {
+        handler: 'src/handler1',
+        events: []
+      };
+      const func2 = {
+        handler: 'src/handler2',
+        events: []
+      };
+      // Serverless behavior
+      sandbox.stub(serverless.config, 'servicePath').value('/my/Service/Path');
+      getVersionStub.returns('1.18.0');
+      getServiceObjectStub.returns({
+        name: 'test-service'
+      });
+      getAllFunctionsStub.returns(allFunctions);
+      getFunctionStub.withArgs('func1').returns(func1);
+      getFunctionStub.withArgs('func2').returns(func2);
+      // Mock behavior
+      globbyMock.sync.returns(files);
+      fsMock._streamMock.on.withArgs('open').yields();
+      fsMock._streamMock.on.withArgs('close').yields();
+      fsMock._statMock.isDirectory.returns(false);
+
+      module.compileStats = stats;
+      return expect(module.packageModules()).to.be.fulfilled
+      .then(() => expect(globbyMock.sync).to.have.been.calledWith([ '**', '!*.map', 'special.map', '*.js' ]));
     });
 
     describe('with individual packaging', () => {
@@ -381,7 +429,7 @@ describe('packageModules', () => {
         getFunctionStub.withArgs('func1').returns(func1);
         getFunctionStub.withArgs('func2').returns(func2);
         // Mock behavior
-        globMock.sync.returns(files);
+        globbyMock.sync.returns(files);
         fsMock._streamMock.on.withArgs('open').yields();
         fsMock._streamMock.on.withArgs('close').yields();
         fsMock._statMock.isDirectory.returns(false);

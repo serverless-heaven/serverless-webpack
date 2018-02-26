@@ -3,7 +3,7 @@
     "archiver": "^2.0.0",
     "bluebird": "^3.4.0",
     "fs-extra": "^0.26.7",
-    "glob": "^7.1.2",
+    "globby": "^8.0.1",
     "lodash": "^4.17.4",
     "npm-programmatic": "0.0.5",
     "uuid": "^5.4.1",
