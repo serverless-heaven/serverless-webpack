@@ -9,4 +9,5 @@ describe('serverless-webpack', () => {
   require('./cleanup.test');
   require('./wpwatch.test');
   require('./runPluginSupport.test');
+  require('./prepareStepOfflineInvoke.test');
 });
