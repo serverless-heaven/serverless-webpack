@@ -453,6 +453,14 @@ Plugin commands are supported by the following providers. ⁇ indicates that com
 | invoke local          |      ✔︎     |         ✔︎        |        ⁇        |            ⁇           |
 | invoke local --watch  |      ✔︎     |         ✔︎        |        ⁇        |            ⁇           |
 
+## Plugin support
+
+The following serverless plugins are explicitly supported with `serverless-webpack`
+
+| Plugin                            | NPM |
+|-----------------------------------|-----|
+| serverless-step-functions-offline | [![NPM][ico-step-functions-offline]][link-step-functions-offline] |
+
 ## For developers
 
 The plugin exposes a complete lifecycle model that can be hooked by other plugins to extend
@@ -602,6 +610,8 @@ plugin when running a command or invoked by a hook.
 [link-examples]: ./examples
 [link-serverless-offline]: https://www.npmjs.com/package/serverless-offline
 [link-serverless-dynamodb-local]: https://www.npmjs.com/package/serverless-dynamodb-local
+[link-step-functions-offline]: https://www.npmjs.com/package/serverless-step-functions-offline
+[ico-step-functions-offline]: https://img.shields.io/npm/v/serverless-step-functions-offline.svg
 
 [comment]: # (Referenced issues)
 
