@@ -19,6 +19,16 @@ chai.use(require('sinon-chai'));
 
 const expect = chai.expect;
 
+class ChunkMock {
+  constructor(modules) {
+    this._modules = modules;
+  }
+
+  forEachModule(fn) {
+    _.forEach(this._modules, fn);
+  }
+}
+
 describe('packExternalModules', () => {
   let sandbox;
   let baseModule;
@@ -90,34 +100,32 @@ describe('packExternalModules', () => {
         {
           compilation: {
             chunks: [
-              {
-                modules: [
-                  {
-                    identifier: _.constant('"crypto"')
-                  },
-                  {
-                    identifier: _.constant('"uuid/v4"')
-                  },
-                  {
-                    identifier: _.constant('external "eslint"')
-                  },
-                  {
-                    identifier: _.constant('"mockery"')
-                  },
-                  {
-                    identifier: _.constant('"@scoped/vendor/module1"')
-                  },
-                  {
-                    identifier: _.constant('external "@scoped/vendor/module2"')
-                  },
-                  {
-                    identifier: _.constant('external "uuid/v4"')
-                  },
-                  {
-                    identifier: _.constant('external "bluebird"')
-                  },
-                ]
-              }
+              new ChunkMock([
+                {
+                  identifier: _.constant('"crypto"')
+                },
+                {
+                  identifier: _.constant('"uuid/v4"')
+                },
+                {
+                  identifier: _.constant('external "eslint"')
+                },
+                {
+                  identifier: _.constant('"mockery"')
+                },
+                {
+                  identifier: _.constant('"@scoped/vendor/module1"')
+                },
+                {
+                  identifier: _.constant('external "@scoped/vendor/module2"')
+                },
+                {
+                  identifier: _.constant('external "uuid/v4"')
+                },
+                {
+                  identifier: _.constant('external "bluebird"')
+                },
+              ])
             ],
             compiler: {
               outputPath: '/my/Service/Path/.webpack/service'
@@ -131,22 +139,20 @@ describe('packExternalModules', () => {
         {
           compilation: {
             chunks: [
-              {
-                modules: [
-                  {
-                    identifier: _.constant('"crypto"')
-                  },
-                  {
-                    identifier: _.constant('"uuid/v4"')
-                  },
-                  {
-                    identifier: _.constant('"mockery"')
-                  },
-                  {
-                    identifier: _.constant('"@scoped/vendor/module1"')
-                  },
-                ]
-              }
+              new ChunkMock([
+                {
+                  identifier: _.constant('"crypto"')
+                },
+                {
+                  identifier: _.constant('"uuid/v4"')
+                },
+                {
+                  identifier: _.constant('"mockery"')
+                },
+                {
+                  identifier: _.constant('"@scoped/vendor/module1"')
+                },
+              ])
             ],
             compiler: {
               outputPath: '/my/Service/Path/.webpack/service'
@@ -160,37 +166,35 @@ describe('packExternalModules', () => {
         {
           compilation: {
             chunks: [
-              {
-                modules: [
-                  {
-                    identifier: _.constant('"crypto"')
-                  },
-                  {
-                    identifier: _.constant('"uuid/v4"')
-                  },
-                  {
-                    identifier: _.constant('external "eslint"')
-                  },
-                  {
-                    identifier: _.constant('"mockery"')
-                  },
-                  {
-                    identifier: _.constant('"@scoped/vendor/module1"')
-                  },
-                  {
-                    identifier: _.constant('external "@scoped/vendor/module2"')
-                  },
-                  {
-                    identifier: _.constant('external "uuid/v4"')
-                  },
-                  {
-                    identifier: _.constant('external "localmodule"')
-                  },
-                  {
-                    identifier: _.constant('external "bluebird"')
-                  },
-                ]
-              }
+              new ChunkMock([
+                {
+                  identifier: _.constant('"crypto"')
+                },
+                {
+                  identifier: _.constant('"uuid/v4"')
+                },
+                {
+                  identifier: _.constant('external "eslint"')
+                },
+                {
+                  identifier: _.constant('"mockery"')
+                },
+                {
+                  identifier: _.constant('"@scoped/vendor/module1"')
+                },
+                {
+                  identifier: _.constant('external "@scoped/vendor/module2"')
+                },
+                {
+                  identifier: _.constant('external "uuid/v4"')
+                },
+                {
+                  identifier: _.constant('external "localmodule"')
+                },
+                {
+                  identifier: _.constant('external "bluebird"')
+                },
+              ])
             ],
             compiler: {
               outputPath: '/my/Service/Path/.webpack/service'
@@ -332,7 +336,7 @@ describe('packExternalModules', () => {
 
       sandbox.stub(process, 'cwd').returns(path.join('/my/Service/Path'));
       mockery.registerMock(path.join(process.cwd(), 'locals', 'package.json'), packageLocalRefMock);
-      
+
       return expect(module.packExternalModules()).to.be.fulfilled
       .then(() => BbPromise.all([
         // The module package JSON and the composite one should have been stored
@@ -859,7 +863,39 @@ describe('packExternalModules', () => {
         };
 
         const dependencyGraph = require('./data/npm-ls-peerdeps.json');
-        const peerDepStats = require('./data/stats-peerdeps.js');
+        const peerDepStats = {
+          stats: [
+            {
+              compilation: {
+                chunks: [
+                  new ChunkMock([
+                    {
+                      identifier: _.constant('"crypto"')
+                    },
+                    {
+                      identifier: _.constant('"uuid/v4"')
+                    },
+                    {
+                      identifier: _.constant('"mockery"')
+                    },
+                    {
+                      identifier: _.constant('"@scoped/vendor/module1"')
+                    },
+                    {
+                      identifier: _.constant('external "bluebird"')
+                    },
+                    {
+                      identifier: _.constant('external "request-promise"')
+                    }
+                  ])
+                ],
+                compiler: {
+                  outputPath: '/my/Service/Path/.webpack/service'
+                }
+              }
+            }
+          ]
+        };
 
         module.webpackOutputPath = 'outputPath';
         fsExtraMock.pathExists.yields(null, false);
