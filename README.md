@@ -24,12 +24,12 @@ and much more!
 individually, resulting in smaller Lambda packages that contain only the code and
 dependencies needed to run the function. This allows the plugin to fully utilize
 WebPack's [Tree-Shaking][link-webpack-tree] optimization.
+* Webpack version 3 and 4 support
 
 ## Recent improvements and important changes
 
-* Restrict webpack peer dependency version to `< 4`. Compatibility with webpack 4 will be
-added with the next major release (5.0.0).
-* Support for [serverless-step-functions-offline][link-step-functions-offline]
+* Webpack 2 support has been dropped in favor of Webpack 4
+* This 5.0.0 prerelease is based on the current 4.4.0
 
 For the complete release notes see the end of this document.
 
