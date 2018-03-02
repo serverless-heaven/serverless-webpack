@@ -27,9 +27,9 @@ WebPack's [Tree-Shaking][link-webpack-tree] optimization.
 
 ## Recent improvements and important changes
 
-* Improved extensibility for plugin authors (see _For Developers_ section)
-* Serverless 1.12+ is now required
-* Support of local `file:...` module references in package.json
+* Restrict webpack peer dependency version to `< 4`. Compatibility with webpack 4 will be
+added with the next major release (5.0.0).
+* Support for [serverless-step-functions-offline][link-step-functions-offline]
 
 For the complete release notes see the end of this document.
 
@@ -523,6 +523,11 @@ plugin when running a command or invoked by a hook.
 
 ## Release Notes
 
+* 4.4.0
+  * Support serverless-step-functions-offline [#313][link-313]
+  * Fixed webpack documentation links [#326][link-326]
+  * Abstracted packager interface [#329][link-329]
+
 * 4.3.0
   * Add new `webpack:compile:watch:compile` event [#315][link-315]
   * Added note to README about using yarn [#316][link-316]
@@ -698,3 +703,7 @@ plugin when running a command or invoked by a hook.
 [link-253]: https://github.com/serverless-heaven/serverless-webpack/issues/253
 [link-317]: https://github.com/serverless-heaven/serverless-webpack/pull/317
 [link-321]: https://github.com/serverless-heaven/serverless-webpack/pull/321
+
+[link-313]: https://github.com/serverless-heaven/serverless-webpack/pull/313
+[link-326]: https://github.com/serverless-heaven/serverless-webpack/pull/326
+[link-329]: https://github.com/serverless-heaven/serverless-webpack/issues/329
