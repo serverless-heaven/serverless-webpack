@@ -66,6 +66,6 @@
     "sinon-chai": "^2.14.0"
   },
   "peerDependencies": {
-    "webpack": "*"
+    "webpack": "< 4"
   }
 }
