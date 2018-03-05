@@ -126,6 +126,24 @@ as that will modify the running framework and leads to unpredictable behavior!
 If you have cool use cases with the full customization, we might add your solution
 to the plugin examples as showcase.
 
+#### Invocation state
+
+`lib.webpack` contains state variables that can be used to configure the build
+dynamically on a specific plugin state.
+
+##### isLocal
+
+`lib.webpack.isLocal` is a boolean property that is set to true, if any known
+mechanism is used in the current Serverless invocation that runs code locally.
+
+This allows to set properties in the webpack configuration differently depending
+if the lambda code is run on the local machine or deployed.
+
+A sample is to set the compile mode with Webpack 4:
+```
+mode: slsw.lib.webpack.isLocal ? "development" : "production"
+```
+
 ### Output
 
 Note that, if the `output` configuration is not set, it will automatically be
