@@ -712,5 +712,26 @@ describe('validate', () => {
         }).to.throw(new RegExp(`^Function "${testFunction}" doesn't exist`));
       });
     });
+
+    describe('webpack', () => {
+      it('should default isLocal to false', () => {
+        const testOutPath = 'test';
+        const testConfig = {
+          entry: 'test',
+          context: 'testcontext',
+          output: {
+            path: testOutPath,
+          },
+        };
+        module.serverless.service.custom.webpack = testConfig;
+        return expect(module.validate()).to.be.fulfilled
+        .then(() => {
+          const lib = require('../lib/index');
+          expect(lib.webpack.isLocal).to.be.false;
+          return null;
+        });
+      });
+    });
+
   });
 });
