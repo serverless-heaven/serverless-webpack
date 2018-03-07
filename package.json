@@ -24,7 +24,7 @@
   },
   "homepage": "https://github.com/serverless-heaven/serverless-webpack#readme",
   "scripts": {
-    "test": "nyc ./node_modules/mocha/bin/_mocha tests/all \"lib/**/*.test.js\" -R spec --recursive",
+    "test": "nyc ./node_modules/mocha/bin/_mocha tests/all index.test.js \"lib/**/*.test.js\" -R spec --recursive",
     "eslint": "node node_modules/eslint/bin/eslint.js --ext .js lib"
   },
   "nyc": {
