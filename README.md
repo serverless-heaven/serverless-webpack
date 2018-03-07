@@ -29,6 +29,7 @@ WebPack's [Tree-Shaking][link-webpack-tree] optimization.
 ## Recent improvements and important changes
 
 * Webpack 2 support has been dropped in favor of Webpack 4
+* Cleaned up configuration. You should now use a `custom.webpack` object to configure everything relevant for the plugin. The old configuration still works but will be removed in the next major release. For details see below.
 * This 5.0.0 prerelease is based on the current 4.4.0
 
 For the complete release notes see the end of this document.
@@ -48,12 +49,27 @@ plugins:
 
 ## Configure
 
-By default the plugin will look for a `webpack.config.js` in the service directory.
-Alternatively, you can specify a different file or configuration in `serverless.yml`:
+The configuration of the plugin is done by defining a `custom: webpack` object in your `serverless.yml` with your specific configuration. All settings are optional and will be set to reasonable defaults if missing.
+
+See the sections below for detailed descriptions of the settings. The defaults are:
 
 ```yaml
 custom:
-  webpack: ./folder/my-webpack.config.js
+  webpack:
+    webpackConfig: 'webpack.config.js'   # Name of webpack configuration file
+    webpackIncludeModules: false   # Node modules configuration for packaging
+    packager: 'npm'   # Reserved for future use. Any other values will not work right now.
+    packExternalModulesMaxBuffer: 200 * 1024   # Size of stdio buffers for spawned child processes
+```
+
+### Webpack configuration file
+
+By default the plugin will look for a `webpack.config.js` in the service directory. Alternatively, you can specify a different file or configuration in `serverless.yml`.
+
+```yaml
+custom:
+  webpack:
+    webpackConfig: ./folder/my-webpack.config.js
 ```
 
 A base Webpack configuration might look like this:
@@ -209,7 +225,8 @@ module.exports = {
 ```yaml
 # serverless.yml
 custom:
-  webpackIncludeModules: true # enable auto-packing of external modules
+  webpack:
+    webpackIncludeModules: true # enable auto-packing of external modules
 ```
 
 
@@ -223,8 +240,9 @@ use a different package file, set `packagePath` to your custom `package.json`:
 ```yaml
 # serverless.yml
 custom:
-  webpackIncludeModules:
-    packagePath: '../package.json' # relative path to custom package.json file.
+  webpack:
+    webpackIncludeModules:
+      packagePath: '../package.json' # relative path to custom package.json file.
 ```
 > Note that only relative path is supported at the moment.
 
@@ -246,10 +264,11 @@ your service's production dependencies in `package.json`.
 ```yaml
 # serverless.yml
 custom:
-  webpackIncludeModules:
-    forceInclude:
-      - module1
-      - module2
+  webpack:
+    webpackIncludeModules:
+      forceInclude:
+        - module1
+        - module2
 ```
 
 #### Forced exclusion
@@ -262,10 +281,11 @@ Just add them to the `forceExclude` array property and they will not be packaged
 ```yaml
 # serverless.yml
 custom:
-  webpackIncludeModules:
-    forceExclude:
-      - module1
-      - module2
+  webpack:
+    webpackIncludeModules:
+      forceExclude:
+        - module1
+        - module2
 ```
 
 If you specify a module in both arrays, `forceInclude` and `forceExclude`, the
