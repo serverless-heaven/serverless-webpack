@@ -27,8 +27,11 @@ class ServerlessWebpack {
     this.options = options;
 
     if (
-      _.has(this.serverless, 'service.custom.webpack') &&
-      _.endsWith(this.serverless.service.custom.webpack, '.ts')
+      (_.has(this.serverless, 'service.custom.webpack') &&
+      _.isString(this.serverless.service.custom.webpack) &&
+      _.endsWith(this.serverless.service.custom.webpack, '.ts')) ||
+      (_.has(this.serverless, 'service.custom.webpack.webpackConfig') &&
+      _.endsWith(this.serverless.service.custom.webpack.webpackConfig, '.ts'))
     ) {
       require('ts-node/register');
     }
