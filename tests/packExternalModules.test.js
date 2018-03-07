@@ -7,6 +7,7 @@ const chai = require('chai');
 const sinon = require('sinon');
 const mockery = require('mockery');
 const Serverless = require('serverless');
+const Configuration = require('../lib/Configuration');
 
 // Mocks
 const fsExtraMockFactory = require('./mocks/fs-extra.mock');
@@ -101,6 +102,11 @@ describe('packExternalModules', () => {
       options: {
         verbose: true
       },
+      configuration: new Configuration({ 
+        webpack: {
+          webpackIncludeModules: true
+        } 
+      })
     }, baseModule);
   });
 
@@ -225,7 +231,7 @@ describe('packExternalModules', () => {
     };
 
     it('should do nothing if webpackIncludeModules is not set', () => {
-      _.unset(serverless, 'service.custom.webpackIncludeModules');
+      module.configuration = new Configuration();
       module.compileStats = { stats: [] };
       return expect(module.packExternalModules()).to.be.fulfilled
       .then(() => BbPromise.all([
@@ -319,7 +325,13 @@ describe('packExternalModules', () => {
         }
       };
 
-      _.set(serverless, 'service.custom.webpackIncludeModules.packagePath', path.join('locals', 'package.json'));
+      module.configuration = new Configuration({
+        webpack: {
+          webpackIncludeModules: {
+            packagePath: path.join('locals', 'package.json')
+          }
+        }
+      });
       module.webpackOutputPath = 'outputPath';
       readFileSyncStub.returns(fakePackageLockJSON);
       fsExtraMock.pathExists.yields(null, true);
@@ -494,11 +506,13 @@ describe('packExternalModules', () => {
           pg: '^4.3.5'
         }
       };
-      serverless.service.custom = {
-        webpackIncludeModules: {
-          forceInclude: ['pg']
+      module.configuration = new Configuration({
+        webpack: {
+          webpackIncludeModules: {
+            forceInclude: ['pg']
+          }
         }
-      };
+      });
       module.webpackOutputPath = 'outputPath';
       fsExtraMock.pathExists.yields(null, false);
       fsExtraMock.copy.yields();
@@ -542,11 +556,13 @@ describe('packExternalModules', () => {
           'not-in-prod-deps': ''
         }
       };
-      serverless.service.custom = {
-        webpackIncludeModules: {
-          forceInclude: ['not-in-prod-deps']
+      module.configuration = new Configuration({
+        webpack: {
+          webpackIncludeModules: {
+            forceInclude: ['not-in-prod-deps']
+          }
         }
-      };
+      });
       module.webpackOutputPath = 'outputPath';
       fsExtraMock.pathExists.yields(null, false);
       fsExtraMock.copy.yields();
@@ -588,12 +604,14 @@ describe('packExternalModules', () => {
           pg: '^4.3.5'
         }
       };
-      serverless.service.custom = {
-        webpackIncludeModules: {
-          forceInclude: ['pg'],
-          forceExclude: ['uuid']
+      module.configuration = new Configuration({
+        webpack: {
+          webpackIncludeModules: {
+            forceInclude: ['pg'],
+            forceExclude: ['uuid']
+          }
         }
-      };
+      });
       module.webpackOutputPath = 'outputPath';
       fsExtraMock.pathExists.yields(null, false);
       fsExtraMock.copy.yields();

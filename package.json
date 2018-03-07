@@ -28,9 +28,12 @@
     "eslint": "node node_modules/eslint/bin/eslint.js --ext .js lib"
   },
   "nyc": {
+    "all": true,
     "exclude": [
       "tests/**/*.*",
-      "**/*.test.js"
+      "**/*.test.js",
+      "coverage/**",
+      "examples/**"
     ],
     "reporter": [
       "lcov",
@@ -61,7 +64,7 @@
     "mocha": "^5.0.2",
     "mockery": "^2.1.0",
     "nyc": "^11.4.1",
-    "serverless": "^1.24.1",
+    "serverless": "^1.26.1",
     "sinon": "^4.4.2",
     "sinon-chai": "^3.0.0"
   },
