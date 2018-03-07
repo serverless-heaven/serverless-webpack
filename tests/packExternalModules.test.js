@@ -104,7 +104,7 @@ describe('packExternalModules', () => {
       },
       configuration: new Configuration({ 
         webpack: {
-          webpackIncludeModules: true
+          includeModules: true
         } 
       })
     }, baseModule);
@@ -327,7 +327,7 @@ describe('packExternalModules', () => {
 
       module.configuration = new Configuration({
         webpack: {
-          webpackIncludeModules: {
+          includeModules: {
             packagePath: path.join('locals', 'package.json')
           }
         }
@@ -508,7 +508,7 @@ describe('packExternalModules', () => {
       };
       module.configuration = new Configuration({
         webpack: {
-          webpackIncludeModules: {
+          includeModules: {
             forceInclude: ['pg']
           }
         }
@@ -558,7 +558,7 @@ describe('packExternalModules', () => {
       };
       module.configuration = new Configuration({
         webpack: {
-          webpackIncludeModules: {
+          includeModules: {
             forceInclude: ['not-in-prod-deps']
           }
         }
@@ -606,7 +606,7 @@ describe('packExternalModules', () => {
       };
       module.configuration = new Configuration({
         webpack: {
-          webpackIncludeModules: {
+          includeModules: {
             forceInclude: ['pg'],
             forceExclude: ['uuid']
           }

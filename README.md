@@ -57,7 +57,7 @@ See the sections below for detailed descriptions of the settings. The defaults a
 custom:
   webpack:
     webpackConfig: 'webpack.config.js'   # Name of webpack configuration file
-    webpackIncludeModules: false   # Node modules configuration for packaging
+    includeModules: false   # Node modules configuration for packaging
     packager: 'npm'   # Reserved for future use. Any other values will not work right now.
     packExternalModulesMaxBuffer: 200 * 1024   # Size of stdio buffers for spawned child processes
 ```
@@ -208,7 +208,7 @@ builtin package (ie: `aws-sdk`) and handling webpack-incompatible modules.
 
 In this case you might add external modules in
 [Webpack's `externals` configuration][link-webpack-externals].
-Those modules can be included in the Serverless bundle with the `webpackIncludeModules`
+Those modules can be included in the Serverless bundle with the `custom: webpack: includeModules`
 option in `serverless.yml`:
 
 ```js
@@ -226,7 +226,7 @@ module.exports = {
 # serverless.yml
 custom:
   webpack:
-    webpackIncludeModules: true # enable auto-packing of external modules
+    includeModules: true # enable auto-packing of external modules
 ```
 
 
@@ -241,7 +241,7 @@ use a different package file, set `packagePath` to your custom `package.json`:
 # serverless.yml
 custom:
   webpack:
-    webpackIncludeModules:
+    includeModules:
       packagePath: '../package.json' # relative path to custom package.json file.
 ```
 > Note that only relative path is supported at the moment.
@@ -265,7 +265,7 @@ your service's production dependencies in `package.json`.
 # serverless.yml
 custom:
   webpack:
-    webpackIncludeModules:
+    includeModules:
       forceInclude:
         - module1
         - module2
@@ -282,7 +282,7 @@ Just add them to the `forceExclude` array property and they will not be packaged
 # serverless.yml
 custom:
   webpack:
-    webpackIncludeModules:
+    includeModules:
       forceExclude:
         - module1
         - module2

@@ -1,6 +1,6 @@
 {
   "name": "serverless-webpack",
-  "version": "5.0.0-rc.3",
+  "version": "5.0.0-rc.4",
   "description": "Serverless plugin to bundle your javascript with Webpack",
   "main": "index.js",
   "author": "Nicola Peduzzi <nicola.peduzzi@elastic-coders.com> (http://elastic-coders.com)",
