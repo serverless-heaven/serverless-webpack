@@ -33,6 +33,7 @@ const packagerMockFactory = {
   create(sandbox) {
     const packagerMock = {
       lockfileName: 'mocked-lock.json',
+      mustCopyModules: true,
       rebaseLockfile: sandbox.stub(),
       getProdDependencies: sandbox.stub(),
       install: sandbox.stub(),
@@ -351,8 +352,8 @@ describe('packExternalModules', () => {
         expect(writeFileSyncStub).to.have.been.calledThrice,
         expect(writeFileSyncStub.firstCall.args[1]).to.equal(JSON.stringify(expectedCompositePackageJSON, null, 2)),
         expect(writeFileSyncStub.thirdCall.args[1]).to.equal(JSON.stringify(expectedPackageJSON, null, 2)),
-        // The modules should have been copied
-        expect(fsExtraMock.copy).to.have.been.calledOnce,
+        // The modules and the lock file should have been copied
+        expect(fsExtraMock.copy).to.have.been.calledTwice,
         // Lock file rebase should have been called
         expect(packagerMock.rebaseLockfile).to.have.been.calledOnce,
         expect(packagerMock.rebaseLockfile).to.have.been.calledWith(sinon.match.any, sinon.match(fakePackageLockJSON)),
@@ -670,8 +671,8 @@ describe('packExternalModules', () => {
         expect(writeFileSyncStub.firstCall.args[1]).to.equal(JSON.stringify(expectedCompositePackageJSON, null, 2)),
         expect(writeFileSyncStub.secondCall.args[1]).to.equal(JSON.stringify({ info: 'lockfile' }, null, 2)),
         expect(writeFileSyncStub.thirdCall.args[1]).to.equal(JSON.stringify(expectedPackageJSON, null, 2)),
-        // The modules should have been copied
-        expect(fsExtraMock.copy).to.have.been.calledOnce,
+        // The modules and the lock file should have been copied
+        expect(fsExtraMock.copy).to.have.been.calledTwice,
         // npm ls and npm prune should have been called
         expect(packagerMock.getProdDependencies).to.have.been.calledOnce,
         expect(packagerMock.install).to.have.been.calledOnce,
@@ -720,6 +721,52 @@ describe('packExternalModules', () => {
         expect(packagerMock.install).to.have.been.calledOnce,
         expect(packagerMock.prune).to.have.been.calledOnce,
       ]));
+    });
+
+    it('should skip module copy if demanded by packager', () => {
+      const expectedCompositePackageJSON = {
+        name: 'test-service',
+        version: '1.0.0',
+        description: 'Packaged externals for test-service',
+        private: true,
+        dependencies: {
+          '@scoped/vendor': '1.0.0',
+          uuid: '^5.4.1',
+          bluebird: '^3.4.0'
+        }
+      };
+      const expectedPackageJSON = {
+        dependencies: {
+          '@scoped/vendor': '1.0.0',
+          uuid: '^5.4.1',
+          bluebird: '^3.4.0'
+        }
+      };
+
+      module.webpackOutputPath = 'outputPath';
+      fsExtraMock.pathExists.yields(null, false);
+      fsExtraMock.copy.onFirstCall().yields();
+      packagerMock.getProdDependencies.returns(BbPromise.resolve({}));
+      packagerMock.install.returns(BbPromise.resolve());
+      packagerMock.prune.returns(BbPromise.resolve());
+      packagerMock.mustCopyModules = false;
+      module.compileStats = stats;
+      return expect(module.packExternalModules()).to.be.fulfilled
+      .then(() => BbPromise.all([
+        // The module package JSON and the composite one should have been stored
+        expect(writeFileSyncStub).to.have.been.calledTwice,
+        expect(writeFileSyncStub.firstCall.args[1]).to.equal(JSON.stringify(expectedCompositePackageJSON, null, 2)),
+        expect(writeFileSyncStub.secondCall.args[1]).to.equal(JSON.stringify(expectedPackageJSON, null, 2)),
+        // The modules should not have been copied
+        expect(fsExtraMock.copy).to.not.have.been.called,
+        // npm ls and npm prune should have been called
+        expect(packagerMock.getProdDependencies).to.have.been.calledOnce,
+        expect(packagerMock.install).to.have.been.calledOnce,
+        expect(packagerMock.prune).to.have.been.calledOnce,
+      ]))
+      .finally(() => {
+        packagerMock.mustCopyModules = true;
+      });
     });
 
     describe('peer dependencies', () => {
