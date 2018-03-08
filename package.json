@@ -1,9 +1,9 @@
 {
   "name": "serverless-webpack",
-  "version": "5.0.0-rc.4",
+  "version": "5.0.0",
   "description": "Serverless plugin to bundle your javascript with Webpack",
   "main": "index.js",
-  "author": "Nicola Peduzzi <nicola.peduzzi@elastic-coders.com> (http://elastic-coders.com)",
+  "author": "Frank Schmid <fschmid740@googlemail.com>",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/serverless-heaven/serverless-webpack.git"
