@@ -28,9 +28,9 @@ WebPack's [Tree-Shaking][link-webpack-tree] optimization.
 
 ## Recent improvements and important changes
 
-* Webpack 2 support has been dropped in favor of Webpack 4
+* Support Webpack 4
+* Drop Webpack 2 support
 * Cleaned up configuration. You should now use a `custom.webpack` object to configure everything relevant for the plugin. The old configuration still works but will be removed in the next major release. For details see below.
-* This 5.0.0 prerelease is based on the current 4.4.0
 
 For the complete release notes see the end of this document.
 
@@ -503,6 +503,7 @@ The following serverless plugins are explicitly supported with `serverless-webpa
 
 | Plugin                            | NPM |
 |-----------------------------------|-----|
+| serverless-offline | [![NPM][ico-serverless-offline]][link-serverless-offline] |
 | serverless-step-functions-offline | [![NPM][ico-step-functions-offline]][link-step-functions-offline] |
 
 ## For developers
@@ -559,7 +560,19 @@ plugin when running a command or invoked by a hook.
    -> webpack:compile
 ```
 
+## Thanks
+
+Special thanks go to the initial author of serverless-webpack, Nicola Peduzzi (https://github.com/thenikso), who allowed
+me to take it over and continue working on the project. That helped to revive it and lead it to new horizons.
+
 ## Release Notes
+
+* 5.0.0
+  * Support Webpack 4 [#331][link-331] [#328][link-328]
+  * BREAKING: Drop support for Webpack 2
+  * Allow to check for local invocation in the webpack configuration [#232][link-232]
+  * New centralized configuration with fallback to the old one [#336][link-336]
+  * Improved unit tests and actual coverage calculation [#337][link-337]
 
 * 4.4.0
   * Support serverless-step-functions-offline [#313][link-313]
@@ -666,6 +679,7 @@ plugin when running a command or invoked by a hook.
 [link-webpack-externals]: https://webpack.js.org/configuration/externals/
 [link-examples]: ./examples
 [link-serverless-offline]: https://www.npmjs.com/package/serverless-offline
+[ico-serverless-offline]: https://img.shields.io/npm/v/serverless-offline.svg
 [link-serverless-dynamodb-local]: https://www.npmjs.com/package/serverless-dynamodb-local
 [link-step-functions-offline]: https://www.npmjs.com/package/serverless-step-functions-offline
 [ico-step-functions-offline]: https://img.shields.io/npm/v/serverless-step-functions-offline.svg
@@ -745,3 +759,9 @@ plugin when running a command or invoked by a hook.
 [link-313]: https://github.com/serverless-heaven/serverless-webpack/pull/313
 [link-326]: https://github.com/serverless-heaven/serverless-webpack/pull/326
 [link-329]: https://github.com/serverless-heaven/serverless-webpack/issues/329
+
+[link-232]: https://github.com/serverless-heaven/serverless-webpack/issues/232
+[link-331]: https://github.com/serverless-heaven/serverless-webpack/issues/331
+[link-328]: https://github.com/serverless-heaven/serverless-webpack/pull/328
+[link-336]: https://github.com/serverless-heaven/serverless-webpack/pull/336
+[link-337]: https://github.com/serverless-heaven/serverless-webpack/pull/337
