@@ -7,6 +7,7 @@ const chai = require('chai');
 const sinon = require('sinon');
 const mockery = require('mockery');
 const Serverless = require('serverless');
+const Configuration = require('../lib/Configuration');
 
 // Mocks
 const fsExtraMockFactory = require('./mocks/fs-extra.mock');
@@ -17,6 +18,16 @@ chai.use(require('chai-as-promised'));
 chai.use(require('sinon-chai'));
 
 const expect = chai.expect;
+
+class ChunkMock {
+  constructor(modules) {
+    this._modules = modules;
+  }
+
+  forEachModule(fn) {
+    _.forEach(this._modules, fn);
+  }
+}
 
 const packagerMockFactory = {
   create(sandbox) {
@@ -91,6 +102,11 @@ describe('packExternalModules', () => {
       options: {
         verbose: true
       },
+      configuration: new Configuration({ 
+        webpack: {
+          includeModules: true
+        } 
+      })
     }, baseModule);
   });
 
@@ -110,34 +126,32 @@ describe('packExternalModules', () => {
         {
           compilation: {
             chunks: [
-              {
-                modules: [
-                  {
-                    identifier: _.constant('"crypto"')
-                  },
-                  {
-                    identifier: _.constant('"uuid/v4"')
-                  },
-                  {
-                    identifier: _.constant('external "eslint"')
-                  },
-                  {
-                    identifier: _.constant('"mockery"')
-                  },
-                  {
-                    identifier: _.constant('"@scoped/vendor/module1"')
-                  },
-                  {
-                    identifier: _.constant('external "@scoped/vendor/module2"')
-                  },
-                  {
-                    identifier: _.constant('external "uuid/v4"')
-                  },
-                  {
-                    identifier: _.constant('external "bluebird"')
-                  },
-                ]
-              }
+              new ChunkMock([
+                {
+                  identifier: _.constant('"crypto"')
+                },
+                {
+                  identifier: _.constant('"uuid/v4"')
+                },
+                {
+                  identifier: _.constant('external "eslint"')
+                },
+                {
+                  identifier: _.constant('"mockery"')
+                },
+                {
+                  identifier: _.constant('"@scoped/vendor/module1"')
+                },
+                {
+                  identifier: _.constant('external "@scoped/vendor/module2"')
+                },
+                {
+                  identifier: _.constant('external "uuid/v4"')
+                },
+                {
+                  identifier: _.constant('external "bluebird"')
+                },
+              ])
             ],
             compiler: {
               outputPath: '/my/Service/Path/.webpack/service'
@@ -151,22 +165,20 @@ describe('packExternalModules', () => {
         {
           compilation: {
             chunks: [
-              {
-                modules: [
-                  {
-                    identifier: _.constant('"crypto"')
-                  },
-                  {
-                    identifier: _.constant('"uuid/v4"')
-                  },
-                  {
-                    identifier: _.constant('"mockery"')
-                  },
-                  {
-                    identifier: _.constant('"@scoped/vendor/module1"')
-                  },
-                ]
-              }
+              new ChunkMock([
+                {
+                  identifier: _.constant('"crypto"')
+                },
+                {
+                  identifier: _.constant('"uuid/v4"')
+                },
+                {
+                  identifier: _.constant('"mockery"')
+                },
+                {
+                  identifier: _.constant('"@scoped/vendor/module1"')
+                },
+              ])
             ],
             compiler: {
               outputPath: '/my/Service/Path/.webpack/service'
@@ -180,37 +192,35 @@ describe('packExternalModules', () => {
         {
           compilation: {
             chunks: [
-              {
-                modules: [
-                  {
-                    identifier: _.constant('"crypto"')
-                  },
-                  {
-                    identifier: _.constant('"uuid/v4"')
-                  },
-                  {
-                    identifier: _.constant('external "eslint"')
-                  },
-                  {
-                    identifier: _.constant('"mockery"')
-                  },
-                  {
-                    identifier: _.constant('"@scoped/vendor/module1"')
-                  },
-                  {
-                    identifier: _.constant('external "@scoped/vendor/module2"')
-                  },
-                  {
-                    identifier: _.constant('external "uuid/v4"')
-                  },
-                  {
-                    identifier: _.constant('external "localmodule"')
-                  },
-                  {
-                    identifier: _.constant('external "bluebird"')
-                  },
-                ]
-              }
+              new ChunkMock([
+                {
+                  identifier: _.constant('"crypto"')
+                },
+                {
+                  identifier: _.constant('"uuid/v4"')
+                },
+                {
+                  identifier: _.constant('external "eslint"')
+                },
+                {
+                  identifier: _.constant('"mockery"')
+                },
+                {
+                  identifier: _.constant('"@scoped/vendor/module1"')
+                },
+                {
+                  identifier: _.constant('external "@scoped/vendor/module2"')
+                },
+                {
+                  identifier: _.constant('external "uuid/v4"')
+                },
+                {
+                  identifier: _.constant('external "localmodule"')
+                },
+                {
+                  identifier: _.constant('external "bluebird"')
+                },
+              ])
             ],
             compiler: {
               outputPath: '/my/Service/Path/.webpack/service'
@@ -221,7 +231,7 @@ describe('packExternalModules', () => {
     };
 
     it('should do nothing if webpackIncludeModules is not set', () => {
-      _.unset(serverless, 'service.custom.webpackIncludeModules');
+      module.configuration = new Configuration();
       module.compileStats = { stats: [] };
       return expect(module.packExternalModules()).to.be.fulfilled
       .then(() => BbPromise.all([
@@ -315,7 +325,13 @@ describe('packExternalModules', () => {
         }
       };
 
-      _.set(serverless, 'service.custom.webpackIncludeModules.packagePath', path.join('locals', 'package.json'));
+      module.configuration = new Configuration({
+        webpack: {
+          includeModules: {
+            packagePath: path.join('locals', 'package.json')
+          }
+        }
+      });
       module.webpackOutputPath = 'outputPath';
       readFileSyncStub.returns(fakePackageLockJSON);
       fsExtraMock.pathExists.yields(null, true);
@@ -328,7 +344,7 @@ describe('packExternalModules', () => {
 
       sandbox.stub(process, 'cwd').returns(path.join('/my/Service/Path'));
       mockery.registerMock(path.join(process.cwd(), 'locals', 'package.json'), packageLocalRefMock);
-      
+
       return expect(module.packExternalModules()).to.be.fulfilled
       .then(() => BbPromise.all([
         // The module package JSON and the composite one should have been stored
@@ -490,11 +506,13 @@ describe('packExternalModules', () => {
           pg: '^4.3.5'
         }
       };
-      serverless.service.custom = {
-        webpackIncludeModules: {
-          forceInclude: ['pg']
+      module.configuration = new Configuration({
+        webpack: {
+          includeModules: {
+            forceInclude: ['pg']
+          }
         }
-      };
+      });
       module.webpackOutputPath = 'outputPath';
       fsExtraMock.pathExists.yields(null, false);
       fsExtraMock.copy.yields();
@@ -538,11 +556,13 @@ describe('packExternalModules', () => {
           'not-in-prod-deps': ''
         }
       };
-      serverless.service.custom = {
-        webpackIncludeModules: {
-          forceInclude: ['not-in-prod-deps']
+      module.configuration = new Configuration({
+        webpack: {
+          includeModules: {
+            forceInclude: ['not-in-prod-deps']
+          }
         }
-      };
+      });
       module.webpackOutputPath = 'outputPath';
       fsExtraMock.pathExists.yields(null, false);
       fsExtraMock.copy.yields();
@@ -584,12 +604,14 @@ describe('packExternalModules', () => {
           pg: '^4.3.5'
         }
       };
-      serverless.service.custom = {
-        webpackIncludeModules: {
-          forceInclude: ['pg'],
-          forceExclude: ['uuid']
+      module.configuration = new Configuration({
+        webpack: {
+          includeModules: {
+            forceInclude: ['pg'],
+            forceExclude: ['uuid']
+          }
         }
-      };
+      });
       module.webpackOutputPath = 'outputPath';
       fsExtraMock.pathExists.yields(null, false);
       fsExtraMock.copy.yields();
@@ -749,7 +771,39 @@ describe('packExternalModules', () => {
         };
 
         const dependencyGraph = require('./data/npm-ls-peerdeps.json');
-        const peerDepStats = require('./data/stats-peerdeps.js');
+        const peerDepStats = {
+          stats: [
+            {
+              compilation: {
+                chunks: [
+                  new ChunkMock([
+                    {
+                      identifier: _.constant('"crypto"')
+                    },
+                    {
+                      identifier: _.constant('"uuid/v4"')
+                    },
+                    {
+                      identifier: _.constant('"mockery"')
+                    },
+                    {
+                      identifier: _.constant('"@scoped/vendor/module1"')
+                    },
+                    {
+                      identifier: _.constant('external "bluebird"')
+                    },
+                    {
+                      identifier: _.constant('external "request-promise"')
+                    }
+                  ])
+                ],
+                compiler: {
+                  outputPath: '/my/Service/Path/.webpack/service'
+                }
+              }
+            }
+          ]
+        };
 
         module.webpackOutputPath = 'outputPath';
         fsExtraMock.pathExists.yields(null, false);

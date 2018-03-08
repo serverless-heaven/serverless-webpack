@@ -2,7 +2,6 @@
 
 const BbPromise = require('bluebird');
 const _ = require('lodash');
-const path = require('path');
 
 const validate = require('./lib/validate');
 const compile = require('./lib/compile');
@@ -28,8 +27,11 @@ class ServerlessWebpack {
     this.options = options;
 
     if (
-      _.has(this.serverless, 'service.custom.webpack') &&
-      _.endsWith(this.serverless.service.custom.webpack, '.ts')
+      (_.has(this.serverless, 'service.custom.webpack') &&
+      _.isString(this.serverless.service.custom.webpack) &&
+      _.endsWith(this.serverless.service.custom.webpack, '.ts')) ||
+      (_.has(this.serverless, 'service.custom.webpack.webpackConfig') &&
+      _.endsWith(this.serverless.service.custom.webpack.webpackConfig, '.ts'))
     ) {
       require('ts-node/register');
     }
@@ -108,7 +110,10 @@ class ServerlessWebpack {
         .then(() => this.serverless.pluginManager.spawn('webpack:package')),
 
       'before:invoke:local:invoke': () => BbPromise.bind(this)
-        .then(() => this.serverless.pluginManager.spawn('webpack:validate'))
+        .then(() => {
+          lib.webpack.isLocal = true;
+          return this.serverless.pluginManager.spawn('webpack:validate');
+        })
         .then(() => this.serverless.pluginManager.spawn('webpack:compile'))
         .then(this.prepareLocalInvoke),
 
@@ -158,16 +163,25 @@ class ServerlessWebpack {
         .then(this.packageModules),
 
       'before:offline:start': () => BbPromise.bind(this)
+        .tap(() => {
+          lib.webpack.isLocal = true;
+        })
         .then(this.prepareOfflineInvoke)
         .then(this.wpwatch),
 
       'before:offline:start:init': () => BbPromise.bind(this)
+        .tap(() => {
+          lib.webpack.isLocal = true;
+        })
         .then(this.prepareOfflineInvoke)
         .then(this.wpwatch),
 
       'before:step-functions-offline:start': () => BbPromise.bind(this)
-         .then(this.prepareStepOfflineInvoke)
-         .then(this.compile)
+        .tap(() => {
+          lib.webpack.isLocal = true;
+        })
+        .then(this.prepareStepOfflineInvoke)
+        .then(this.compile)
     };
   }
 }

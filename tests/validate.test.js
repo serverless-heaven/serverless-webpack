@@ -8,6 +8,7 @@ const path = require('path');
 const Serverless = require('serverless');
 const fsExtraMockFactory = require('./mocks/fs-extra.mock');
 
+chai.use(require('chai-as-promised'));
 chai.use(require('sinon-chai'));
 
 const expect = chai.expect;
@@ -67,7 +68,7 @@ describe('validate', () => {
         path: 'test',
       },
     };
-    module.serverless.service.custom.webpack = testConfig;
+    _.set(module.serverless.service, 'custom.webpack.config', testConfig);
     return module
       .validate()
       .then(() => expect(module.webpackConfig).to.eql(testConfig));
@@ -82,7 +83,7 @@ describe('validate', () => {
         path: testOutPath,
       },
     };
-    module.serverless.service.custom.webpack = testConfig;
+    _.set(module.serverless.service, 'custom.webpack.config', testConfig);
     return module
       .validate()
       .then(() => expect(fsExtraMock.removeSync).to.have.been.calledWith(testOutPath));
@@ -98,7 +99,7 @@ describe('validate', () => {
       },
     };
     _.set(module, 'keepOutputDirectory', true);
-    module.serverless.service.custom.webpack = testConfig;
+    _.set(module.serverless.service, 'custom.webpack.config', testConfig);
     return module
       .validate()
       .then(() => expect(fsExtraMock.removeSync).to.not.have.been.called);
@@ -117,7 +118,7 @@ describe('validate', () => {
     const testOptionsOut = 'testdir';
     module.options.out = testOptionsOut;
     module.serverless.config.servicePath = testServicePath;
-    module.serverless.service.custom.webpack = testConfig;
+    _.set(module.serverless.service, 'custom.webpack.config', testConfig);
     return module
       .validate()
       .then(() => expect(module.webpackConfig.output).to.eql({
@@ -133,7 +134,7 @@ describe('validate', () => {
     };
     const testServicePath = 'testpath';
     module.serverless.config.servicePath = testServicePath;
-    module.serverless.service.custom.webpack = testConfig;
+    _.set(module.serverless.service, 'custom.webpack.config', testConfig);
     return module
       .validate()
       .then(() => expect(module.webpackConfig.context).to.equal(testServicePath));
@@ -147,7 +148,7 @@ describe('validate', () => {
       };
       const testServicePath = 'testpath';
       module.serverless.config.servicePath = testServicePath;
-      module.serverless.service.custom.webpack = testConfig;
+      _.set(module.serverless.service, 'custom.webpack.config', testConfig);
       return module
       .validate()
       .then(() => expect(module.webpackConfig.target).to.equal('node'));
@@ -161,7 +162,7 @@ describe('validate', () => {
       };
       const testServicePath = 'testpath';
       module.serverless.config.servicePath = testServicePath;
-      module.serverless.service.custom.webpack = testConfig;
+      _.set(module.serverless.service, 'custom.webpack.config', testConfig);
       return module
       .validate()
       .then(() => expect(module.webpackConfig.target).to.equal('myTarget'));
@@ -176,7 +177,7 @@ describe('validate', () => {
       };
       const testServicePath = 'testpath';
       module.serverless.config.servicePath = testServicePath;
-      module.serverless.service.custom.webpack = testConfig;
+      _.set(module.serverless.service, 'custom.webpack.config', testConfig);
       return module
         .validate()
         .then(() => expect(module.webpackConfig.output).to.eql({
@@ -193,7 +194,7 @@ describe('validate', () => {
       };
       const testServicePath = 'testpath';
       module.serverless.config.servicePath = testServicePath;
-      module.serverless.service.custom.webpack = testConfig;
+      _.set(module.serverless.service, 'custom.webpack.config', testConfig);
       return module
         .validate()
         .then(() => expect(module.webpackConfig.output).to.eql({
@@ -207,7 +208,7 @@ describe('validate', () => {
       const testConfig = {};
       const testServicePath = 'testpath';
       module.serverless.config.servicePath = testServicePath;
-      module.serverless.service.custom.webpack = testConfig;
+      _.set(module.serverless.service, 'custom.webpack.config', testConfig);
       return module
         .validate()
         .then(() => expect(module.webpackConfig.output).to.eql({
@@ -290,7 +291,7 @@ describe('validate', () => {
           path: testOutPath,
         },
       };
-      module.serverless.service.custom.webpack = testConfig;
+      _.set(module.serverless.service, 'custom.webpack.config', testConfig);
       return expect(module.validate()).to.be.fulfilled
       .then(() => {
         const lib = require('../lib/index');
@@ -316,7 +317,7 @@ describe('validate', () => {
         serverless,
         options: _.cloneDeep(testOptions),
       }, baseModule);
-      configuredModule.serverless.service.custom.webpack = testConfig;
+      _.set(module.serverless.service, 'custom.webpack.config', testConfig);
       return expect(configuredModule.validate()).to.be.fulfilled
       .then(() => {
         const lib = require('../lib/index');
@@ -394,7 +395,7 @@ describe('validate', () => {
             path: testOutPath,
           },
         };
-        module.serverless.service.custom.webpack = testConfig;
+        _.set(module.serverless.service, 'custom.webpack.config', testConfig);
         module.serverless.service.functions = testFunctionsConfig;
         globSyncStub.callsFake(filename => [_.replace(filename, '*', 'js')]);
         return expect(module.validate()).to.be.fulfilled
@@ -424,7 +425,7 @@ describe('validate', () => {
             path: testOutPath,
           },
         };
-        module.serverless.service.custom.webpack = testConfig;
+        _.set(module.serverless.service, 'custom.webpack.config', testConfig);
         module.serverless.service.functions = testFunctionsConfig;
         module.options.function = testFunction;
         globSyncStub.callsFake(filename => [_.replace(filename, '*', 'js')]);
@@ -463,7 +464,7 @@ describe('validate', () => {
               filename: 'index.js'
             },
           };
-          module.serverless.service.custom.webpack = testConfig;
+          _.set(module.serverless.service, 'custom.webpack.config', testConfig);
           module.serverless.service.functions = testFunctionsGoogleConfig;
           module.options.function = testFunction;
           globSyncStub.returns([]);
@@ -495,7 +496,7 @@ describe('validate', () => {
         });
 
         it('should enable multiCompile', () => {
-          module.serverless.service.custom.webpack = testConfig;
+          _.set(module.serverless.service, 'custom.webpack.config', testConfig);
           module.serverless.service.functions = testFunctionsConfig;
           globSyncStub.callsFake(filename => [_.replace(filename, '*', 'js')]);
 
@@ -509,12 +510,12 @@ describe('validate', () => {
         });
 
         it('should fail if webpackConfig.entry is customised', () => {
-          module.serverless.service.custom.webpack = _.merge({}, testConfig, {
+          _.set(module.serverless.service, 'custom.webpack.config', _.merge({}, testConfig, {
             entry: {
               module1: './module1.js',
               module2: './module2.js'
             }
-          });
+          }));
           module.serverless.service.functions = testFunctionsConfig;
           globSyncStub.callsFake(filename => [_.replace(filename, '*', 'js')]);
           return expect(module.validate()).to.be.rejectedWith(
@@ -523,16 +524,16 @@ describe('validate', () => {
 
         it('should not fail if webpackConfig.entry is set to lib.entries for backward compatibility', () => {
           const lib = require('../lib/index');
-          module.serverless.service.custom.webpack = _.merge({}, testConfig, {
+          _.set(module.serverless.service, 'custom.webpack.config', _.merge({}, testConfig, {
             entry: lib.entries
-          });
+          }));
           module.serverless.service.functions = testFunctionsConfig;
           globSyncStub.callsFake(filename => [_.replace(filename, '*', 'js')]);
           return expect(module.validate()).to.be.fulfilled;
         });
 
         it('should expose all functions details in entryFunctions property', () => {
-          module.serverless.service.custom.webpack = testConfig;
+          _.set(module.serverless.service, 'custom.webpack.config', testConfig);
           module.serverless.service.functions = testFunctionsConfig;
           globSyncStub.callsFake(filename => [_.replace(filename, '*', 'js')]);
           return expect(module.validate()).to.be.fulfilled
@@ -568,7 +569,7 @@ describe('validate', () => {
         });
 
         it('should set webpackConfig output path for every functions', () => {
-          module.serverless.service.custom.webpack = testConfig;
+          _.set(module.serverless.service, 'custom.webpack.config', testConfig);
           module.serverless.service.functions = testFunctionsConfig;
           globSyncStub.callsFake(filename => [_.replace(filename, '*', 'js')]);
           return expect(module.validate()).to.be.fulfilled
@@ -584,13 +585,13 @@ describe('validate', () => {
         });
 
         it('should clone other webpackConfig options without modification', () => {
-          module.serverless.service.custom.webpack = _.merge({}, testConfig, {
+          _.set(module.serverless.service, 'custom.webpack.config', _.merge({}, testConfig, {
             devtool: 'source-map',
             context: 'some context',
             output: {
               libraryTarget: 'commonjs'
             }
-          });
+          }));
           module.serverless.service.functions = testFunctionsConfig;
           globSyncStub.callsFake(filename => [_.replace(filename, '*', 'js')]);
           return expect(module.validate()).to.be.fulfilled
@@ -623,7 +624,7 @@ describe('validate', () => {
             path: testOutPath,
           },
         };
-        module.serverless.service.custom.webpack = testConfig;
+        _.set(module.serverless.service, 'custom.webpack.config', testConfig);
         module.serverless.service.functions = testFunctionsConfig;
         module.options.function = testFunction;
         globSyncStub.returns([ 'module1.ts', 'module1.js' ]);
@@ -654,7 +655,7 @@ describe('validate', () => {
             path: testOutPath,
           },
         };
-        module.serverless.service.custom.webpack = testConfig;
+        _.set(module.serverless.service, 'custom.webpack.config', testConfig);
         module.serverless.service.functions = testFunctionsConfig;
         module.options.function = testFunction;
         globSyncStub.returns([ 'module1.doc', 'module1.json', 'module1.test.js', 'module1.ts', 'module1.js' ]);
@@ -685,7 +686,7 @@ describe('validate', () => {
             path: testOutPath,
           },
         };
-        module.serverless.service.custom.webpack = testConfig;
+        _.set(module.serverless.service, 'custom.webpack.config', testConfig);
         module.serverless.service.functions = testFunctionsConfig;
         module.options.function = testFunction;
         globSyncStub.returns([]);
@@ -704,7 +705,7 @@ describe('validate', () => {
             path: testOutPath,
           },
         };
-        module.serverless.service.custom.webpack = testConfig;
+        _.set(module.serverless.service, 'custom.webpack.config', testConfig);
         module.serverless.service.functions = testFunctionsConfig;
         module.options.function = testFunction;
         expect(() => {
@@ -712,5 +713,26 @@ describe('validate', () => {
         }).to.throw(new RegExp(`^Function "${testFunction}" doesn't exist`));
       });
     });
+
+    describe('webpack', () => {
+      it('should default isLocal to false', () => {
+        const testOutPath = 'test';
+        const testConfig = {
+          entry: 'test',
+          context: 'testcontext',
+          output: {
+            path: testOutPath,
+          },
+        };
+        _.set(module.serverless.service, 'custom.webpack.config', testConfig);
+        return expect(module.validate()).to.be.fulfilled
+        .then(() => {
+          const lib = require('../lib/index');
+          expect(lib.webpack.isLocal).to.be.false;
+          return null;
+        });
+      });
+    });
+
   });
 });
