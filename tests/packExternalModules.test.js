@@ -37,7 +37,8 @@ const packagerMockFactory = {
       rebaseLockfile: sandbox.stub(),
       getProdDependencies: sandbox.stub(),
       install: sandbox.stub(),
-      prune: sandbox.stub()
+      prune: sandbox.stub(),
+      runScripts: sandbox.stub()
     };
 
     return packagerMock;
@@ -248,6 +249,7 @@ describe('packExternalModules', () => {
         version: '1.0.0',
         description: 'Packaged externals for test-service',
         private: true,
+        scripts: {},
         dependencies: {
           '@scoped/vendor': '1.0.0',
           uuid: '^5.4.1',
@@ -255,6 +257,11 @@ describe('packExternalModules', () => {
         }
       };
       const expectedPackageJSON = {
+        name: 'test-service',
+        version: '1.0.0',
+        description: 'Packaged externals for test-service',
+        private: true,
+        scripts: {},
         dependencies: {
           '@scoped/vendor': '1.0.0',
           uuid: '^5.4.1',
@@ -268,6 +275,7 @@ describe('packExternalModules', () => {
       packagerMock.getProdDependencies.returns(BbPromise.resolve({}));
       packagerMock.install.returns(BbPromise.resolve());
       packagerMock.prune.returns(BbPromise.resolve());
+      packagerMock.runScripts.returns(BbPromise.resolve());
       module.compileStats = stats;
       return expect(module.packExternalModules()).to.be.fulfilled
       .then(() => BbPromise.all([
@@ -281,6 +289,7 @@ describe('packExternalModules', () => {
         expect(packagerMock.getProdDependencies).to.have.been.calledOnce,
         expect(packagerMock.install).to.have.been.calledOnce,
         expect(packagerMock.prune).to.have.been.calledOnce,
+        expect(packagerMock.runScripts).to.have.been.calledOnce,
       ]));
     });
 
@@ -291,6 +300,7 @@ describe('packExternalModules', () => {
         version: '1.0.0',
         description: 'Packaged externals for test-service',
         private: true,
+        scripts: {},
         dependencies: {
           '@scoped/vendor': '1.0.0',
           uuid: '^5.4.1',
@@ -299,6 +309,11 @@ describe('packExternalModules', () => {
         }
       };
       const expectedPackageJSON = {
+        name: 'test-service',
+        version: '1.0.0',
+        description: 'Packaged externals for test-service',
+        private: true,
+        scripts: {},
         dependencies: {
           '@scoped/vendor': '1.0.0',
           uuid: '^5.4.1',
@@ -341,6 +356,7 @@ describe('packExternalModules', () => {
       packagerMock.rebaseLockfile.callsFake((pathToPackageRoot, lockfile) => lockfile);
       packagerMock.install.returns(BbPromise.resolve());
       packagerMock.prune.returns(BbPromise.resolve());
+      packagerMock.runScripts.returns(BbPromise.resolve());
       module.compileStats = statsWithFileRef;
 
       sandbox.stub(process, 'cwd').returns(path.join('/my/Service/Path'));
@@ -361,6 +377,7 @@ describe('packExternalModules', () => {
         expect(packagerMock.getProdDependencies).to.have.been.calledOnce,
         expect(packagerMock.install).to.have.been.calledOnce,
         expect(packagerMock.prune).to.have.been.calledOnce,
+        expect(packagerMock.runScripts).to.have.been.calledOnce,
       ]))
       .finally(() => {
         process.cwd.restore();
@@ -373,6 +390,7 @@ describe('packExternalModules', () => {
         version: '1.0.0',
         description: 'Packaged externals for test-service',
         private: true,
+        scripts: {},
         dependencies: {
           '@scoped/vendor': '1.0.0',
           uuid: '^5.4.1',
@@ -380,6 +398,11 @@ describe('packExternalModules', () => {
         }
       };
       const expectedPackageJSON = {
+        name: 'test-service',
+        version: '1.0.0',
+        description: 'Packaged externals for test-service',
+        private: true,
+        scripts: {},
         dependencies: {
           '@scoped/vendor': '1.0.0',
           uuid: '^5.4.1',
@@ -394,6 +417,7 @@ describe('packExternalModules', () => {
       packagerMock.getProdDependencies.returns(BbPromise.resolve({}));
       packagerMock.install.returns(BbPromise.resolve());
       packagerMock.prune.returns(BbPromise.resolve());
+      packagerMock.runScripts.returns(BbPromise.resolve());
       module.compileStats = stats;
       return expect(module.packExternalModules()).to.be.fulfilled
       .then(() => BbPromise.all([
@@ -407,6 +431,7 @@ describe('packExternalModules', () => {
         expect(packagerMock.getProdDependencies).to.have.been.calledOnce,
         expect(packagerMock.install).to.have.been.calledOnce,
         expect(packagerMock.prune).to.not.have.been.called,
+        expect(packagerMock.runScripts).to.not.have.been.called,
       ]));
     });
 
@@ -417,6 +442,7 @@ describe('packExternalModules', () => {
       packagerMock.getProdDependencies.returns(BbPromise.resolve({}));
       packagerMock.install.callsFake(() => BbPromise.reject(new Error('npm install failed')));
       packagerMock.prune.returns(BbPromise.resolve());
+      packagerMock.runScripts.returns(BbPromise.resolve());
       module.compileStats = stats;
       return expect(module.packExternalModules()).to.be.rejectedWith('npm install failed')
       .then(() => BbPromise.all([
@@ -424,6 +450,7 @@ describe('packExternalModules', () => {
         expect(packagerMock.getProdDependencies).to.have.been.calledOnce,
         expect(packagerMock.install).to.have.been.calledOnce,
         expect(packagerMock.prune).to.not.have.been.called,
+        expect(packagerMock.runScripts).to.not.have.been.called,
       ]));
     });
 
@@ -443,6 +470,7 @@ describe('packExternalModules', () => {
         expect(packagerMock.getProdDependencies).to.have.been.calledOnce,
         expect(packagerMock.install).to.not.have.been.called,
         expect(packagerMock.prune).to.not.have.been.called,
+        expect(packagerMock.runScripts).to.not.have.been.called,
       ]));
     });
 
@@ -461,6 +489,7 @@ describe('packExternalModules', () => {
         expect(packagerMock.getProdDependencies).to.have.been.calledOnce,
         expect(packagerMock.install).to.not.have.been.called,
         expect(packagerMock.prune).to.not.have.been.called,
+        expect(packagerMock.runScripts).to.not.have.been.called,
       ]));
     });
 
@@ -476,6 +505,7 @@ describe('packExternalModules', () => {
       }));
       packagerMock.install.returns(BbPromise.resolve());
       packagerMock.prune.returns(BbPromise.resolve());
+      packagerMock.runScripts.returns(BbPromise.resolve());
       module.compileStats = stats;
       return expect(module.packExternalModules()).to.be.fulfilled
       .then(() => {
@@ -492,6 +522,7 @@ describe('packExternalModules', () => {
         version: '1.0.0',
         description: 'Packaged externals for test-service',
         private: true,
+        scripts: {},
         dependencies: {
           '@scoped/vendor': '1.0.0',
           uuid: '^5.4.1',
@@ -500,6 +531,11 @@ describe('packExternalModules', () => {
         }
       };
       const expectedPackageJSON = {
+        name: 'test-service',
+        version: '1.0.0',
+        description: 'Packaged externals for test-service',
+        private: true,
+        scripts: {},
         dependencies: {
           '@scoped/vendor': '1.0.0',
           uuid: '^5.4.1',
@@ -520,6 +556,7 @@ describe('packExternalModules', () => {
       packagerMock.getProdDependencies.returns(BbPromise.resolve({}));
       packagerMock.install.returns(BbPromise.resolve());
       packagerMock.prune.returns(BbPromise.resolve());
+      packagerMock.runScripts.returns(BbPromise.resolve());
       module.compileStats = stats;
       return expect(module.packExternalModules()).to.be.fulfilled
       .then(() => BbPromise.all([
@@ -533,6 +570,7 @@ describe('packExternalModules', () => {
         expect(packagerMock.getProdDependencies).to.have.been.calledOnce,
         expect(packagerMock.install).to.have.been.calledOnce,
         expect(packagerMock.prune).to.have.been.calledOnce,
+        expect(packagerMock.runScripts).to.have.been.calledOnce,
       ]));
     });
 
@@ -542,6 +580,7 @@ describe('packExternalModules', () => {
         version: '1.0.0',
         description: 'Packaged externals for test-service',
         private: true,
+        scripts: {},
         dependencies: {
           '@scoped/vendor': '1.0.0',
           uuid: '^5.4.1',
@@ -550,6 +589,11 @@ describe('packExternalModules', () => {
         }
       };
       const expectedPackageJSON = {
+        name: 'test-service',
+        version: '1.0.0',
+        description: 'Packaged externals for test-service',
+        private: true,
+        scripts: {},
         dependencies: {
           '@scoped/vendor': '1.0.0',
           uuid: '^5.4.1',
@@ -570,6 +614,7 @@ describe('packExternalModules', () => {
       packagerMock.getProdDependencies.returns(BbPromise.resolve({}));
       packagerMock.install.returns(BbPromise.resolve());
       packagerMock.prune.returns(BbPromise.resolve());
+      packagerMock.runScripts.returns(BbPromise.resolve());
       module.compileStats = stats;
       return expect(module.packExternalModules()).to.be.fulfilled
       .then(() => BbPromise.all([
@@ -583,6 +628,7 @@ describe('packExternalModules', () => {
         expect(packagerMock.getProdDependencies).to.have.been.calledOnce,
         expect(packagerMock.install).to.have.been.calledOnce,
         expect(packagerMock.prune).to.have.been.calledOnce,
+        expect(packagerMock.runScripts).to.have.been.calledOnce,
       ]));
     });
 
@@ -592,6 +638,7 @@ describe('packExternalModules', () => {
         version: '1.0.0',
         description: 'Packaged externals for test-service',
         private: true,
+        scripts: {},
         dependencies: {
           '@scoped/vendor': '1.0.0',
           bluebird: '^3.4.0',
@@ -599,6 +646,11 @@ describe('packExternalModules', () => {
         }
       };
       const expectedPackageJSON = {
+        name: 'test-service',
+        version: '1.0.0',
+        description: 'Packaged externals for test-service',
+        private: true,
+        scripts: {},
         dependencies: {
           '@scoped/vendor': '1.0.0',
           bluebird: '^3.4.0',
@@ -619,6 +671,7 @@ describe('packExternalModules', () => {
       packagerMock.getProdDependencies.returns(BbPromise.resolve({}));
       packagerMock.install.returns(BbPromise.resolve());
       packagerMock.prune.returns(BbPromise.resolve());
+      packagerMock.runScripts.returns(BbPromise.resolve());
       module.compileStats = stats;
       return expect(module.packExternalModules()).to.be.fulfilled
       .then(() => BbPromise.all([
@@ -632,6 +685,7 @@ describe('packExternalModules', () => {
         expect(packagerMock.getProdDependencies).to.have.been.calledOnce,
         expect(packagerMock.install).to.have.been.calledOnce,
         expect(packagerMock.prune).to.have.been.calledOnce,
+        expect(packagerMock.runScripts).to.have.been.calledOnce,
       ]));
     });
 
@@ -641,6 +695,7 @@ describe('packExternalModules', () => {
         version: '1.0.0',
         description: 'Packaged externals for test-service',
         private: true,
+        scripts: {},
         dependencies: {
           '@scoped/vendor': '1.0.0',
           uuid: '^5.4.1',
@@ -648,6 +703,11 @@ describe('packExternalModules', () => {
         }
       };
       const expectedPackageJSON = {
+        name: 'test-service',
+        version: '1.0.0',
+        description: 'Packaged externals for test-service',
+        private: true,
+        scripts: {},
         dependencies: {
           '@scoped/vendor': '1.0.0',
           uuid: '^5.4.1',
@@ -663,6 +723,7 @@ describe('packExternalModules', () => {
       packagerMock.getProdDependencies.returns(BbPromise.resolve({}));
       packagerMock.install.returns(BbPromise.resolve());
       packagerMock.prune.returns(BbPromise.resolve());
+      packagerMock.runScripts.returns(BbPromise.resolve());
       module.compileStats = stats;
       return expect(module.packExternalModules()).to.be.fulfilled
       .then(() => BbPromise.all([
@@ -677,6 +738,7 @@ describe('packExternalModules', () => {
         expect(packagerMock.getProdDependencies).to.have.been.calledOnce,
         expect(packagerMock.install).to.have.been.calledOnce,
         expect(packagerMock.prune).to.have.been.calledOnce,
+        expect(packagerMock.runScripts).to.have.been.calledOnce,
       ]));
     });
 
@@ -686,6 +748,7 @@ describe('packExternalModules', () => {
         version: '1.0.0',
         description: 'Packaged externals for test-service',
         private: true,
+        scripts: {},
         dependencies: {
           '@scoped/vendor': '1.0.0',
           uuid: '^5.4.1',
@@ -693,6 +756,11 @@ describe('packExternalModules', () => {
         }
       };
       const expectedPackageJSON = {
+        name: 'test-service',
+        version: '1.0.0',
+        description: 'Packaged externals for test-service',
+        private: true,
+        scripts: {},
         dependencies: {
           '@scoped/vendor': '1.0.0',
           uuid: '^5.4.1',
@@ -707,6 +775,7 @@ describe('packExternalModules', () => {
       packagerMock.getProdDependencies.returns(BbPromise.resolve({}));
       packagerMock.install.returns(BbPromise.resolve());
       packagerMock.prune.returns(BbPromise.resolve());
+      packagerMock.runScripts.returns(BbPromise.resolve());
       module.compileStats = stats;
       return expect(module.packExternalModules()).to.be.fulfilled
       .then(() => BbPromise.all([
@@ -720,6 +789,7 @@ describe('packExternalModules', () => {
         expect(packagerMock.getProdDependencies).to.have.been.calledOnce,
         expect(packagerMock.install).to.have.been.calledOnce,
         expect(packagerMock.prune).to.have.been.calledOnce,
+        expect(packagerMock.runScripts).to.have.been.calledOnce,
       ]));
     });
 
@@ -729,6 +799,7 @@ describe('packExternalModules', () => {
         version: '1.0.0',
         description: 'Packaged externals for test-service',
         private: true,
+        scripts: {},
         dependencies: {
           '@scoped/vendor': '1.0.0',
           uuid: '^5.4.1',
@@ -736,6 +807,11 @@ describe('packExternalModules', () => {
         }
       };
       const expectedPackageJSON = {
+        name: 'test-service',
+        version: '1.0.0',
+        description: 'Packaged externals for test-service',
+        private: true,
+        scripts: {},
         dependencies: {
           '@scoped/vendor': '1.0.0',
           uuid: '^5.4.1',
@@ -749,6 +825,7 @@ describe('packExternalModules', () => {
       packagerMock.getProdDependencies.returns(BbPromise.resolve({}));
       packagerMock.install.returns(BbPromise.resolve());
       packagerMock.prune.returns(BbPromise.resolve());
+      packagerMock.runScripts.returns(BbPromise.resolve());
       packagerMock.mustCopyModules = false;
       module.compileStats = stats;
       return expect(module.packExternalModules()).to.be.fulfilled
@@ -763,6 +840,7 @@ describe('packExternalModules', () => {
         expect(packagerMock.getProdDependencies).to.have.been.calledOnce,
         expect(packagerMock.install).to.have.been.calledOnce,
         expect(packagerMock.prune).to.have.been.calledOnce,
+        expect(packagerMock.runScripts).to.have.been.calledOnce,
       ]))
       .finally(() => {
         packagerMock.mustCopyModules = true;
@@ -803,6 +881,7 @@ describe('packExternalModules', () => {
           version: '1.0.0',
           description: 'Packaged externals for test-service',
           private: true,
+          scripts: {},
           dependencies: {
             bluebird: '^3.5.0',
             'request-promise': '^4.2.1',
@@ -810,6 +889,11 @@ describe('packExternalModules', () => {
           }
         };
         const expectedPackageJSON = {
+          name: 'test-service',
+          version: '1.0.0',
+          description: 'Packaged externals for test-service',
+          private: true,
+          scripts: {},
           dependencies: {
             bluebird: '^3.5.0',
             'request-promise': '^4.2.1',
@@ -858,6 +942,7 @@ describe('packExternalModules', () => {
         packagerMock.getProdDependencies.returns(BbPromise.resolve(dependencyGraph));
         packagerMock.install.returns(BbPromise.resolve());
         packagerMock.prune.returns(BbPromise.resolve());
+        packagerMock.runScripts.returns(BbPromise.resolve());
         module.compileStats = peerDepStats;
         return expect(module.packExternalModules()).to.be.fulfilled
         .then(() => BbPromise.all([
@@ -871,6 +956,7 @@ describe('packExternalModules', () => {
           expect(packagerMock.getProdDependencies).to.have.been.calledOnce,
           expect(packagerMock.install).to.have.been.calledOnce,
           expect(packagerMock.prune).to.have.been.calledOnce,
+          expect(packagerMock.runScripts).to.have.been.calledOnce,
         ]));
       });
     });
