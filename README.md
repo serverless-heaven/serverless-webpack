@@ -246,11 +246,44 @@ custom:
 ```
 > Note that only relative path is supported at the moment.
 
-#### Usage with yarn
+#### Packagers
 
-Note that if auto-packing is enabled, the plugin will call `npm install`. If you are using yarn your `yarn.lock` file will be not be honored, which might lead to unexpected results as your dependencies will most likely not match (or be missing, as npm does not install packages in the same way as yarn).
+You can select the packager that will be used to package your external modules.
+The packager can be set with the packager configuration. Currently it can be 'npm'
+or 'yarn' and defaults to using npm when not set.
 
-Yarn support is planned [#286][link-286]. Until then we recommend using npm when using auto-packing.
+```yaml
+# serverless.yml
+custom:
+  webpack:
+    packager: 'yarn'      # Defaults to npm
+    packagerOptions: {}   # Optional, depending on the selected packager
+```
+
+You should select the packager, that you use to develop your projects, because only
+then locked versions will be handled correctly, i.e. the plugin uses the generated 
+(and usually committed) package lock file that is created by your favorite packager.
+
+Each packager might support specific options that can be set in the `packagerOptions`
+configuration setting. For details see below.
+
+##### NPM
+
+By default, the plugin uses NPM to package the external modules. However, if you use npm,
+you should use any version `<5.5 >=5.7.1` as the versions in-between have some nasty bugs.
+
+Right now there are no `packagerOptions` that can be set with NPM.
+
+#### Yarn
+
+Using yarn will switch the whole packaging pipeline to use yarn, so does it use a `yan.lock` file.
+
+The yarn packager supports the following `packagerOptions`:
+
+| Option        | Type | Default | Description |
+|---------------|------|---------|-------------|
+| flat          | bool | true    | Will set --flat on install |
+| ignoreScripts | bool | true    | Do not execute package.json hook scripts on install |
 
 #### Forced inclusion
 
