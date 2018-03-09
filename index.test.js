@@ -30,7 +30,6 @@ describe('ServerlessWebpack', () => {
     mockery.enable({ useCleanCache: true, warnOnUnregistered: false });
     mockery.registerMock('ts-node/register', {});
     mockery.registerMock('webpack', {});
-    mockery.registerMock('fs-extra', {});
 
     ServerlessWebpack = require('./index');
     sandbox.spy(Module, '_load');
