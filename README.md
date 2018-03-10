@@ -276,7 +276,7 @@ Right now there are no `packagerOptions` that can be set with NPM.
 
 #### Yarn
 
-Using yarn will switch the whole packaging pipeline to use yarn, so does it use a `yan.lock` file.
+Using yarn will switch the whole packaging pipeline to use yarn, so does it use a `yarn.lock` file.
 
 The yarn packager supports the following `packagerOptions`:
 
