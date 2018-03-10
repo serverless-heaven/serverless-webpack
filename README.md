@@ -282,7 +282,6 @@ The yarn packager supports the following `packagerOptions`:
 
 | Option        | Type | Default | Description |
 |---------------|------|---------|-------------|
-| flat          | bool | true    | Will set --flat on install |
 | ignoreScripts | bool | true    | Do not execute package.json hook scripts on install |
 
 #### Forced inclusion
