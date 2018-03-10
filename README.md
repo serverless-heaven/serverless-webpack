@@ -274,7 +274,7 @@ you should use any version `<5.5 >=5.7.1` as the versions in-between have some n
 
 Right now there are no `packagerOptions` that can be set with NPM.
 
-#### Yarn
+##### Yarn
 
 Using yarn will switch the whole packaging pipeline to use yarn, so does it use a `yarn.lock` file.
 
@@ -283,6 +283,28 @@ The yarn packager supports the following `packagerOptions`:
 | Option        | Type | Default | Description |
 |---------------|------|---------|-------------|
 | ignoreScripts | bool | true    | Do not execute package.json hook scripts on install |
+
+##### Common packager options
+
+There are some settings that are common to all packagers and affect the packaging itself.
+
+###### Custom scripts
+
+You can specify custom scripts that are executed after the installation of the function/service packages
+has been finished. These are standard packager scripts as they can be used in any `package.json`.
+
+Warning: The use cases for them are very rare and specific and you should investigate first,
+if your use case can be covered with webpack plugins first. They should never access files 
+outside of their current working directory which is the compiled function folder, if any.
+A valid use case would be to start anything available as binary from `node_modules`.
+
+```yaml
+custom:
+  webpack:
+    packagerOptions:
+      scripts:
+        - npm rebuild grpc --target=6.1.0 --target_arch=x64 --target_platform=linux --target_libc=glibc
+```
 
 #### Forced inclusion
 
