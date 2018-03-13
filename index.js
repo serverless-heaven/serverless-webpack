@@ -112,9 +112,14 @@ class ServerlessWebpack {
       'before:invoke:local:invoke': () => BbPromise.bind(this)
         .then(() => {
           lib.webpack.isLocal = true;
+          // --no-build override
+          if (this.options.build === false) {
+            this.skipCompile = true;
+          }
+
           return this.serverless.pluginManager.spawn('webpack:validate');
         })
-        .then(() => this.serverless.pluginManager.spawn('webpack:compile'))
+        .then(() => this.skipCompile ? BbPromise.resolve() : this.serverless.pluginManager.spawn('webpack:compile'))
         .then(this.prepareLocalInvoke),
 
       'after:invoke:local:invoke': () => BbPromise.bind(this)
@@ -181,7 +186,7 @@ class ServerlessWebpack {
           lib.webpack.isLocal = true;
         })
         .then(this.prepareStepOfflineInvoke)
-        .then(this.compile)
+        .then(() => this.serverless.pluginManager.spawn('webpack:compile')),
     };
   }
 }
