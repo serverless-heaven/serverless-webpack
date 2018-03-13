@@ -357,7 +357,8 @@ describe('ServerlessWebpack', () => {
             .then(() => {
               expect(ServerlessWebpack.lib.webpack.isLocal).to.be.true;
               expect(slsw.prepareStepOfflineInvoke).to.have.been.calledOnce;
-              expect(slsw.compile).to.have.been.calledOnce;
+              expect(slsw.serverless.pluginManager.spawn).to.have.been.calledOnce;
+              expect(slsw.serverless.pluginManager.spawn).to.have.been.calledWithExactly('webpack:compile');
               return null;
             });
           });
