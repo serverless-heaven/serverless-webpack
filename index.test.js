@@ -200,6 +200,17 @@ describe('ServerlessWebpack', () => {
               return null;
             });
           });
+
+          it('should skip compile if requested', () => {
+            slsw.options.build = false;
+            return expect(slsw.hooks['before:invoke:local:invoke']()).to.be.fulfilled
+            .then(() => {
+              expect(slsw.serverless.pluginManager.spawn).to.have.been.calledOnce;
+              expect(slsw.serverless.pluginManager.spawn).to.have.been.calledWithExactly('webpack:validate');
+              expect(slsw.prepareLocalInvoke).to.have.been.calledOnce;
+              return null;
+            });
+          });
         }
       },
       {
