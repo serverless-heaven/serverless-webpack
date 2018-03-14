@@ -422,6 +422,19 @@ All options that are supported by invoke local can be used as usual:
 
 > :exclamation: The old `webpack invoke` command has been disabled.
 
+#### Run a function with an existing compiled output (--no-build)
+
+On CI systems it is likely that you'll run multiple integration tests with `invoke local`
+sequentially. To improve this, you can do one compile and run multiple invokes on the
+compiled output -  it is not necessary to compile again before each and every invoke.
+
+```bash
+$ serverless webpack
+$ serverless invoke local --function <function-name-1> --no-build
+$ serverless invoke local --function <function-name-2> --no-build
+...
+```
+
 ### Run a function locally on source changes
 
 Or to run a function every time the source files change use the `--watch` option

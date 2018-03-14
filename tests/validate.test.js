@@ -53,6 +53,7 @@ describe('validate', () => {
 
   afterEach(() => {
     fsExtraMock.removeSync.reset();
+    fsExtraMock.pathExistsSync.reset();
     sandbox.restore();
   });
 
@@ -733,6 +734,38 @@ describe('validate', () => {
         });
       });
     });
+  });
 
+  describe('with skipped builds', () => {
+    it('should keep output directory', () => {
+      const testConfig = {
+        entry: 'test',
+        output: {},
+      };
+      const testServicePath = 'testpath';
+      module.serverless.config.servicePath = testServicePath;
+      _.set(module.serverless.service, 'custom.webpack.config', testConfig);
+      module.skipCompile = true;
+      fsExtraMock.pathExistsSync.returns(true);
+      return module
+      .validate()
+      .then(() => {
+        expect(module.keepOutputDirectory).to.be.true;
+        return null;
+      });
+    });
+
+    it('should fail without exiting output', () => {
+      const testConfig = {
+        entry: 'test',
+        output: {},
+      };
+      const testServicePath = 'testpath';
+      module.serverless.config.servicePath = testServicePath;
+      _.set(module.serverless.service, 'custom.webpack.config', testConfig);
+      module.skipCompile = true;
+      fsExtraMock.pathExistsSync.returns(false);
+      return expect(module.validate()).to.be.rejectedWith(/No compiled output found/);
+    });
   });
 });
