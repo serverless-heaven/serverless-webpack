@@ -636,6 +636,11 @@ me to take it over and continue working on the project. That helped to revive it
 
 ## Release Notes
 
+* 5.1.1
+  * Fixed local invoke watch mode not executing changed files [#349][link-349]
+  * Added Webpack 4 example [#355][link-355]
+  * Documentation updates [#354][link-354]
+
 * 5.1.0
   * Support Yarn [#286][link-286]
   * Allow local invoke to use existing compiled output [#341][link-341] [#275][link-275]
@@ -845,3 +850,7 @@ me to take it over and continue working on the project. That helped to revive it
 [link-341]: https://github.com/serverless-heaven/serverless-webpack/issues/341
 [link-342]: https://github.com/serverless-heaven/serverless-webpack/issues/342
 [link-343]: https://github.com/serverless-heaven/serverless-webpack/issues/343
+
+[link-349]: https://github.com/serverless-heaven/serverless-webpack/issues/349
+[link-354]: https://github.com/serverless-heaven/serverless-webpack/pull/354
+[link-355]: https://github.com/serverless-heaven/serverless-webpack/pull/355
