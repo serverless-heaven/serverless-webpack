@@ -320,8 +320,10 @@ describe('packageModules', () => {
     });
 
     it('should respect package.include and package.exclude', () => {
-      _.set(serverless.service.package, 'include', ['*.js']);
-      _.set(serverless.service.package, 'exclude', ['*.map', '!special.map']);
+      _.set(module, 'configuration.package', {
+        include: ['*.js'],
+        exclude: [ '*.map', '!special.map' ],
+      });
 
       // Test data
       const stats = {
