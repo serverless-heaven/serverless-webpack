@@ -16,8 +16,9 @@
     "babel-loader": "^7.1.3",
     "babel-plugin-source-map-support": "^2.0.1",
     "babel-preset-env": "^1.6.0",
-    "serverless-webpack": "file:../../",
     "serverless": "^1.26.1",
+    "serverless-offline": "^3.20.1",
+    "serverless-webpack": "file:../../",
     "webpack": "^4.2.0",
     "webpack-node-externals": "^1.6.0"
   }
