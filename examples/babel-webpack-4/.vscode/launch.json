@@ -7,7 +7,7 @@
       {
           "type": "node",
           "request": "launch",
-          "name": "Launch Dev Offline",
+          "name": "Launch Serverless Offline",
           "program": "${workspaceRoot}/node_modules/serverless/bin/serverless",
           "args": [ "offline", "--noTimeout", "--dontPrintOutput", "--stage=dev" ],
           "sourceMaps": true,
