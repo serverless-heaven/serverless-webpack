@@ -61,7 +61,6 @@ custom:
     webpackConfig: 'webpack.config.js'   # Name of webpack configuration file
     includeModules: false   # Node modules configuration for packaging
     packager: 'npm'   # Packager that will be used to package your external modules
-    packExternalModulesMaxBuffer: 200 * 1024   # Size of stdio buffers for spawned child processes
 ```
 
 ### Webpack configuration file
