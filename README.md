@@ -640,6 +640,10 @@ me to take it over and continue working on the project. That helped to revive it
 
 ## Release Notes
 
+* 5.1.2
+  * Fixed issue that leads to `Unexpected end of JSON` in projects with lots of dependencies [#309][link-309][#373][link-373]
+  * Update webpack-4 example with VSCode debugging configuration [#365][link-365]
+
 * 5.1.1
   * Fixed local invoke watch mode not executing changed files [#349][link-349]
   * Added Webpack 4 example [#355][link-355]
@@ -859,3 +863,7 @@ me to take it over and continue working on the project. That helped to revive it
 [link-349]: https://github.com/serverless-heaven/serverless-webpack/issues/349
 [link-354]: https://github.com/serverless-heaven/serverless-webpack/pull/354
 [link-355]: https://github.com/serverless-heaven/serverless-webpack/pull/355
+
+[link-309]: https://github.com/serverless-heaven/serverless-webpack/issues/309
+[link-365]: https://github.com/serverless-heaven/serverless-webpack/pull/365
+[link-373]: https://github.com/serverless-heaven/serverless-webpack/pull/373
