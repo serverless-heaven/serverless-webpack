@@ -640,6 +640,9 @@ me to take it over and continue working on the project. That helped to revive it
 
 ## Release Notes
 
+* 5.1.3
+  * Fixed issue with Yarn and file references as dependencies [#370][link-370]
+
 * 5.1.2
   * Fixed issue that leads to `Unexpected end of JSON` in projects with lots of dependencies [#309][link-309][#373][link-373]
   * Update webpack-4 example with VSCode debugging configuration [#365][link-365]
@@ -867,3 +870,5 @@ me to take it over and continue working on the project. That helped to revive it
 [link-309]: https://github.com/serverless-heaven/serverless-webpack/issues/309
 [link-365]: https://github.com/serverless-heaven/serverless-webpack/pull/365
 [link-373]: https://github.com/serverless-heaven/serverless-webpack/pull/373
+
+[link-370]: https://github.com/serverless-heaven/serverless-webpack/issues/370
