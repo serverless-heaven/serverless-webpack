@@ -349,6 +349,7 @@ describe('packExternalModules', () => {
         }
       });
       module.webpackOutputPath = 'outputPath';
+      readFileSyncStub.onFirstCall().returns(packageLocalRefMock);
       readFileSyncStub.returns(fakePackageLockJSON);
       fsExtraMock.pathExists.yields(null, true);
       fsExtraMock.copy.yields();
@@ -718,6 +719,7 @@ describe('packExternalModules', () => {
       module.webpackOutputPath = 'outputPath';
       fsExtraMock.pathExists.yields(null, true);
       fsExtraMock.copy.yields();
+      readFileSyncStub.onFirstCall().returns(packageMock);
       readFileSyncStub.returns({ info: 'lockfile' });
       packagerMock.rebaseLockfile.callsFake((pathToPackageRoot, lockfile) => lockfile);
       packagerMock.getProdDependencies.returns(BbPromise.resolve({}));
@@ -769,6 +771,7 @@ describe('packExternalModules', () => {
       };
 
       module.webpackOutputPath = 'outputPath';
+      readFileSyncStub.onFirstCall().returns(packageMock);
       readFileSyncStub.throws(new Error('Failed to read package-lock.json'));
       fsExtraMock.pathExists.yields(null, true);
       fsExtraMock.copy.onFirstCall().yields();
