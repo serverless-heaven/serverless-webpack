@@ -33,6 +33,7 @@ const packagerMockFactory = {
   create(sandbox) {
     const packagerMock = {
       lockfileName: 'mocked-lock.json',
+      copyPackageSectionNames: [ 'section1', 'section2' ],
       mustCopyModules: true,
       rebaseLockfile: sandbox.stub(),
       getProdDependencies: sandbox.stub(),
@@ -243,6 +244,75 @@ describe('packExternalModules', () => {
       ]));
     });
 
+    it('should copy needed package sections if available', () => {
+      const originalPackageJSON = {
+        name: 'test-service',
+        version: '1.0.0',
+        description: 'Packaged externals for test-service',
+        private: true,
+        scripts: {},
+        section1: {
+          value: 'myValue'          
+        },
+        dependencies: {
+          '@scoped/vendor': '1.0.0',
+          uuid: '^5.4.1',
+          bluebird: '^3.4.0'
+        }
+      };
+      const expectedCompositePackageJSON = {
+        name: 'test-service',
+        version: '1.0.0',
+        description: 'Packaged externals for test-service',
+        private: true,
+        scripts: {},
+        section1: originalPackageJSON.section1,
+        dependencies: {
+          '@scoped/vendor': '1.0.0',
+          uuid: '^5.4.1',
+          bluebird: '^3.4.0'
+        }
+      };
+      const expectedPackageJSON = {
+        name: 'test-service',
+        version: '1.0.0',
+        description: 'Packaged externals for test-service',
+        private: true,
+        scripts: {},
+        dependencies: {
+          '@scoped/vendor': '1.0.0',
+          uuid: '^5.4.1',
+          bluebird: '^3.4.0'
+        },
+        section1: originalPackageJSON.section1
+      };
+
+      module.webpackOutputPath = 'outputPath';
+      readFileSyncStub.onFirstCall().returns(originalPackageJSON);
+      readFileSyncStub.throws(new Error('Unexpected call to readFileSync'));
+      fsExtraMock.pathExists.yields(null, false);
+      fsExtraMock.copy.yields();
+      packagerMock.getProdDependencies.returns(BbPromise.resolve({}));
+      packagerMock.install.returns(BbPromise.resolve());
+      packagerMock.prune.returns(BbPromise.resolve());
+      packagerMock.runScripts.returns(BbPromise.resolve());
+      module.compileStats = stats;
+      return expect(module.packExternalModules()).to.be.fulfilled
+      .then(() => BbPromise.all([
+        // The module package JSON and the composite one should have been stored
+        expect(writeFileSyncStub).to.have.been.calledTwice,
+        expect(writeFileSyncStub.firstCall.args[1]).to.equal(JSON.stringify(expectedCompositePackageJSON, null, 2)),
+        expect(writeFileSyncStub.secondCall.args[1]).to.equal(JSON.stringify(expectedPackageJSON, null, 2)),
+        // The modules should have been copied
+        expect(fsExtraMock.copy).to.have.been.calledOnce,
+        // npm ls and npm prune should have been called
+        expect(packagerMock.getProdDependencies).to.have.been.calledOnce,
+        expect(packagerMock.install).to.have.been.calledOnce,
+        expect(packagerMock.prune).to.have.been.calledOnce,
+        expect(packagerMock.runScripts).to.have.been.calledOnce,
+      ]));
+    });
+
     it('should install external modules', () => {
       const expectedCompositePackageJSON = {
         name: 'test-service',
@@ -349,6 +419,7 @@ describe('packExternalModules', () => {
         }
       });
       module.webpackOutputPath = 'outputPath';
+      readFileSyncStub.onFirstCall().returns(packageLocalRefMock);
       readFileSyncStub.returns(fakePackageLockJSON);
       fsExtraMock.pathExists.yields(null, true);
       fsExtraMock.copy.yields();
@@ -718,6 +789,7 @@ describe('packExternalModules', () => {
       module.webpackOutputPath = 'outputPath';
       fsExtraMock.pathExists.yields(null, true);
       fsExtraMock.copy.yields();
+      readFileSyncStub.onFirstCall().returns(packageMock);
       readFileSyncStub.returns({ info: 'lockfile' });
       packagerMock.rebaseLockfile.callsFake((pathToPackageRoot, lockfile) => lockfile);
       packagerMock.getProdDependencies.returns(BbPromise.resolve({}));
@@ -769,6 +841,7 @@ describe('packExternalModules', () => {
       };
 
       module.webpackOutputPath = 'outputPath';
+      readFileSyncStub.onFirstCall().returns(packageMock);
       readFileSyncStub.throws(new Error('Failed to read package-lock.json'));
       fsExtraMock.pathExists.yields(null, true);
       fsExtraMock.copy.onFirstCall().yields();
