@@ -137,9 +137,6 @@ describe('packExternalModules', () => {
                   identifier: _.constant('"uuid/v4"')
                 },
                 {
-                  identifier: _.constant('external "eslint"')
-                },
-                {
                   identifier: _.constant('"mockery"')
                 },
                 {
@@ -191,6 +188,45 @@ describe('packExternalModules', () => {
       ]
     };
     const statsWithFileRef = {
+      stats: [
+        {
+          compilation: {
+            chunks: [
+              new ChunkMock([
+                {
+                  identifier: _.constant('"crypto"')
+                },
+                {
+                  identifier: _.constant('"uuid/v4"')
+                },
+                {
+                  identifier: _.constant('"mockery"')
+                },
+                {
+                  identifier: _.constant('"@scoped/vendor/module1"')
+                },
+                {
+                  identifier: _.constant('external "@scoped/vendor/module2"')
+                },
+                {
+                  identifier: _.constant('external "uuid/v4"')
+                },
+                {
+                  identifier: _.constant('external "localmodule"')
+                },
+                {
+                  identifier: _.constant('external "bluebird"')
+                },
+              ])
+            ],
+            compiler: {
+              outputPath: '/my/Service/Path/.webpack/service'
+            }
+          }
+        }
+      ]
+    };
+    const statsWithDevDependency = {
       stats: [
         {
           compilation: {
@@ -753,6 +789,51 @@ describe('packExternalModules', () => {
         // The modules should have been copied
         expect(fsExtraMock.copy).to.have.been.calledOnce,
         // npm ls and npm prune should have been called
+        expect(packagerMock.getProdDependencies).to.have.been.calledOnce,
+        expect(packagerMock.install).to.have.been.calledOnce,
+        expect(packagerMock.prune).to.have.been.calledOnce,
+        expect(packagerMock.runScripts).to.have.been.calledOnce,
+      ]));
+    });
+
+    it('should reject if devDependency is required at runtime', () => {
+      module.webpackOutputPath = 'outputPath';
+      fsExtraMock.pathExists.yields(null, false);
+      fsExtraMock.copy.yields();
+      packagerMock.getProdDependencies.returns(BbPromise.resolve({}));
+      packagerMock.install.returns(BbPromise.resolve());
+      packagerMock.prune.returns(BbPromise.resolve());
+      packagerMock.runScripts.returns(BbPromise.resolve());
+      module.compileStats = statsWithDevDependency;
+      return expect(module.packExternalModules()).to.be.rejectedWith('Serverless-webpack dependency error: eslint.')
+      .then(() => BbPromise.all([
+        // npm ls and npm install should have been called
+        expect(packagerMock.getProdDependencies).to.have.been.calledOnce,
+        expect(packagerMock.install).to.not.have.been.called,
+        expect(packagerMock.prune).to.not.have.been.called,
+        expect(packagerMock.runScripts).to.not.have.been.called,
+      ]));
+    });
+
+    it('should succeed if devDependency is required at runtime but forcefully excluded', () => {
+      module.configuration = new Configuration({
+        webpack: {
+          includeModules: {
+            forceExclude: ['eslint']
+          }
+        }
+      });
+      module.webpackOutputPath = 'outputPath';
+      fsExtraMock.pathExists.yields(null, false);
+      fsExtraMock.copy.yields();
+      packagerMock.getProdDependencies.returns(BbPromise.resolve({}));
+      packagerMock.install.returns(BbPromise.resolve());
+      packagerMock.prune.returns(BbPromise.resolve());
+      packagerMock.runScripts.returns(BbPromise.resolve());
+      module.compileStats = statsWithDevDependency;
+      return expect(module.packExternalModules()).to.be.fulfilled
+      .then(() => BbPromise.all([
+        // npm ls and npm install should have been called
         expect(packagerMock.getProdDependencies).to.have.been.calledOnce,
         expect(packagerMock.install).to.have.been.calledOnce,
         expect(packagerMock.prune).to.have.been.calledOnce,
