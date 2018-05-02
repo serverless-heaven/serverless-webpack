@@ -186,7 +186,7 @@ module.exports = {
 ### Stats
 
 By default, the plugin will print a quite verbose bundle information to your console. However, if
-you are not satisfy with the current output info, you can overwrite it in your `webpack.config.js`
+you are not satisfied with the current output info, you can overwrite it in your `webpack.config.js`
 
 ```js
 // webpack.config.js
