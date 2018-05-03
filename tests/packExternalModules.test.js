@@ -13,6 +13,7 @@ const Configuration = require('../lib/Configuration');
 const fsExtraMockFactory = require('./mocks/fs-extra.mock');
 const packageMock = require('./mocks/package.mock.json');
 const packageLocalRefMock = require('./mocks/packageLocalRef.mock.json');
+const packageIgnoredDevDepsMock = require('./mocks/packageIgnoredDevDeps.mock.json');
 
 chai.use(require('chai-as-promised'));
 chai.use(require('sinon-chai'));
@@ -258,6 +259,48 @@ describe('packExternalModules', () => {
                 },
                 {
                   identifier: _.constant('external "bluebird"')
+                },
+              ])
+            ],
+            compiler: {
+              outputPath: '/my/Service/Path/.webpack/service'
+            }
+          }
+        }
+      ]
+    };
+    const statsWithIgnoredDevDependency = {
+      stats: [
+        {
+          compilation: {
+            chunks: [
+              new ChunkMock([
+                {
+                  identifier: _.constant('"crypto"')
+                },
+                {
+                  identifier: _.constant('"uuid/v4"')
+                },
+                {
+                  identifier: _.constant('"mockery"')
+                },
+                {
+                  identifier: _.constant('"@scoped/vendor/module1"')
+                },
+                {
+                  identifier: _.constant('external "@scoped/vendor/module2"')
+                },
+                {
+                  identifier: _.constant('external "uuid/v4"')
+                },
+                {
+                  identifier: _.constant('external "localmodule"')
+                },
+                {
+                  identifier: _.constant('external "bluebird"')
+                },
+                {
+                  identifier: _.constant('external "aws-sdk"')
                 },
               ])
             ],
@@ -807,11 +850,40 @@ describe('packExternalModules', () => {
       module.compileStats = statsWithDevDependency;
       return expect(module.packExternalModules()).to.be.rejectedWith('Serverless-webpack dependency error: eslint.')
       .then(() => BbPromise.all([
+        expect(module.serverless.cli.log).to.have.been.calledWith(sinon.match(/ERROR: Runtime dependency 'eslint' found in devDependencies/)),
         // npm ls and npm install should have been called
         expect(packagerMock.getProdDependencies).to.have.been.calledOnce,
         expect(packagerMock.install).to.not.have.been.called,
         expect(packagerMock.prune).to.not.have.been.called,
         expect(packagerMock.runScripts).to.not.have.been.called,
+      ]));
+    });
+
+    it('should ignore aws-sdk if set only in devDependencies', () => {
+      module.configuration = new Configuration({
+        webpack: {
+          includeModules: {
+            packagePath: path.join('ignoreDevDeps', 'package.json')
+          }
+        }
+      });
+      module.webpackOutputPath = 'outputPath';
+      fsExtraMock.pathExists.yields(null, false);
+      fsExtraMock.copy.yields();
+      packagerMock.getProdDependencies.returns(BbPromise.resolve({}));
+      packagerMock.install.returns(BbPromise.resolve());
+      packagerMock.prune.returns(BbPromise.resolve());
+      packagerMock.runScripts.returns(BbPromise.resolve());
+      module.compileStats = statsWithIgnoredDevDependency;
+      mockery.registerMock(path.join(process.cwd(), 'ignoreDevDeps', 'package.json'), packageIgnoredDevDepsMock);
+      return expect(module.packExternalModules()).to.be.fulfilled
+      .then(() => BbPromise.all([
+        expect(module.serverless.cli.log).to.have.been.calledWith(sinon.match(/WARNING: Runtime dependency 'aws-sdk' found in devDependencies/)),
+        // npm ls and npm install should have been called
+        expect(packagerMock.getProdDependencies).to.have.been.calledOnce,
+        expect(packagerMock.install).to.have.been.calledOnce,
+        expect(packagerMock.prune).to.have.been.calledOnce,
+        expect(packagerMock.runScripts).to.have.been.calledOnce,
       ]));
     });
 
