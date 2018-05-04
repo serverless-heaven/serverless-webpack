@@ -640,6 +640,9 @@ me to take it over and continue working on the project. That helped to revive it
 
 ## Release Notes
 
+* 5.1.5
+  * Re-publish of 5.1.4 without yarn.lock
+
 * 5.1.4
   * Fix support for Yarn resolutions definitions [#379][link-379]
   * Better debugging for "Unable to import module ..." errors: Detect runtime dependencies that are only declared as devDependencies [#384][link-384]
