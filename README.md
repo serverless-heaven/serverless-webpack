@@ -640,6 +640,11 @@ me to take it over and continue working on the project. That helped to revive it
 
 ## Release Notes
 
+* 5.1.4
+  * Fix support for Yarn resolutions definitions [#379][link-379]
+  * Better debugging for "Unable to import module ..." errors: Detect runtime dependencies that are only declared as devDependencies [#384][link-384]
+  * Documentation updates [#382][link-382]
+
 * 5.1.3
   * Fixed issue with Yarn and file references as dependencies [#370][link-370]
 
@@ -872,3 +877,7 @@ me to take it over and continue working on the project. That helped to revive it
 [link-373]: https://github.com/serverless-heaven/serverless-webpack/pull/373
 
 [link-370]: https://github.com/serverless-heaven/serverless-webpack/issues/370
+
+[link-379]: https://github.com/serverless-heaven/serverless-webpack/issues/379
+[link-382]: https://github.com/serverless-heaven/serverless-webpack/pull/382
+[link-384]: https://github.com/serverless-heaven/serverless-webpack/pull/384
