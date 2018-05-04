@@ -3,3 +3,9 @@ coverage
 examples
 tests
 *.test.js
+.nyc_output
+.github
+yarn.lock
+yarn-error.log
+.appveyor.yml
+.travis.yml
