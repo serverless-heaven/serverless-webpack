@@ -247,6 +247,31 @@ custom:
 ```
 > Note that only relative path is supported at the moment.
 
+#### Runtime dependencies
+
+If a runtime dependency is detected that is found in the `devDependencies` section and
+so would not be packages, the plugin will error until you explicitly exclude it (see `forceExclude` below) 
+or move it to the `dependencies` section.
+
+#### AWS-SDK
+
+An exception for the runtime dependency error is the AWS-SDK. All projects using the AWS-SDK normally
+have it listed in `devDependencies` but Webpack will determine it as runtime dependency. In this case
+only a warning is emitted instead of an error (and the aws-sdk is silently omitted from the package).
+
+The main reason for the warning is, that silently ignoring anything contradicts the declarative nature
+of Serverless' service definition. So the correct way to define the handling for the aws-sdk is, as 
+you would do for all other excluded modules (see `forceExclude` below).
+
+```yaml
+# serverless.yml
+custom:
+  webpack:
+    includeModules:
+      forceExclude:
+        - aws-sdk
+```
+
 #### Packagers
 
 You can select the packager that will be used to package your external modules.
