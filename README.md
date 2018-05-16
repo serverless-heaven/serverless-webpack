@@ -250,14 +250,14 @@ custom:
 #### Runtime dependencies
 
 If a runtime dependency is detected that is found in the `devDependencies` section and
-so would not be packages, the plugin will error until you explicitly exclude it (see `forceExclude` below) 
+so would not be packaged, the plugin will error until you explicitly exclude it (see `forceExclude` below) 
 or move it to the `dependencies` section.
 
 #### AWS-SDK
 
 An exception for the runtime dependency error is the AWS-SDK. All projects using the AWS-SDK normally
-have it listed in `devDependencies` but Webpack will determine it as runtime dependency. In this case
-only a warning is emitted instead of an error (and the aws-sdk is silently omitted from the package).
+have it listed in `devDependencies` because AWS provides it already in their Lambda environment. In this case 
+the aws-sdk is automatically excluded and only an informational message is printed (in `--verbose` mode).
 
 The main reason for the warning is, that silently ignoring anything contradicts the declarative nature
 of Serverless' service definition. So the correct way to define the handling for the aws-sdk is, as 
