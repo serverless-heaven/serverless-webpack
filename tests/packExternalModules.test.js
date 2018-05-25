@@ -878,7 +878,7 @@ describe('packExternalModules', () => {
       mockery.registerMock(path.join(process.cwd(), 'ignoreDevDeps', 'package.json'), packageIgnoredDevDepsMock);
       return expect(module.packExternalModules()).to.be.fulfilled
       .then(() => BbPromise.all([
-        expect(module.serverless.cli.log).to.have.been.calledWith(sinon.match(/WARNING: Runtime dependency 'aws-sdk' found in devDependencies/)),
+        expect(module.serverless.cli.log).to.have.been.calledWith(sinon.match(/INFO: Runtime dependency 'aws-sdk' found in devDependencies/)),
         // npm ls and npm install should have been called
         expect(packagerMock.getProdDependencies).to.have.been.calledOnce,
         expect(packagerMock.install).to.have.been.calledOnce,
