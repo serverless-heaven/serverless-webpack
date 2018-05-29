@@ -533,6 +533,80 @@ describe('validate', () => {
           return expect(module.validate()).to.be.fulfilled;
         });
 
+        it('should allow entries customization per function', () => {
+          const testFunctionsConfigWithCustomEntry = {
+            func1: {
+              handler: 'module1.func1handler',
+              artifact: 'artifact-func1.zip',
+              events: [{
+                http: {
+                  method: 'get',
+                  path: 'func1path',
+                },
+              }],
+            },
+            func2: {
+              handler: 'module2.func2handler',
+              artifact: 'artifact-func2.zip',
+              events: [
+                {
+                  http: {
+                    method: 'POST',
+                    path: 'func2path',
+                  },
+                }, {
+                  nonhttp: 'non-http',
+                }
+              ],
+              webpack: {
+                entry: {
+                  prepend: ['./pre.js'],
+                },
+              },
+            },
+            func3: {
+              handler: 'handlers/func3/module2.func3handler',
+              artifact: 'artifact-func3.zip',
+              events: [{
+                nonhttp: 'non-http',
+              }],
+              webpack: {
+                entry: {
+                  append: ['./post.js'],
+                },
+              },
+            },
+          };
+
+          _.set(module.serverless.service, 'custom.webpack.config', testConfig);
+          module.serverless.service.functions = testFunctionsConfigWithCustomEntry;
+          globSyncStub.callsFake(filename => [_.replace(filename, '*', 'js')]);
+          return expect(module.validate()).to.be.fulfilled
+          .then(() => {
+            expect(module.entryFunctions).to.deep.equal([
+              {
+                handlerFile: 'module1',
+                funcName: 'func1',
+                func: testFunctionsConfigWithCustomEntry.func1,
+                entry: { key: 'module1', value: './module1.js' }
+              },
+              {
+                handlerFile: 'module2',
+                funcName: 'func2',
+                func: testFunctionsConfigWithCustomEntry.func2,
+                entry: { key: 'module2', value: [ './pre.js', './module2.js' ] }
+              },
+              {
+                handlerFile: path.join('handlers', 'func3', 'module2'),
+                funcName: 'func3',
+                func: testFunctionsConfigWithCustomEntry.func3,
+                entry: { key: 'handlers/func3/module2', value:  [ './handlers/func3/module2.js', './post.js' ] }
+              }
+            ]);
+            return null;
+          });
+        });
+
         it('should expose all functions details in entryFunctions property', () => {
           _.set(module.serverless.service, 'custom.webpack.config', testConfig);
           module.serverless.service.functions = testFunctionsConfig;
