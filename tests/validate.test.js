@@ -242,6 +242,28 @@ describe('validate', () => {
         });
     });
 
+    it('should load a async webpack config from file if `custom.webpack` is a string', () => {
+      const testConfig = 'testconfig';
+      const testServicePath = 'testpath';
+      const requiredPath = path.join(testServicePath, testConfig);
+      module.serverless.config.servicePath = testServicePath;
+      module.serverless.service.custom.webpack = testConfig;
+      serverless.utils.fileExistsSync = sinon.stub().returns(true);
+      const loadedConfig = {
+        entry: 'testentry',
+      };
+      const loadedConfigPromise = Promise.resolve(loadedConfig);
+      mockery.registerMock(requiredPath, loadedConfigPromise);
+      return module
+        .validate()
+        .then(() => {
+          expect(serverless.utils.fileExistsSync).to.have.been.calledWith(requiredPath);
+          expect(module.webpackConfig).to.eql(loadedConfig);
+          mockery.deregisterMock(requiredPath);
+          return null;
+        });
+    });
+
     it('should throw if providing an invalid file', () => {
       const testConfig = 'testconfig';
       const testServicePath = 'testpath';
