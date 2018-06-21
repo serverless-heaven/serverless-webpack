@@ -26,6 +26,7 @@ dependencies needed to run the function. This allows the plugin to fully utilize
 WebPack's [Tree-Shaking][link-webpack-tree] optimization.
 * Webpack version 3 and 4 support
 * Support NPM and Yarn for packaging
+* Support asynchronous webpack configuration
 
 ## Recent improvements and important changes
 
@@ -33,6 +34,7 @@ WebPack's [Tree-Shaking][link-webpack-tree] optimization.
 * Support Webpack 4
 * Drop Webpack 2 support
 * Cleaned up configuration. You should now use a `custom.webpack` object to configure everything relevant for the plugin. The old configuration still works but will be removed in the next major release. For details see below.
+* Added support for asynchronous webpack configuration
 
 For the complete release notes see the end of this document.
 
@@ -664,6 +666,9 @@ Special thanks go to the initial author of serverless-webpack, Nicola Peduzzi (h
 me to take it over and continue working on the project. That helped to revive it and lead it to new horizons.
 
 ## Release Notes
+
+* 5.2.0
+  * Added support for asynchronous webpack configuration
 
 * 5.1.5
   * Re-publish of 5.1.4 without yarn.lock
