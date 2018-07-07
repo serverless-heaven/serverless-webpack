@@ -2,7 +2,6 @@ language: node_js
 
 matrix:
   include:
-    - node_js: '4.9.1'
     - node_js: '6.10.1'
     - node_js: '8.11.3'
 
@@ -12,7 +11,7 @@ install:
   - travis_retry npm install
 
 script:
-  - node_version=$(node -v); if [ ${node_version:1:1} != 4 ]; then npm run eslint; fi
+  - npm run eslint
   - npm test
 
 after_success:
