@@ -26,7 +26,7 @@ describe('cleanup', () => {
   let dirExistsSyncStub;
 
   before(() => {
-    sandbox = sinon.sandbox.create();
+    sandbox = sinon.createSandbox();
     sandbox.usingPromise(BbPromise);
 
     fseMock = FseMock(sandbox);

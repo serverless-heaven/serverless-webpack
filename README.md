@@ -28,11 +28,10 @@ WebPack's [Tree-Shaking][link-webpack-tree] optimization.
 * Support NPM and Yarn for packaging
 * Support asynchronous webpack configuration
 
-## Recent improvements and important changes
+## Recent improvements and important changes for 5.x
 
 * Support Yarn
 * Support Webpack 4
-* Drop Webpack 2 support
 * Cleaned up configuration. You should now use a `custom.webpack` object to configure everything relevant for the plugin. The old configuration still works but will be removed in the next major release. For details see below.
 * Added support for asynchronous webpack configuration
 
@@ -719,7 +718,9 @@ me to take it over and continue working on the project. That helped to revive it
 ## Release Notes
 
 * 5.2.0
-  * Added support for asynchronous webpack configuration
+  * Show info message in verbose mode if aws-sdk has been excluded automatically [#393][link-393]
+  * Added support for asynchronous webpack configuration [#412][link-412]
+  * Better error message if handlers are not found [#418][link-418]
 
 * 5.1.5
   * Re-publish of 5.1.4 without yarn.lock
@@ -965,3 +966,7 @@ me to take it over and continue working on the project. That helped to revive it
 [link-379]: https://github.com/serverless-heaven/serverless-webpack/issues/379
 [link-382]: https://github.com/serverless-heaven/serverless-webpack/pull/382
 [link-384]: https://github.com/serverless-heaven/serverless-webpack/pull/384
+
+[link-393]: https://github.com/serverless-heaven/serverless-webpack/issues/393
+[link-412]: https://github.com/serverless-heaven/serverless-webpack/issues/412
+[link-418]: https://github.com/serverless-heaven/serverless-webpack/issues/418

@@ -62,7 +62,7 @@ describe('packExternalModules', () => {
   let readFileSyncStub;
 
   before(() => {
-    sandbox = sinon.sandbox.create();
+    sandbox = sinon.createSandbox();
     sandbox.usingPromise(BbPromise.Promise);
 
     packagerMock = packagerMockFactory.create(sandbox);

@@ -21,7 +21,7 @@ describe('compile', () => {
   let module;
 
   before(() => {
-    sandbox = sinon.sandbox.create();
+    sandbox = sinon.createSandbox();
     sandbox.usingPromise(BbPromise);
 
     webpackMock = makeWebpackMock(sandbox);
