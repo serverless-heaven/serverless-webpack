@@ -89,10 +89,11 @@ module.exports = {
 };
 ```
 
-Alternatively Webpack configuration can export a `Promise` which resolve final configuration object. It is useful if confguration depends on async functions. for example defining AccountId of current aws user inside lambda@edge which does not support defining normal process environment variables.
-A base Webpack promise configuration might look like this:
+Alternatively the Webpack configuration can export an asynchronous object (e.g. a promise or async function) which will be awaited by the plugin and resolves to the final configuration object. This is useful if the confguration depends on asynchronous functions, for example, defining the AccountId of the current aws user inside AWS lambda@edge which does not support defining normal process environment variables.
 
+A basic Webpack promise configuration might look like this:
 ```js
+// Version if the local Node.js version supports async/await
 // webpack.config.js
 
 const webpack = require('webpack')
@@ -113,6 +114,30 @@ module.exports = async () => {
     }
   };
 }();
+```
+```js
+// Version with promises
+// webpack.config.js
+
+const webpack = require('webpack')
+const slsw = require('serverless-webpack');
+const BbPromise = require('bluebird');
+
+module.exports = BbPromise.try(() => {
+  return slsw.lib.serverless.providers.aws.getAccountId()
+  .then(accountId => ({
+    entry: './handler.js',
+    target: 'node',
+    plugins: [
+      new webpack.DefinePlugin({
+        AWS_ACCOUNT_ID: `${accountId}`,
+      }),
+    ],
+    module: {
+      loaders: [ ... ]
+    }
+  }));
+};
 ```
 
 ### serverless-webpack lib export helper
