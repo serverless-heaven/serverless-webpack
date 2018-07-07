@@ -1,6 +1,7 @@
 'use strict';
 
 const _ = require('lodash');
+const BbPromise = require('bluebird');
 const chai = require('chai');
 const sinon = require('sinon');
 const mockery = require('mockery');
@@ -232,14 +233,15 @@ describe('validate', () => {
         entry: 'testentry',
       };
       mockery.registerMock(requiredPath, loadedConfig);
-      return module
-        .validate()
-        .then(() => {
-          expect(serverless.utils.fileExistsSync).to.have.been.calledWith(requiredPath);
-          expect(module.webpackConfig).to.eql(loadedConfig);
-          mockery.deregisterMock(requiredPath);
-          return null;
-        });
+      return expect(module.validate()).to.fulfilled
+      .then(() => {
+        expect(serverless.utils.fileExistsSync).to.have.been.calledWith(requiredPath);
+        expect(module.webpackConfig).to.eql(loadedConfig);
+        return null;
+      })
+      .finally(() => {
+        mockery.deregisterMock(requiredPath);
+      });
     });
 
     it('should load a async webpack config from file if `custom.webpack` is a string', () => {
@@ -252,16 +254,17 @@ describe('validate', () => {
       const loadedConfig = {
         entry: 'testentry',
       };
-      const loadedConfigPromise = Promise.resolve(loadedConfig);
+      const loadedConfigPromise = BbPromise.resolve(loadedConfig);
       mockery.registerMock(requiredPath, loadedConfigPromise);
-      return module
-        .validate()
-        .then(() => {
-          expect(serverless.utils.fileExistsSync).to.have.been.calledWith(requiredPath);
-          expect(module.webpackConfig).to.eql(loadedConfig);
-          mockery.deregisterMock(requiredPath);
-          return null;
-        });
+      return expect(module.validate()).to.be.fulfilled
+      .then(() => {
+        expect(serverless.utils.fileExistsSync).to.have.been.calledWith(requiredPath);
+        expect(module.webpackConfig).to.deep.equal(loadedConfig);
+        return null;
+      })
+      .finally(() => {
+        mockery.deregisterMock(requiredPath);
+      });
     });
 
     it('should catch errors while loading a async webpack config from file if `custom.webpack` is a string', () => {
@@ -271,16 +274,16 @@ describe('validate', () => {
       module.serverless.config.servicePath = testServicePath;
       module.serverless.service.custom.webpack = testConfig;
       serverless.utils.fileExistsSync = sinon.stub().returns(true);
-      const loadedConfigPromise = Promise.reject('config failed to load');
+      const loadedConfigPromise = BbPromise.reject('config failed to load');
       mockery.registerMock(requiredPath, loadedConfigPromise);
-      return module
-        .validate()
-        .catch(e => {
-          expect(serverless.utils.fileExistsSync).to.have.been.calledWith(requiredPath);
-          expect(e).to.eql('config failed to load');
-          mockery.deregisterMock(requiredPath);
-          return null;
-        });
+      return expect(module.validate()).to.be.rejectedWith('config failed to load')
+      .then(() => {
+        expect(serverless.utils.fileExistsSync).to.have.been.calledWith(requiredPath);
+        return null;
+      })
+      .finally(() => {
+        mockery.deregisterMock(requiredPath);
+      });
     });
 
     it('should load a wrong thenable webpack config as normal object from file if `custom.webpack` is a string', () => {
@@ -295,14 +298,15 @@ describe('validate', () => {
         entry: 'testentry',
       };
       mockery.registerMock(requiredPath, loadedConfig);
-      return module
-        .validate()
-        .then(() => {
-          expect(serverless.utils.fileExistsSync).to.have.been.calledWith(requiredPath);
-          expect(module.webpackConfig).to.eql(loadedConfig);
-          mockery.deregisterMock(requiredPath);
-          return null;
-        });
+      return expect(module.validate()).to.be.fulfilled
+      .then(() => {
+        expect(serverless.utils.fileExistsSync).to.have.been.calledWith(requiredPath);
+        expect(module.webpackConfig).to.deep.equal(loadedConfig);
+        return null;
+      })
+      .finally(() => {
+        mockery.deregisterMock(requiredPath);
+      });
     });
 
     it('should throw if providing an invalid file', () => {
@@ -311,7 +315,7 @@ describe('validate', () => {
       module.serverless.config.servicePath = testServicePath;
       module.serverless.service.custom.webpack = testConfig;
       serverless.utils.fileExistsSync = sinon.stub().returns(false);
-      expect(module.validate.bind(module)).to.throw(/could not find/);
+      return expect(module.validate()).to.be.rejectedWith(/could not find/);
     });
 
     it('should load a default file if no custom config is provided', () => {
@@ -324,14 +328,15 @@ describe('validate', () => {
         entry: 'testentry',
       };
       mockery.registerMock(requiredPath, loadedConfig);
-      return module
-        .validate()
-        .then(() => {
-          expect(serverless.utils.fileExistsSync).to.have.been.calledWith(requiredPath);
-          expect(module.webpackConfig).to.eql(loadedConfig);
-          mockery.deregisterMock(requiredPath);
-          return null;
-        });
+      return expect(module.validate()).to.be.fulfilled
+      .then(() => {
+        expect(serverless.utils.fileExistsSync).to.have.been.calledWith(requiredPath);
+        expect(module.webpackConfig).to.eql(loadedConfig);
+        return null;
+      })
+      .finally(() => {
+        mockery.deregisterMock(requiredPath);
+      });
     });
 
     it('should fail when importing a broken configuration file', () => {
