@@ -24,7 +24,7 @@ describe('run', () => {
   let chdirStub;
 
   before(() => {
-    sandbox = sinon.sandbox.create();
+    sandbox = sinon.createSandbox();
     sandbox.usingPromise(BbPromise);
 
     webpackMock = makeWebpackMock(sandbox);

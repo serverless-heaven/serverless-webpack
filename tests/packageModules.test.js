@@ -36,7 +36,7 @@ describe('packageModules', () => {
   let getVersionStub;
 
   before(() => {
-    sandbox = sinon.sandbox.create();
+    sandbox = sinon.createSandbox();
     sandbox.usingPromise(BbPromise);
 
     fsMock = fsMockFactory.create(sandbox);

@@ -26,7 +26,7 @@ describe('validate', () => {
   let sandbox;
 
   before(() => {
-    sandbox = sinon.sandbox.create();
+    sandbox = sinon.createSandbox();
 
     mockery.enable({ warnOnUnregistered: false });
     fsExtraMock = fsExtraMockFactory.create(sandbox);
