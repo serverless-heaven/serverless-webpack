@@ -26,6 +26,7 @@ dependencies needed to run the function. This allows the plugin to fully utilize
 WebPack's [Tree-Shaking][link-webpack-tree] optimization.
 * Webpack version 3 and 4 support
 * Support NPM and Yarn for packaging
+* Support asynchronous webpack configuration
 
 ## Recent improvements and important changes
 
@@ -33,6 +34,7 @@ WebPack's [Tree-Shaking][link-webpack-tree] optimization.
 * Support Webpack 4
 * Drop Webpack 2 support
 * Cleaned up configuration. You should now use a `custom.webpack` object to configure everything relevant for the plugin. The old configuration still works but will be removed in the next major release. For details see below.
+* Added support for asynchronous webpack configuration
 
 For the complete release notes see the end of this document.
 
@@ -84,6 +86,57 @@ module.exports = {
   module: {
     loaders: [ ... ]
   }
+};
+```
+
+Alternatively the Webpack configuration can export an asynchronous object (e.g. a promise or async function) which will be awaited by the plugin and resolves to the final configuration object. This is useful if the confguration depends on asynchronous functions, for example, defining the AccountId of the current aws user inside AWS lambda@edge which does not support defining normal process environment variables.
+
+A basic Webpack promise configuration might look like this:
+```js
+// Version if the local Node.js version supports async/await
+// webpack.config.js
+
+const webpack = require('webpack')
+const slsw = require('serverless-webpack');
+
+module.exports = async () => {
+  const accountId = await slsw.lib.serverless.providers.aws.getAccountId();
+  return {
+    entry: './handler.js',
+    target: 'node',
+    plugins: [
+      new webpack.DefinePlugin({
+        AWS_ACCOUNT_ID: `${accountId}`,
+      }),
+    ],
+    module: {
+      loaders: [ ... ]
+    }
+  };
+}();
+```
+```js
+// Version with promises
+// webpack.config.js
+
+const webpack = require('webpack')
+const slsw = require('serverless-webpack');
+const BbPromise = require('bluebird');
+
+module.exports = BbPromise.try(() => {
+  return slsw.lib.serverless.providers.aws.getAccountId()
+  .then(accountId => ({
+    entry: './handler.js',
+    target: 'node',
+    plugins: [
+      new webpack.DefinePlugin({
+        AWS_ACCOUNT_ID: `${accountId}`,
+      }),
+    ],
+    module: {
+      loaders: [ ... ]
+    }
+  }));
 };
 ```
 
@@ -664,6 +717,9 @@ Special thanks go to the initial author of serverless-webpack, Nicola Peduzzi (h
 me to take it over and continue working on the project. That helped to revive it and lead it to new horizons.
 
 ## Release Notes
+
+* 5.2.0
+  * Added support for asynchronous webpack configuration
 
 * 5.1.5
   * Re-publish of 5.1.4 without yarn.lock
