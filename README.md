@@ -243,7 +243,7 @@ you are not satisfied with the current output info, you can overwrite it in your
 ```js
 // webpack.config.js
 
-module.export = {
+module.exports = {
   // ...
   stats: 'minimal'
   // ...
