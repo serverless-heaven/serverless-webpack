@@ -745,6 +745,40 @@ describe('validate', () => {
         });
       });
 
+      it('should call glob with ignore parameter if there is an excludeFiles config', () => {
+        const testOutPath = 'test';
+        const testFunction = 'func1';
+        const testConfig = {
+          entry: 'test',
+          context: 'testcontext',
+          output: {
+            path: testOutPath,
+          },
+        };
+        _.set(module.serverless.service, 'custom.webpack.config', testConfig);
+        _.set(module.serverless.service, 'custom.webpack.excludeFiles', '**/*.ts');
+        module.serverless.service.functions = testFunctionsConfig;
+        module.options.function = testFunction;
+        globSyncStub.returns(['module1.js']);
+        return expect(module.validate()).to.be.fulfilled
+        .then(() => {
+          const lib = require('../lib/index');
+          const expectedLibEntries = {
+            'module1': './module1.js'
+          };
+
+          expect(lib.entries).to.deep.equal(expectedLibEntries);
+
+          expect(globSyncStub).to.have.been.calledOnceWith('module1.*', {
+            ignore: '**/*.ts',
+            cwd: null,
+            nodir: true
+          });
+          expect(serverless.cli.log).not.to.have.been.called;
+          return null;
+        });
+      });
+
       it('should throw an exception if no handler is found', () => {
         const testOutPath = 'test';
         const testFunction = 'func1';

@@ -62,6 +62,7 @@ custom:
     webpackConfig: 'webpack.config.js'   # Name of webpack configuration file
     includeModules: false   # Node modules configuration for packaging
     packager: 'npm'   # Packager that will be used to package your external modules
+    excludeFiles: src/**/*.test.js # Provide a glob for files to ignore
 ```
 
 ### Webpack configuration file
@@ -302,17 +303,17 @@ custom:
 #### Runtime dependencies
 
 If a runtime dependency is detected that is found in the `devDependencies` section and
-so would not be packaged, the plugin will error until you explicitly exclude it (see `forceExclude` below) 
+so would not be packaged, the plugin will error until you explicitly exclude it (see `forceExclude` below)
 or move it to the `dependencies` section.
 
 #### AWS-SDK
 
 An exception for the runtime dependency error is the AWS-SDK. All projects using the AWS-SDK normally
-have it listed in `devDependencies` because AWS provides it already in their Lambda environment. In this case 
+have it listed in `devDependencies` because AWS provides it already in their Lambda environment. In this case
 the aws-sdk is automatically excluded and only an informational message is printed (in `--verbose` mode).
 
 The main reason for the warning is, that silently ignoring anything contradicts the declarative nature
-of Serverless' service definition. So the correct way to define the handling for the aws-sdk is, as 
+of Serverless' service definition. So the correct way to define the handling for the aws-sdk is, as
 you would do for all other excluded modules (see `forceExclude` below).
 
 ```yaml
@@ -339,7 +340,7 @@ custom:
 ```
 
 You should select the packager, that you use to develop your projects, because only
-then locked versions will be handled correctly, i.e. the plugin uses the generated 
+then locked versions will be handled correctly, i.e. the plugin uses the generated
 (and usually committed) package lock file that is created by your favorite packager.
 
 Each packager might support specific options that can be set in the `packagerOptions`
@@ -372,7 +373,7 @@ You can specify custom scripts that are executed after the installation of the f
 has been finished. These are standard packager scripts as they can be used in any `package.json`.
 
 Warning: The use cases for them are very rare and specific and you should investigate first,
-if your use case can be covered with webpack plugins first. They should never access files 
+if your use case can be covered with webpack plugins first. They should never access files
 outside of their current working directory which is the compiled function folder, if any.
 A valid use case would be to start anything available as binary from `node_modules`.
 
