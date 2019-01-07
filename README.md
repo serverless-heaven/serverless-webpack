@@ -431,6 +431,25 @@ from a local folder (e.g. `"mymodule": "file:../../myOtherProject/mymodule"`).
 With that you can do test deployments from the local machine with different
 module versions or modules before they are published officially.
 
+#### Exclude Files with similar names
+
+If you have a project structure that uses something like `index.js` and a
+co-located `index.test.js` then you have likely seen an error like:
+`WARNING: More than one matching handlers found for index. Using index.js`
+
+This config option allows you to exlcude files that match a glob from function
+resolution. Just add: `excludeFiles: **/*.test.js` (with whatever glob you want
+to exclude).
+
+```yaml
+# serverless.yml
+custom:
+  webpack:
+    excludeFiles: **/*.test.js
+```
+
+This is also useful for projects that use TypeScript.
+
 #### Examples
 
 You can find an example setups in the [`examples`][link-examples] folder.
