@@ -183,6 +183,8 @@ module.exports = {
 The lib export also provides the `serverless` and `options` properties, through
 which you can access the Serverless instance and the options given on the command-line.
 
+The current stage e.g is accessible through `slsw.lib.options.stage`
+
 This enables you to have a fully customized dynamic configuration, that can evaluate
 anything available in the Serverless framework. There are really no limits.
 
