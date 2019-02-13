@@ -98,7 +98,7 @@ A basic Webpack promise configuration might look like this:
 const webpack = require('webpack')
 const slsw = require('serverless-webpack');
 
-module.exports = async () => {
+module.exports = (async () => {
   const accountId = await slsw.lib.serverless.providers.aws.getAccountId();
   return {
     entry: './handler.js',
@@ -112,7 +112,7 @@ module.exports = async () => {
       loaders: [ ... ]
     }
   };
-}();
+})();
 ```
 ```js
 // Version with promises
