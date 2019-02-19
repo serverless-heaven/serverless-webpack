@@ -12,7 +12,8 @@ const StreamMock = sandbox => ({
 });
 
 const StatMock = sandbox => ({
-  isDirectory: sandbox.stub()
+  isDirectory: sandbox.stub(),
+  isSymbolicLink: sandbox.stub()
 });
 
 module.exports.create = sandbox => {

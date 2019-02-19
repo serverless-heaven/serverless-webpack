@@ -139,6 +139,7 @@ describe('packageModules', () => {
         fsMock._streamMock.on.withArgs('open').yields();
         fsMock._streamMock.on.withArgs('close').yields();
         fsMock._statMock.isDirectory.returns(false);
+        fsMock._statMock.isSymbolicLink.returns(false);
 
         const expectedArtifactPath = path.join('.serverless', 'test-service.zip');
 
@@ -205,6 +206,7 @@ describe('packageModules', () => {
           fsMock._streamMock.on.withArgs('open').yields();
           fsMock._streamMock.on.withArgs('close').yields();
           fsMock._statMock.isDirectory.returns(false);
+          fsMock._statMock.isSymbolicLink.returns(false);
 
           const expectedArtifactPath = path.join('.serverless', 'test-service.zip');
 
@@ -252,6 +254,7 @@ describe('packageModules', () => {
         fsMock._streamMock.on.withArgs('open').yields();
         fsMock._streamMock.on.withArgs('close').yields();
         fsMock._statMock.isDirectory.returns(false);
+        fsMock._statMock.isSymbolicLink.returns(false);
 
         const expectedArtifactPath = path.join('.serverless', 'test-service.zip');
 
@@ -313,6 +316,7 @@ describe('packageModules', () => {
         fsMock._streamMock.on.withArgs('open').yields();
         fsMock._streamMock.on.withArgs('close').yields();
         fsMock._statMock.isDirectory.returns(false);
+        fsMock._statMock.isSymbolicLink.returns(false);
 
         module.compileStats = stats;
         return expect(module.packageModules()).to.be.rejectedWith('Packaging: No files found');
@@ -385,6 +389,7 @@ describe('packageModules', () => {
         fsMock._streamMock.on.withArgs('open').yields();
         fsMock._streamMock.on.withArgs('close').yields();
         fsMock._statMock.isDirectory.returns(false);
+        fsMock._statMock.isSymbolicLink.returns(false);
 
         module.compileStats = stats;
         return expect(module.packageModules()).to.be.fulfilled
