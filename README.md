@@ -449,6 +449,22 @@ custom:
 This can be useful, in case you want to upload the source maps to your Error
 reporting system, or just have it available for some post processing.
 
+### Include only a subset of built assets
+
+If you don't want all built assets (i.e. js, json, js.map files, etc.) to be included
+in the package, then you can specify the glob value that'll be used to match the files
+to include in the package.
+
+```yaml
+# serverless.yml
+custom:
+  webpack:
+    builtAssetIncludeGlob: "**/*.{js,json}"
+```
+
+This can be useful when you don't want to include the source maps to make the package
+even smaller.
+
 #### Examples
 
 You can find an example setups in the [`examples`][link-examples] folder.
