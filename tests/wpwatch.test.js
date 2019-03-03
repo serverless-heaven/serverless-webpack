@@ -142,54 +142,86 @@ describe('wpwatch', function() {
     ));
   });
 
-  it('should call callback on subsequent runs', () => {
+  it('should spawn webpack:compile:watch on subsequent runs', () => {
     const wpwatch = module.wpwatch.bind(module);
     let watchCallbackSpy;
-    webpackMock.compilerMock.watch.onFirstCall().callsFake((options, cb) => {
-      // We'll spy the callback registered for watch
-      watchCallbackSpy = sandbox.spy(cb);
+    let beforeCompileCallbackSpy;
 
-      // Schedule second call after 2 seconds
-      setTimeout(() => {
-        process.nextTick(() => watchCallbackSpy(null, { call: 2, hash: '2' }));
-      }, 2000);
-      process.nextTick(() => watchCallbackSpy(null, { call: 1, hash: '1' }));
-      return webpackMock.watchMock;
-    });
     spawnStub.resolves();
 
+    webpackMock.compilerMock.hooks.beforeCompile.tapPromise.callsFake((options, cb) => {
+      beforeCompileCallbackSpy = sandbox.spy(cb);
+    });
+
+    webpackMock.compilerMock.watch.onFirstCall().callsFake((options, cb) => {
+      watchCallbackSpy = sandbox.spy(cb);
+      watchCallbackSpy(null, { call: 1, hash: '1' });
+      watchCallbackSpy(null, { call: 2, hash: '2' });
+
+      // We only call this once, to simulate that promises that might take longer to resolve
+      // don't cause a re-emit to avoid race-conditions.
+      beforeCompileCallbackSpy();
+      watchCallbackSpy(null, { call: 3, hash: '3' });
+      watchCallbackSpy(null, { call: 3, hash: '4' });
+    });
+
+    return expect(wpwatch()).to.be.fulfilled.then(
+      () => BbPromise.join(
+        expect(watchCallbackSpy).to.have.been.callCount(4),
+        expect(spawnStub).to.have.been.calledOnce,
+        expect(spawnStub).to.have.been.calledWithExactly('webpack:compile:watch')
+      )
+    );
+  });
+
+  it('should spawn more webpack:compile:watch when previous is resolved', () => {
+    const wpwatch = module.wpwatch.bind(module);
+    let watchCallbackSpy;
+    let beforeCompileCallbackSpy;
+    let beforeCompileCallbackSpyPromise;
+
+    spawnStub.resolves();
+
+    webpackMock.compilerMock.hooks.beforeCompile.tapPromise.callsFake((options, cb) => {
+      beforeCompileCallbackSpy = sandbox.spy(cb);
+    });
+
+    webpackMock.compilerMock.watch.onFirstCall().callsFake((options, cb) => {
+      watchCallbackSpy = sandbox.spy(cb);
+
+      watchCallbackSpy(null, { call: 1, hash: '1' });
+      watchCallbackSpy(null, { call: 2, hash: '2' });
+
+      // eslint-disable-next-line promise/always-return,promise/catch-or-return
+      beforeCompileCallbackSpyPromise = beforeCompileCallbackSpy().then(() => {
+        watchCallbackSpy(null, { call: 3, hash: '3' });
+      });
+    });
+
     return expect(wpwatch()).to.be.fulfilled
-    .then(() => BbPromise.delay(3000))
-    .then(() => BbPromise.join(
-      expect(spawnStub).to.have.been.calledOnce,
-      expect(spawnStub).to.have.been.calledWithExactly('webpack:compile:watch'),
-      expect(webpackMock.compilerMock.watch).to.have.been.calledTwice,
-      expect(webpackMock.watchMock.close).to.have.been.calledOnce,
-      expect(watchCallbackSpy).to.have.been.calledTwice
-    ));
+      .then(() => beforeCompileCallbackSpyPromise)
+      .then(() => BbPromise.join(
+        expect(watchCallbackSpy).to.have.been.calledThrice,
+        expect(spawnStub).to.have.been.calledTwice,
+        expect(spawnStub).to.have.been.calledWithExactly('webpack:compile:watch')
+      ));
   });
 
   it('should throw if compile fails on subsequent runs', () => {
     const wpwatch = module.wpwatch.bind(module);
     let watchCallbackSpy;
+
+    spawnStub.resolves();
+
     webpackMock.compilerMock.watch.callsFake((options, cb) => {
       // We'll spy the callback registered for watch
       watchCallbackSpy = sandbox.spy(cb);
 
-      // Schedule second call after 2 seconds
-      setTimeout(() => {
-        try {
-          watchCallbackSpy(new Error('Compile failed'));
-        } catch (e) {
-          // Ignore the exception. The spy will record it.
-        }
-      }, 2000);
-      process.nextTick(() => watchCallbackSpy(null, { call: 3, hash: '3' }));
+      watchCallbackSpy(null, { call: 3, hash: '3' });
+      watchCallbackSpy(new Error('Compile failed'));
     });
-    spawnStub.resolves();
 
     return expect(wpwatch()).to.be.fulfilled
-    .then(() => BbPromise.delay(3000))
     .then(() => BbPromise.join(
       expect(watchCallbackSpy).to.have.been.calledTwice,
       expect(watchCallbackSpy.secondCall.threw()).to.be.true
