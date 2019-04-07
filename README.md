@@ -432,6 +432,23 @@ from a local folder (e.g. `"mymodule": "file:../../myOtherProject/mymodule"`).
 With that you can do test deployments from the local machine with different
 module versions or modules before they are published officially.
 
+#### Keep output directory after packaging
+
+You can keep the output directory (defaults to `.webpack`) from being removed
+after build.
+
+Just add `keepOutputDirectory: true`
+
+```yaml
+# serverless.yml
+custom:
+  webpack:
+    keepOutputDirectory: true
+```
+
+This can be useful, in case you want to upload the source maps to your Error
+reporting system, or just have it available for some post processing.
+
 #### Examples
 
 You can find an example setups in the [`examples`][link-examples] folder.
