@@ -136,7 +136,7 @@ module.exports = BbPromise.try(() => {
       loaders: [ ... ]
     }
   }));
-};
+});
 ```
 
 ### serverless-webpack lib export helper
