@@ -99,7 +99,7 @@ A basic Webpack promise configuration might look like this:
 const webpack = require('webpack')
 const slsw = require('serverless-webpack');
 
-module.exports = async () => {
+module.exports = (async () => {
   const accountId = await slsw.lib.serverless.providers.aws.getAccountId();
   return {
     entry: './handler.js',
@@ -113,7 +113,7 @@ module.exports = async () => {
       loaders: [ ... ]
     }
   };
-}();
+})();
 ```
 ```js
 // Version with promises
@@ -184,6 +184,8 @@ module.exports = {
 The lib export also provides the `serverless` and `options` properties, through
 which you can access the Serverless instance and the options given on the command-line.
 
+The current stage e.g is accessible through `slsw.lib.options.stage`
+
 This enables you to have a fully customized dynamic configuration, that can evaluate
 anything available in the Serverless framework. There are really no limits.
 
@@ -228,7 +230,7 @@ const path = require('path');
 module.exports = {
   // ...
   output: {
-    libraryTarget: 'commonjs',
+    libraryTarget: 'commonjs2',
     path: path.resolve(__dirname, '.webpack'),
     filename: '[name].js',
   },
@@ -449,6 +451,23 @@ custom:
 ```
 
 This is also useful for projects that use TypeScript.
+
+#### Keep output directory after packaging
+
+You can keep the output directory (defaults to `.webpack`) from being removed
+after build.
+
+Just add `keepOutputDirectory: true`
+
+```yaml
+# serverless.yml
+custom:
+  webpack:
+    keepOutputDirectory: true
+```
+
+This can be useful, in case you want to upload the source maps to your Error
+reporting system, or just have it available for some post processing.
 
 #### Examples
 

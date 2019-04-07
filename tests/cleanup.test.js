@@ -54,7 +54,8 @@ describe('cleanup', () => {
     module = _.assign({
       serverless,
       options: {},
-      webpackOutputPath: 'my/Output/Path'
+      webpackOutputPath: 'my/Output/Path',
+      configuration: {}
     }, baseModule);
   });
 
@@ -88,4 +89,19 @@ describe('cleanup', () => {
       return null;
     });
   });
+
+  it('should keep output dir if keepOutputDir = true', () => {
+    dirExistsSyncStub.returns(true);
+    fseMock.removeSync.reset();
+
+    const configuredModule = _.assign({}, module, {
+      configuration: { keepOutputDirectory: true }
+    });
+    return expect(configuredModule.cleanup()).to.be.fulfilled
+    .then(() => {
+      expect(dirExistsSyncStub).to.not.have.been.calledOnce;
+      expect(fseMock.removeSync).to.not.have.been.called;
+      return null;
+    });
+  })
 });
