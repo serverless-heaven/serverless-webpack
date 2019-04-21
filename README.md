@@ -756,6 +756,13 @@ me to take it over and continue working on the project. That helped to revive it
 
 ## Release Notes
 
+* 5.3.0
+  * Restore compatibility with TypeScript [#449][link-449] [#465][link-465]
+  * Use colored output depending on tty [#480][link-480]
+  * Allow to keep webpack folder [#453][link-453] [#467][link-467]
+  * Add ability to exclude files from handler lookup [#433][link-433]
+  * Documentation fixes [#429][link-429]
+
 * 5.2.0
   * Show info message in verbose mode if aws-sdk has been excluded automatically [#393][link-393]
   * Added support for asynchronous webpack configuration [#412][link-412]
@@ -1009,3 +1016,11 @@ me to take it over and continue working on the project. That helped to revive it
 [link-393]: https://github.com/serverless-heaven/serverless-webpack/issues/393
 [link-412]: https://github.com/serverless-heaven/serverless-webpack/issues/412
 [link-418]: https://github.com/serverless-heaven/serverless-webpack/issues/418
+
+[link-453]: https://github.com/serverless-heaven/serverless-webpack/issues/453
+[link-467]: https://github.com/serverless-heaven/serverless-webpack/issues/467
+[link-449]: https://github.com/serverless-heaven/serverless-webpack/issues/449
+[link-465]: https://github.com/serverless-heaven/serverless-webpack/issues/465
+[link-480]: https://github.com/serverless-heaven/serverless-webpack/issues/480
+[link-429]: https://github.com/serverless-heaven/serverless-webpack/pull/429
+[link-433]: https://github.com/serverless-heaven/serverless-webpack/issues/433
