@@ -12,23 +12,23 @@ const StatsMock = () => ({
   toString: sinon.stub().returns('testStats'),
 });
 
-const WatchMock = sandbox => ({
-  close: sandbox.stub().callsFake(cb => cb())
-});
 
-const CompilerMock = (sandbox, statsMock, watchMock) => ({
+const CompilerMock = (sandbox, statsMock) => ({
   run: sandbox.stub().yields(null, statsMock),
-  watch: sandbox.stub().returns(watchMock).yields(null, statsMock)
+  watch: sandbox.stub().yields(null, statsMock),
+  hooks: {
+    beforeCompile: {
+      tapPromise: sandbox.stub()
+    }
+  },
 });
 
 const webpackMock = sandbox => {
   const statsMock = StatsMock(sandbox);
-  const watchMock = WatchMock(sandbox);
-  const compilerMock = CompilerMock(sandbox, statsMock, watchMock);
+  const compilerMock = CompilerMock(sandbox, statsMock);
   const mock = sinon.stub().returns(compilerMock);
   mock.compilerMock = compilerMock;
   mock.statsMock = statsMock;
-  mock.watchMock = watchMock;
   return mock;
 };
 
