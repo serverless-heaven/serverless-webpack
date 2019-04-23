@@ -30,6 +30,12 @@ class ChunkMock {
   }
 }
 
+class ChunkMockNoModulesIterable {
+  constructor(modules) {
+    this._modules = modules;
+  }
+}
+
 const packagerMockFactory = {
   create(sandbox) {
     const packagerMock = {
@@ -152,7 +158,10 @@ describe('packExternalModules', () => {
                 {
                   identifier: _.constant('external "bluebird"')
                 },
-              ])
+              ]),
+              new ChunkMockNoModulesIterable([
+                
+              ]),
             ],
             compiler: {
               outputPath: '/my/Service/Path/.webpack/service'
@@ -315,6 +324,22 @@ describe('packExternalModules', () => {
     it('should do nothing if webpackIncludeModules is not set', () => {
       module.configuration = new Configuration();
       module.compileStats = { stats: [] };
+      return expect(module.packExternalModules()).to.be.fulfilled
+        .then(() => BbPromise.all([
+          expect(fsExtraMock.copy).to.not.have.been.called,
+          expect(packagerFactoryMock.get).to.not.have.been.called,
+          expect(writeFileSyncStub).to.not.have.been.called,
+        ]));
+    });
+
+    it('should do nothing if webpackIncludeModules is empty', () => {
+      module.configuration = new Configuration();
+      module.compileStats = {
+        stats: {
+          compileStats: {}
+        }
+      };
+
       return expect(module.packExternalModules()).to.be.fulfilled
         .then(() => BbPromise.all([
           expect(fsExtraMock.copy).to.not.have.been.called,
@@ -1188,3 +1213,4 @@ describe('packExternalModules', () => {
     });
   });
 });
+
