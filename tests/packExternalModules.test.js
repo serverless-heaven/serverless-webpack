@@ -332,24 +332,6 @@ describe('packExternalModules', () => {
         ]));
     });
 
-    it('should do nothing if webpackIncludeModules is empty', () => {
-      module.configuration = new Configuration();
-      module.compileStats = {
-        stats: {
-          compilation: {
-            chunks: []
-          }
-        }
-      };
-
-      return expect(module.packExternalModules()).to.be.fulfilled
-        .then(() => BbPromise.all([
-          expect(fsExtraMock.copy).to.not.have.been.called,
-          expect(packagerFactoryMock.get).to.not.have.been.called,
-          expect(writeFileSyncStub).to.not.have.been.called,
-        ]));
-    });
-
     it('should copy needed package sections if available', () => {
       const originalPackageJSON = {
         name: 'test-service',
