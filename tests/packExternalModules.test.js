@@ -160,7 +160,7 @@ describe('packExternalModules', () => {
                 },
               ]),
               new ChunkMockNoModulesIterable([
-                
+
               ]),
             ],
             compiler: {
@@ -336,7 +336,9 @@ describe('packExternalModules', () => {
       module.configuration = new Configuration();
       module.compileStats = {
         stats: {
-          compileStats: {}
+          compilation: {
+            chunks: []
+          }
         }
       };
 
