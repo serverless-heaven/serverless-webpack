@@ -24,14 +24,14 @@ and much more!
 individually, resulting in smaller Lambda packages that contain only the code and
 dependencies needed to run the function. This allows the plugin to fully utilize
 WebPack's [Tree-Shaking][link-webpack-tree] optimization.
-* Webpack version 3 and 4 support
+* Webpack version 3, 4 and 5 support
 * Support NPM and Yarn for packaging
 * Support asynchronous webpack configuration
 
 ## Recent improvements and important changes for 5.x
 
 * Support Yarn
-* Support Webpack 4
+* Support Webpack 4 and 5
 * Cleaned up configuration. You should now use a `custom.webpack` object to configure everything relevant for the plugin. The old configuration still works but will be removed in the next major release. For details see below.
 * Added support for asynchronous webpack configuration
 
@@ -758,6 +758,8 @@ me to take it over and continue working on the project. That helped to revive it
 
 * 5.3.0
   * Restore compatibility with TypeScript [#449][link-449] [#465][link-465]
+  * Allow glob for excludeFiles [#471][link-471]
+  * Support Webpack 5 [#472][link-472]
   * Use colored output depending on tty [#480][link-480]
   * Allow to keep webpack folder [#453][link-453] [#467][link-467]
   * Add ability to exclude files from handler lookup [#433][link-433]
@@ -1024,3 +1026,5 @@ me to take it over and continue working on the project. That helped to revive it
 [link-480]: https://github.com/serverless-heaven/serverless-webpack/issues/480
 [link-429]: https://github.com/serverless-heaven/serverless-webpack/pull/429
 [link-433]: https://github.com/serverless-heaven/serverless-webpack/issues/433
+[link-471]: https://github.com/serverless-heaven/serverless-webpack/issues/471
+[link-472]: https://github.com/serverless-heaven/serverless-webpack/pull/472
