@@ -24,14 +24,14 @@ and much more!
 individually, resulting in smaller Lambda packages that contain only the code and
 dependencies needed to run the function. This allows the plugin to fully utilize
 WebPack's [Tree-Shaking][link-webpack-tree] optimization.
-* Webpack version 3 and 4 support
+* Webpack version 3, 4 and 5 support
 * Support NPM and Yarn for packaging
 * Support asynchronous webpack configuration
 
 ## Recent improvements and important changes for 5.x
 
 * Support Yarn
-* Support Webpack 4
+* Support Webpack 4 and 5
 * Cleaned up configuration. You should now use a `custom.webpack` object to configure everything relevant for the plugin. The old configuration still works but will be removed in the next major release. For details see below.
 * Added support for asynchronous webpack configuration
 
@@ -62,6 +62,7 @@ custom:
     webpackConfig: 'webpack.config.js'   # Name of webpack configuration file
     includeModules: false   # Node modules configuration for packaging
     packager: 'npm'   # Packager that will be used to package your external modules
+    excludeFiles: src/**/*.test.js # Provide a glob for files to ignore
 ```
 
 ### Webpack configuration file
@@ -98,7 +99,7 @@ A basic Webpack promise configuration might look like this:
 const webpack = require('webpack')
 const slsw = require('serverless-webpack');
 
-module.exports = async () => {
+module.exports = (async () => {
   const accountId = await slsw.lib.serverless.providers.aws.getAccountId();
   return {
     entry: './handler.js',
@@ -112,7 +113,7 @@ module.exports = async () => {
       loaders: [ ... ]
     }
   };
-}();
+})();
 ```
 ```js
 // Version with promises
@@ -136,7 +137,7 @@ module.exports = BbPromise.try(() => {
       loaders: [ ... ]
     }
   }));
-};
+});
 ```
 
 ### serverless-webpack lib export helper
@@ -183,6 +184,8 @@ module.exports = {
 The lib export also provides the `serverless` and `options` properties, through
 which you can access the Serverless instance and the options given on the command-line.
 
+The current stage e.g is accessible through `slsw.lib.options.stage`
+
 This enables you to have a fully customized dynamic configuration, that can evaluate
 anything available in the Serverless framework. There are really no limits.
 
@@ -227,7 +230,7 @@ const path = require('path');
 module.exports = {
   // ...
   output: {
-    libraryTarget: 'commonjs',
+    libraryTarget: 'commonjs2',
     path: path.resolve(__dirname, '.webpack'),
     filename: '[name].js',
   },
@@ -302,17 +305,17 @@ custom:
 #### Runtime dependencies
 
 If a runtime dependency is detected that is found in the `devDependencies` section and
-so would not be packaged, the plugin will error until you explicitly exclude it (see `forceExclude` below) 
+so would not be packaged, the plugin will error until you explicitly exclude it (see `forceExclude` below)
 or move it to the `dependencies` section.
 
 #### AWS-SDK
 
 An exception for the runtime dependency error is the AWS-SDK. All projects using the AWS-SDK normally
-have it listed in `devDependencies` because AWS provides it already in their Lambda environment. In this case 
+have it listed in `devDependencies` because AWS provides it already in their Lambda environment. In this case
 the aws-sdk is automatically excluded and only an informational message is printed (in `--verbose` mode).
 
 The main reason for the warning is, that silently ignoring anything contradicts the declarative nature
-of Serverless' service definition. So the correct way to define the handling for the aws-sdk is, as 
+of Serverless' service definition. So the correct way to define the handling for the aws-sdk is, as
 you would do for all other excluded modules (see `forceExclude` below).
 
 ```yaml
@@ -339,7 +342,7 @@ custom:
 ```
 
 You should select the packager, that you use to develop your projects, because only
-then locked versions will be handled correctly, i.e. the plugin uses the generated 
+then locked versions will be handled correctly, i.e. the plugin uses the generated
 (and usually committed) package lock file that is created by your favorite packager.
 
 Each packager might support specific options that can be set in the `packagerOptions`
@@ -372,7 +375,7 @@ You can specify custom scripts that are executed after the installation of the f
 has been finished. These are standard packager scripts as they can be used in any `package.json`.
 
 Warning: The use cases for them are very rare and specific and you should investigate first,
-if your use case can be covered with webpack plugins first. They should never access files 
+if your use case can be covered with webpack plugins first. They should never access files
 outside of their current working directory which is the compiled function folder, if any.
 A valid use case would be to start anything available as binary from `node_modules`.
 
@@ -429,6 +432,42 @@ You can use `file:` version references in your `package.json` to use a node modu
 from a local folder (e.g. `"mymodule": "file:../../myOtherProject/mymodule"`).
 With that you can do test deployments from the local machine with different
 module versions or modules before they are published officially.
+
+#### Exclude Files with similar names
+
+If you have a project structure that uses something like `index.js` and a
+co-located `index.test.js` then you have likely seen an error like:
+`WARNING: More than one matching handlers found for index. Using index.js`
+
+This config option allows you to exlcude files that match a glob from function
+resolution. Just add: `excludeFiles: **/*.test.js` (with whatever glob you want
+to exclude).
+
+```yaml
+# serverless.yml
+custom:
+  webpack:
+    excludeFiles: **/*.test.js
+```
+
+This is also useful for projects that use TypeScript.
+
+#### Keep output directory after packaging
+
+You can keep the output directory (defaults to `.webpack`) from being removed
+after build.
+
+Just add `keepOutputDirectory: true`
+
+```yaml
+# serverless.yml
+custom:
+  webpack:
+    keepOutputDirectory: true
+```
+
+This can be useful, in case you want to upload the source maps to your Error
+reporting system, or just have it available for some post processing.
 
 #### Examples
 
@@ -717,6 +756,15 @@ me to take it over and continue working on the project. That helped to revive it
 
 ## Release Notes
 
+* 5.3.0
+  * Restore compatibility with TypeScript [#449][link-449] [#465][link-465]
+  * Allow glob for excludeFiles [#471][link-471]
+  * Support Webpack 5 [#472][link-472]
+  * Use colored output depending on tty [#480][link-480]
+  * Allow to keep webpack folder [#453][link-453] [#467][link-467]
+  * Add ability to exclude files from handler lookup [#433][link-433]
+  * Documentation fixes [#429][link-429]
+
 * 5.2.0
   * Show info message in verbose mode if aws-sdk has been excluded automatically [#393][link-393]
   * Added support for asynchronous webpack configuration [#412][link-412]
@@ -970,3 +1018,13 @@ me to take it over and continue working on the project. That helped to revive it
 [link-393]: https://github.com/serverless-heaven/serverless-webpack/issues/393
 [link-412]: https://github.com/serverless-heaven/serverless-webpack/issues/412
 [link-418]: https://github.com/serverless-heaven/serverless-webpack/issues/418
+
+[link-453]: https://github.com/serverless-heaven/serverless-webpack/issues/453
+[link-467]: https://github.com/serverless-heaven/serverless-webpack/issues/467
+[link-449]: https://github.com/serverless-heaven/serverless-webpack/issues/449
+[link-465]: https://github.com/serverless-heaven/serverless-webpack/issues/465
+[link-480]: https://github.com/serverless-heaven/serverless-webpack/issues/480
+[link-429]: https://github.com/serverless-heaven/serverless-webpack/pull/429
+[link-433]: https://github.com/serverless-heaven/serverless-webpack/issues/433
+[link-471]: https://github.com/serverless-heaven/serverless-webpack/issues/471
+[link-472]: https://github.com/serverless-heaven/serverless-webpack/pull/472

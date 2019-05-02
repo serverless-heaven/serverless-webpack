@@ -183,7 +183,7 @@ describe('validate', () => {
       return module
         .validate()
         .then(() => expect(module.webpackConfig.output).to.eql({
-          libraryTarget: 'commonjs',
+          libraryTarget: 'commonjs2',
           path: path.join(testServicePath, '.webpack', 'service'),
           filename: '[name].js',
         }));
@@ -200,7 +200,7 @@ describe('validate', () => {
       return module
         .validate()
         .then(() => expect(module.webpackConfig.output).to.eql({
-          libraryTarget: 'commonjs',
+          libraryTarget: 'commonjs2',
           path: path.join(testServicePath, '.webpack', 'service'),
           filename: '[name].js',
         }));
@@ -214,7 +214,7 @@ describe('validate', () => {
       return module
         .validate()
         .then(() => expect(module.webpackConfig.output).to.eql({
-          libraryTarget: 'commonjs',
+          libraryTarget: 'commonjs2',
           path: path.join(testServicePath, '.webpack', 'service'),
           filename: '[name].js',
         }));
@@ -658,7 +658,7 @@ describe('validate', () => {
             devtool: 'source-map',
             context: 'some context',
             output: {
-              libraryTarget: 'commonjs'
+              libraryTarget: 'commonjs2'
             }
           }));
           module.serverless.service.functions = testFunctionsConfig;
@@ -674,10 +674,10 @@ describe('validate', () => {
             expect(module.webpackConfig[1].context).to.equal('some context');
             expect(module.webpackConfig[2].context).to.equal('some context');
             expect(module.webpackConfig[3].context).to.equal('some context');
-            expect(module.webpackConfig[0].output.libraryTarget).to.equal('commonjs');
-            expect(module.webpackConfig[1].output.libraryTarget).to.equal('commonjs');
-            expect(module.webpackConfig[2].output.libraryTarget).to.equal('commonjs');
-            expect(module.webpackConfig[3].output.libraryTarget).to.equal('commonjs');
+            expect(module.webpackConfig[0].output.libraryTarget).to.equal('commonjs2');
+            expect(module.webpackConfig[1].output.libraryTarget).to.equal('commonjs2');
+            expect(module.webpackConfig[2].output.libraryTarget).to.equal('commonjs2');
+            expect(module.webpackConfig[3].output.libraryTarget).to.equal('commonjs2');
             return null;
           });
         });
@@ -741,6 +741,40 @@ describe('validate', () => {
           expect(serverless.cli.log).to.have.been.calledWith(
             'WARNING: More than one matching handlers found for \'module1\'. Using \'module1.ts\'.'
           );
+          return null;
+        });
+      });
+
+      it('should call glob with ignore parameter if there is an excludeFiles config', () => {
+        const testOutPath = 'test';
+        const testFunction = 'func1';
+        const testConfig = {
+          entry: 'test',
+          context: 'testcontext',
+          output: {
+            path: testOutPath,
+          },
+        };
+        _.set(module.serverless.service, 'custom.webpack.config', testConfig);
+        _.set(module.serverless.service, 'custom.webpack.excludeFiles', '**/*.ts');
+        module.serverless.service.functions = testFunctionsConfig;
+        module.options.function = testFunction;
+        globSyncStub.returns(['module1.js']);
+        return expect(module.validate()).to.be.fulfilled
+        .then(() => {
+          const lib = require('../lib/index');
+          const expectedLibEntries = {
+            'module1': './module1.js'
+          };
+
+          expect(lib.entries).to.deep.equal(expectedLibEntries);
+
+          expect(globSyncStub).to.have.been.calledOnceWith('module1.*', {
+            ignore: '**/*.ts',
+            cwd: null,
+            nodir: true
+          });
+          expect(serverless.cli.log).not.to.have.been.called;
           return null;
         });
       });
