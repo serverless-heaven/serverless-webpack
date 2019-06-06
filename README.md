@@ -756,6 +756,9 @@ me to take it over and continue working on the project. That helped to revive it
 
 ## Release Notes
 
+* 5.3.1
+
+
 * 5.3.0
   * Restore compatibility with TypeScript [#449][link-449] [#465][link-465]
   * Allow glob for excludeFiles [#471][link-471]
