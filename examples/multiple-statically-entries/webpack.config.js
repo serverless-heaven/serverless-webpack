@@ -16,7 +16,7 @@ module.exports = {
   },
   target: 'node',
   output: {
-    libraryTarget: 'commonjs2',
+    libraryTarget: 'commonjs',
     path: path.join(__dirname, '.webpack'),
     filename: '[name].js'
   },

@@ -183,7 +183,7 @@ describe('validate', () => {
       return module
         .validate()
         .then(() => expect(module.webpackConfig.output).to.eql({
-          libraryTarget: 'commonjs2',
+          libraryTarget: 'commonjs',
           path: path.join(testServicePath, '.webpack', 'service'),
           filename: '[name].js',
         }));
@@ -200,7 +200,7 @@ describe('validate', () => {
       return module
         .validate()
         .then(() => expect(module.webpackConfig.output).to.eql({
-          libraryTarget: 'commonjs2',
+          libraryTarget: 'commonjs',
           path: path.join(testServicePath, '.webpack', 'service'),
           filename: '[name].js',
         }));
@@ -214,7 +214,7 @@ describe('validate', () => {
       return module
         .validate()
         .then(() => expect(module.webpackConfig.output).to.eql({
-          libraryTarget: 'commonjs2',
+          libraryTarget: 'commonjs',
           path: path.join(testServicePath, '.webpack', 'service'),
           filename: '[name].js',
         }));
@@ -658,7 +658,7 @@ describe('validate', () => {
             devtool: 'source-map',
             context: 'some context',
             output: {
-              libraryTarget: 'commonjs2'
+              libraryTarget: 'commonjs'
             }
           }));
           module.serverless.service.functions = testFunctionsConfig;
@@ -674,10 +674,10 @@ describe('validate', () => {
             expect(module.webpackConfig[1].context).to.equal('some context');
             expect(module.webpackConfig[2].context).to.equal('some context');
             expect(module.webpackConfig[3].context).to.equal('some context');
-            expect(module.webpackConfig[0].output.libraryTarget).to.equal('commonjs2');
-            expect(module.webpackConfig[1].output.libraryTarget).to.equal('commonjs2');
-            expect(module.webpackConfig[2].output.libraryTarget).to.equal('commonjs2');
-            expect(module.webpackConfig[3].output.libraryTarget).to.equal('commonjs2');
+            expect(module.webpackConfig[0].output.libraryTarget).to.equal('commonjs');
+            expect(module.webpackConfig[1].output.libraryTarget).to.equal('commonjs');
+            expect(module.webpackConfig[2].output.libraryTarget).to.equal('commonjs');
+            expect(module.webpackConfig[3].output.libraryTarget).to.equal('commonjs');
             return null;
           });
         });
