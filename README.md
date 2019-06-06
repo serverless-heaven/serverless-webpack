@@ -757,7 +757,9 @@ me to take it over and continue working on the project. That helped to revive it
 ## Release Notes
 
 * 5.3.1
-
+  * Fixed bug that prevented to use handlers using import [#505][link-505]
+  * Do not print empty lines in webpack stats [#499][link-499]
+  * Added git hooks to improved code quality and developer experience [#496][link-496]
 
 * 5.3.0
   * Restore compatibility with TypeScript [#449][link-449] [#465][link-465]
@@ -1031,3 +1033,7 @@ me to take it over and continue working on the project. That helped to revive it
 [link-433]: https://github.com/serverless-heaven/serverless-webpack/issues/433
 [link-471]: https://github.com/serverless-heaven/serverless-webpack/issues/471
 [link-472]: https://github.com/serverless-heaven/serverless-webpack/pull/472
+
+[link-505]: https://github.com/serverless-heaven/serverless-webpack/issues/505
+[link-499]: https://github.com/serverless-heaven/serverless-webpack/issues/499
+[link-496]: https://github.com/serverless-heaven/serverless-webpack/pull/496
