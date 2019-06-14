@@ -172,7 +172,7 @@ describe('compile', () => {
       })
       .then(() => {
         expect(webpackMock).to.have.been.calledWith(testWebpackConfig);
-        expect(mockStats.toString.args).to.eql([ [testWebpackConfig.stats], [testWebpackConfig.stats] ]);
+        expect(mockStats.toString.args).to.eql([[testWebpackConfig.stats], [testWebpackConfig.stats]]);
         return null;
       });
   });
