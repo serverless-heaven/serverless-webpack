@@ -546,7 +546,8 @@ get that paid back twice at runtime.
 # serverless.yml
 custom:
   webpack:
-    concurrency: 5
+    concurrency: 5          # desired concurrency, defaults to the number of available cores
+    serializedCompile: true # backward compatible, this translates to concurrency: 1
 ```
 Will run each webpack build one at a time which helps reduce memory usage and in some cases impoves overall build performance.
 
