@@ -2,5 +2,4 @@ linters:
   "*.js":
     - "prettier-eslint --write"             # Run Prettier
     - "eslint"                              # Run TSLint
-    - "npm test"                            # Run tests
     - "git add"
