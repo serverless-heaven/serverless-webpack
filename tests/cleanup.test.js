@@ -51,12 +51,15 @@ describe('cleanup', () => {
     };
     dirExistsSyncStub = sandbox.stub(serverless.utils, 'dirExistsSync');
 
-    module = _.assign({
-      serverless,
-      options: {},
-      webpackOutputPath: 'my/Output/Path',
-      configuration: {}
-    }, baseModule);
+    module = _.assign(
+      {
+        serverless,
+        options: {},
+        webpackOutputPath: 'my/Output/Path',
+        configuration: {}
+      },
+      baseModule
+    );
   });
 
   afterEach(() => {
@@ -68,8 +71,7 @@ describe('cleanup', () => {
     dirExistsSyncStub.returns(true);
     fseMock.removeSync.reset();
 
-    return expect(module.cleanup()).to.be.fulfilled
-    .then(() => {
+    return expect(module.cleanup()).to.be.fulfilled.then(() => {
       expect(dirExistsSyncStub).to.have.been.calledOnce;
       expect(dirExistsSyncStub).to.have.been.calledWith('my/Output/Path');
       expect(fseMock.removeSync).to.have.been.calledOnce;
@@ -81,8 +83,7 @@ describe('cleanup', () => {
     dirExistsSyncStub.returns(false);
     fseMock.removeSync.reset();
 
-    return expect(module.cleanup()).to.be.fulfilled
-    .then(() => {
+    return expect(module.cleanup()).to.be.fulfilled.then(() => {
       expect(dirExistsSyncStub).to.have.been.calledOnce;
       expect(dirExistsSyncStub).to.have.been.calledWith('my/Output/Path');
       expect(fseMock.removeSync).to.not.have.been.called;
@@ -97,11 +98,10 @@ describe('cleanup', () => {
     const configuredModule = _.assign({}, module, {
       configuration: { keepOutputDirectory: true }
     });
-    return expect(configuredModule.cleanup()).to.be.fulfilled
-    .then(() => {
+    return expect(configuredModule.cleanup()).to.be.fulfilled.then(() => {
       expect(dirExistsSyncStub).to.not.have.been.calledOnce;
       expect(fseMock.removeSync).to.not.have.been.called;
       return null;
     });
-  })
+  });
 });

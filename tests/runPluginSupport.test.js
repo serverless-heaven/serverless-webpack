@@ -26,18 +26,16 @@ describe('runPluginSupport', () => {
     sandbox = sinon.createSandbox();
     sandbox.usingPromise(BbPromise.Promise);
 
-    const pluginRunUtils = path.join(
-      '.',
-      'plugins',
-      'run',
-      'utils'
-    );
+    const pluginRunUtils = path.join('.', 'plugins', 'run', 'utils');
 
     deployFunctionsToLocalEmulatorStub = sandbox.stub().resolves();
     getLocalRootUrlStub = sandbox.stub();
 
     mockery.enable({ warnOnUnregistered: false });
-    mockery.registerMock(path.join(pluginRunUtils, 'deployFunctionsToLocalEmulator'), deployFunctionsToLocalEmulatorStub);
+    mockery.registerMock(
+      path.join(pluginRunUtils, 'deployFunctionsToLocalEmulator'),
+      deployFunctionsToLocalEmulatorStub
+    );
     mockery.registerMock(path.join(pluginRunUtils, 'getLocalRootUrl'), getLocalRootUrlStub);
     baseModule = require('../lib/runPluginSupport');
     Object.freeze(baseModule);
@@ -55,10 +53,13 @@ describe('runPluginSupport', () => {
       consoleLog: sandbox.stub()
     };
 
-    module = _.assign({
-      serverless,
-      options: {},
-    }, baseModule);
+    module = _.assign(
+      {
+        serverless,
+        options: {}
+      },
+      baseModule
+    );
 
     _.set(serverless, 'config.serverlessPath', '.');
 
@@ -80,14 +81,15 @@ describe('runPluginSupport', () => {
       _.set(module, 'webpackOutputPath', webpackOutputPath);
       _.unset(module, 'keepOutputDirectory');
 
-      return expect(prepareRun()).to.be.fulfilled
-      .then(() => BbPromise.join(
-        expect(module.originalServicePath).to.equal(servicePath),
-        expect(module.originalWebpackOutputPath).to.equal(webpackOutputPath),
-        expect(module.keepOutputDirectory).to.be.true,
-        expect(serverless.config.servicePath).to.equal(path.join(webpackOutputPath, 'service')),
-        expect(chdirStub).to.have.been.calledWith(serverless.config.servicePath)
-      ));
+      return expect(prepareRun()).to.be.fulfilled.then(() =>
+        BbPromise.join(
+          expect(module.originalServicePath).to.equal(servicePath),
+          expect(module.originalWebpackOutputPath).to.equal(webpackOutputPath),
+          expect(module.keepOutputDirectory).to.be.true,
+          expect(serverless.config.servicePath).to.equal(path.join(webpackOutputPath, 'service')),
+          expect(chdirStub).to.have.been.calledWith(serverless.config.servicePath)
+        )
+      );
     });
   });
 
@@ -105,12 +107,13 @@ describe('runPluginSupport', () => {
       _.set(module, 'hooks[before:run:run]', sandbox.stub().resolves());
       _.set(serverless, 'service', service);
 
-      return expect(watchRun()).to.be.fulfilled
-      .then(() => BbPromise.join(
-        expect(deployFunctionsToLocalEmulatorStub).to.have.been.calledOnce,
-        expect(getLocalRootUrlStub).to.have.been.calledOnce,
-        expect(deployFunctionsToLocalEmulatorStub).to.have.been.calledWith(service)
-      ));
+      return expect(watchRun()).to.be.fulfilled.then(() =>
+        BbPromise.join(
+          expect(deployFunctionsToLocalEmulatorStub).to.have.been.calledOnce,
+          expect(getLocalRootUrlStub).to.have.been.calledOnce,
+          expect(deployFunctionsToLocalEmulatorStub).to.have.been.calledWith(service)
+        )
+      );
     });
   });
 });
