@@ -407,7 +407,8 @@ describe('validate', () => {
                 path: 'func1path'
               }
             }
-          ]
+          ],
+          runtime: 'node10.x'
         },
         func2: {
           handler: 'module2.func2handler',
@@ -422,7 +423,8 @@ describe('validate', () => {
             {
               nonhttp: 'non-http'
             }
-          ]
+          ],
+          runtime: 'node10.x'
         },
         func3: {
           handler: 'handlers/func3/module2.func3handler',
@@ -431,7 +433,8 @@ describe('validate', () => {
             {
               nonhttp: 'non-http'
             }
-          ]
+          ],
+          runtime: 'node10.x'
         },
         func4: {
           handler: 'handlers/module2/func3/module2.func3handler',
@@ -440,7 +443,18 @@ describe('validate', () => {
             {
               nonhttp: 'non-http'
             }
-          ]
+          ],
+          runtime: 'node10.x'
+        },
+        func5: {
+          handler: 'com.serverless.Handler',
+          artifact: 'target/hello-dev.jar',
+          events: [
+            {
+              nonhttp: 'non-http'
+            }
+          ],
+          runtime: 'java8'
         }
       };
 
@@ -454,19 +468,24 @@ describe('validate', () => {
                 path: 'func1path'
               }
             }
-          ]
+          ],
+          runtime: 'node10.x'
         }
       };
 
-      it('should expose all functions if `options.function` is not defined', () => {
+      it('should expose all node functions if `options.function` is not defined', () => {
         const testOutPath = 'test';
         const testConfig = {
           entry: 'test',
           context: 'testcontext',
           output: {
             path: testOutPath
+          },
+          getFunction: func => {
+            return testFunctionsConfig[func];
           }
         };
+
         _.set(module.serverless.service, 'custom.webpack.config', testConfig);
         module.serverless.service.functions = testFunctionsConfig;
         globSyncStub.callsFake(filename => [_.replace(filename, '*', 'js')]);
