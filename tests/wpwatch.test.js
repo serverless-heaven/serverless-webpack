@@ -51,10 +51,13 @@ describe('wpwatch', function() {
       consoleLog: sandbox.stub()
     };
 
-    module = _.assign({
-      serverless,
-      options: {},
-    }, baseModule);
+    module = _.assign(
+      {
+        serverless,
+        options: {}
+      },
+      baseModule
+    );
 
     spawnStub = sandbox.stub(serverless.pluginManager, 'spawn');
 
@@ -83,11 +86,12 @@ describe('wpwatch', function() {
     spawnStub.resolves();
     _.set(module.options, 'webpack-no-watch', true);
 
-    return expect(wpwatch()).to.be.fulfilled
-    .then(() => BbPromise.join(
-      expect(spawnStub).to.have.been.calledWith('webpack:compile'),
-      expect(webpackMock.compilerMock.watch).to.not.have.been.called
-    ));
+    return expect(wpwatch()).to.be.fulfilled.then(() =>
+      BbPromise.join(
+        expect(spawnStub).to.have.been.calledWith('webpack:compile'),
+        expect(webpackMock.compilerMock.watch).to.not.have.been.called
+      )
+    );
   });
 
   it('should enter watch mode and return after first compile', () => {
@@ -95,36 +99,38 @@ describe('wpwatch', function() {
     webpackMock.compilerMock.watch.yields(null, {});
     spawnStub.resolves();
 
-    return expect(wpwatch()).to.be.fulfilled
-    .then(() => BbPromise.join(
-      expect(spawnStub).to.not.have.been.called,
-      expect(webpackMock.compilerMock.watch).to.have.been.calledOnce
-    ));
+    return expect(wpwatch()).to.be.fulfilled.then(() =>
+      BbPromise.join(
+        expect(spawnStub).to.not.have.been.called,
+        expect(webpackMock.compilerMock.watch).to.have.been.calledOnce
+      )
+    );
   });
 
   it('should still enter watch mode and return if lastHash is the same as previous', () => {
     const wpwatch = module.wpwatch.bind(module);
     webpackMock.compilerMock.watch.yields(null, { hash: null });
 
-    return expect(wpwatch()).to.be.fulfilled
-      .then(() => BbPromise.join(
+    return expect(wpwatch()).to.be.fulfilled.then(() =>
+      BbPromise.join(
         expect(spawnStub).to.not.have.been.called,
         expect(webpackMock.compilerMock.watch).to.have.been.calledOnce,
         expect(spawnStub).to.not.have.been.called
-      ));
+      )
+    );
   });
-
 
   it('should work if no stats are returned', () => {
     const wpwatch = module.wpwatch.bind(module);
     webpackMock.compilerMock.watch.yields();
     spawnStub.resolves();
 
-    return expect(wpwatch()).to.be.fulfilled
-    .then(() => BbPromise.join(
-      expect(spawnStub).to.not.have.been.called,
-      expect(webpackMock.compilerMock.watch).to.have.been.calledOnce
-    ));
+    return expect(wpwatch()).to.be.fulfilled.then(() =>
+      BbPromise.join(
+        expect(spawnStub).to.not.have.been.called,
+        expect(webpackMock.compilerMock.watch).to.have.been.calledOnce
+      )
+    );
   });
 
   it('should enable polling with command line switch', () => {
@@ -133,12 +139,15 @@ describe('wpwatch', function() {
     spawnStub.resolves();
     _.set(module.options, 'webpack-use-polling', true);
 
-    return expect(wpwatch()).to.be.fulfilled
-    .then(() => BbPromise.join(
-      expect(spawnStub).to.not.have.been.called,
-      expect(webpackMock.compilerMock.watch).to.have.been.calledOnce,
-      expect(webpackMock.compilerMock.watch).to.have.been.calledWith({ poll: 3000 })
-    ));
+    return expect(wpwatch()).to.be.fulfilled.then(() =>
+      BbPromise.join(
+        expect(spawnStub).to.not.have.been.called,
+        expect(webpackMock.compilerMock.watch).to.have.been.calledOnce,
+        expect(webpackMock.compilerMock.watch).to.have.been.calledWith({
+          poll: 3000
+        })
+      )
+    );
   });
 
   it('should set specific polling interval if given with switch', () => {
@@ -147,12 +156,15 @@ describe('wpwatch', function() {
     spawnStub.resolves();
     _.set(module.options, 'webpack-use-polling', 5000);
 
-    return expect(wpwatch()).to.be.fulfilled
-    .then(() => BbPromise.join(
-      expect(spawnStub).to.not.have.been.called,
-      expect(webpackMock.compilerMock.watch).to.have.been.calledOnce,
-      expect(webpackMock.compilerMock.watch).to.have.been.calledWith({ poll: 5000 })
-    ));
+    return expect(wpwatch()).to.be.fulfilled.then(() =>
+      BbPromise.join(
+        expect(spawnStub).to.not.have.been.called,
+        expect(webpackMock.compilerMock.watch).to.have.been.calledOnce,
+        expect(webpackMock.compilerMock.watch).to.have.been.calledWith({
+          poll: 5000
+        })
+      )
+    );
   });
 
   it('should spawn webpack:compile:watch on subsequent runs', () => {
@@ -178,8 +190,8 @@ describe('wpwatch', function() {
       watchCallbackSpy(null, { call: 3, hash: '4' });
     });
 
-    return expect(wpwatch()).to.be.fulfilled.then(
-      () => BbPromise.join(
+    return expect(wpwatch()).to.be.fulfilled.then(() =>
+      BbPromise.join(
         expect(watchCallbackSpy).to.have.been.callCount(4),
         expect(spawnStub).to.have.been.calledOnce,
         expect(spawnStub).to.have.been.calledWithExactly('webpack:compile:watch')
@@ -211,25 +223,27 @@ describe('wpwatch', function() {
       });
     });
 
-    return expect(wpwatch()).to.be.fulfilled
-      .then(() => beforeCompileCallbackSpyPromise)
-      .then(() => BbPromise.join(
-        expect(watchCallbackSpy).to.have.been.calledThrice,
-        expect(spawnStub).to.have.been.calledTwice,
-        expect(spawnStub).to.have.been.calledWithExactly('webpack:compile:watch')
-      ));
+    return expect(wpwatch())
+      .to.be.fulfilled.then(() => beforeCompileCallbackSpyPromise)
+      .then(() =>
+        BbPromise.join(
+          expect(watchCallbackSpy).to.have.been.calledThrice,
+          expect(spawnStub).to.have.been.calledTwice,
+          expect(spawnStub).to.have.been.calledWithExactly('webpack:compile:watch')
+        )
+      );
   });
 
-  it('should use plugins for webpack:compile:watch if hooks doesn\'t exist', () => {
+  it("should use plugins for webpack:compile:watch if hooks doesn't exist", () => {
     const wpwatch = module.wpwatch.bind(module);
     sandbox.stub(webpackMock.compilerMock, 'hooks').value(false);
 
     webpackMock.compilerMock.plugin = sandbox.stub().yields(null, _.noop);
     webpackMock.compilerMock.watch.yields(null, {});
 
-    return expect(wpwatch()).to.be.fulfilled.then(() => (
-      expect(webpackMock.compilerMock.plugin).to.have.been.calledOnce
-    ));
+    return expect(wpwatch()).to.be.fulfilled.then(
+      () => expect(webpackMock.compilerMock.plugin).to.have.been.calledOnce
+    );
   });
 
   it('should not resolve before compile if it has an error', () => {
@@ -253,9 +267,7 @@ describe('wpwatch', function() {
       });
     });
 
-    return expect(wpwatch()).to.be.fulfilled.then(() => (
-      expect(doesResolve).to.be.false
-    ));
+    return expect(wpwatch()).to.be.fulfilled.then(() => expect(doesResolve).to.be.false);
   });
 
   it('should throw if compile fails on subsequent runs', () => {
@@ -272,10 +284,11 @@ describe('wpwatch', function() {
       watchCallbackSpy(new Error('Compile failed'));
     });
 
-    return expect(wpwatch()).to.be.fulfilled
-    .then(() => BbPromise.join(
-      expect(watchCallbackSpy).to.have.been.calledTwice,
-      expect(watchCallbackSpy.secondCall.threw()).to.be.true
-    ));
+    return expect(wpwatch()).to.be.fulfilled.then(() =>
+      BbPromise.join(
+        expect(watchCallbackSpy).to.have.been.calledTwice,
+        expect(watchCallbackSpy.secondCall.threw()).to.be.true
+      )
+    );
   });
 });

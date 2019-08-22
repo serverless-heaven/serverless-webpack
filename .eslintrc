@@ -10,7 +10,6 @@ extends:
   - plugin:promise/recommended
   - plugin:import/errors
   - plugin:import/warnings
-  - prettier
 parser: babel-eslint
 parserOptions:
   sourceType: module
