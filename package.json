@@ -3,6 +3,7 @@
   "version": "5.3.1",
   "description": "Serverless plugin to bundle your javascript with Webpack",
   "main": "index.js",
+  "types": "index.d.ts",
   "author": "Frank Schmid <fschmid740@googlemail.com>",
   "repository": {
     "type": "git",
