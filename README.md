@@ -452,6 +452,41 @@ custom:
 
 This is also useful for projects that use TypeScript.
 
+#### Exclude functions from the Webpack build
+
+By default, serverless-webpack assumes that all the functions defined in the template can and will be built using Webpack.
+This is not always the case, as serverless supports multi-language stacks, where some of the functions can be implemented in other languages, like C# or Python or Go.
+To control which functions should the plugin build, you can use configuration settions:
+
+```yaml
+# serverless.yml
+custom:
+  webpack:
+    # This is useful when all your functions except some are in JS or TS
+    excludeFunctions:
+      - myPythonFunction1
+      - myCSharpFunction1
+```
+
+```yaml
+# serverless.yml
+custom:
+  webpack:
+    # This is useful when your project is mostly in another language, but you have some JS functions
+    includeFunctions:
+      - myJsFunction1
+      - myJsFunction2
+```
+
+Alternatively, you can just provide a list of functions to build in the command line options:
+
+```bash
+$ serverless webpack --function myJsFunction1 --function myJsFunction2
+```
+
+If you provide the list of functions in the command line options, the configuration file settings are ignored, so make sure to include
+all your functions in the command line options should you decide to follow that path.
+
 #### Keep output directory after packaging
 
 You can keep the output directory (defaults to `.webpack`) from being removed

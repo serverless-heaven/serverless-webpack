@@ -513,6 +513,145 @@ describe('validate', () => {
         });
       });
 
+      it('should expose requested functions if multiple `options.function` are defined and the functions are found', () => {
+        const testOutPath = 'test';
+        const testFunction1 = 'func1';
+        const testFunction2 = 'func2';
+        const testConfig = {
+          entry: 'test',
+          context: 'testcontext',
+          output: {
+            path: testOutPath
+          }
+        };
+        _.set(module.serverless.service, 'custom.webpack.config', testConfig);
+        module.serverless.service.functions = testFunctionsConfig;
+        module.options.function = [ testFunction1, testFunction2 ];
+        globSyncStub.callsFake(filename => [_.replace(filename, '*', 'js')]);
+        return expect(module.validate()).to.be.fulfilled.then(() => {
+          const lib = require('../lib/index');
+          const expectedLibEntries = {
+            module1: './module1.js',
+            module2: './module2.js'
+          };
+
+          expect(lib.entries).to.deep.equal(expectedLibEntries);
+          expect(globSyncStub).to.have.been.calledTwice;
+          expect(serverless.cli.log).to.not.have.been.called;
+          return null;
+        });
+      });
+
+      it('should only expose requested functions if `config.includeFunctions` is defined', () => {
+        const testOutPath = 'test';
+        const testConfig = {
+          entry: 'test',
+          context: 'testcontext',
+          output: {
+            path: testOutPath
+          }
+        };
+        _.set(module.serverless.service, 'custom.webpack.config', testConfig);
+        _.set(module.serverless.service, 'custom.webpack.includeFunctions', [ 'func1', 'func2' ]);
+        module.serverless.service.functions = testFunctionsConfig;
+        globSyncStub.callsFake(filename => [_.replace(filename, '*', 'js')]);
+        return expect(module.validate()).to.be.fulfilled.then(() => {
+          const lib = require('../lib/index');
+          const expectedLibEntries = {
+            module1: './module1.js',
+            module2: './module2.js'
+          };
+
+          expect(lib.entries).to.deep.equal(expectedLibEntries);
+          expect(globSyncStub).to.have.been.calledTwice;
+          expect(serverless.cli.log).to.not.have.been.called;
+          return null;
+        });
+      });
+
+      it('should exclude functions if `config.excludeFunctions` is defined', () => {
+        const testOutPath = 'test';
+        const testConfig = {
+          entry: 'test',
+          context: 'testcontext',
+          output: {
+            path: testOutPath
+          }
+        };
+        _.set(module.serverless.service, 'custom.webpack.config', testConfig);
+        _.set(module.serverless.service, 'custom.webpack.excludeFunctions', [ 'func1', 'func2' ]);
+        module.serverless.service.functions = testFunctionsConfig;
+        globSyncStub.callsFake(filename => [_.replace(filename, '*', 'js')]);
+        return expect(module.validate()).to.be.fulfilled.then(() => {
+          const lib = require('../lib/index');
+          const expectedLibEntries = {
+            'handlers/func3/module2': './handlers/func3/module2.js',
+            'handlers/module2/func3/module2': './handlers/module2/func3/module2.js'
+          };
+
+          expect(lib.entries).to.deep.equal(expectedLibEntries);
+          expect(globSyncStub).to.have.been.calledTwice;
+          expect(serverless.cli.log).to.not.have.been.called;
+          return null;
+        });
+      });
+
+      it('should first include then exclude functions if both `config.includeFunctions` and `config.excludeFunctions` are defined', () => {
+        const testOutPath = 'test';
+        const testConfig = {
+          entry: 'test',
+          context: 'testcontext',
+          output: {
+            path: testOutPath
+          }
+        };
+        _.set(module.serverless.service, 'custom.webpack.config', testConfig);
+        _.set(module.serverless.service, 'custom.webpack.includeFunctions', [ 'func1', 'func2' ]);
+        _.set(module.serverless.service, 'custom.webpack.excludeFunctions', ['func2']);
+        module.serverless.service.functions = testFunctionsConfig;
+        globSyncStub.callsFake(filename => [_.replace(filename, '*', 'js')]);
+        return expect(module.validate()).to.be.fulfilled.then(() => {
+          const lib = require('../lib/index');
+          const expectedLibEntries = {
+            module1: './module1.js'
+          };
+
+          expect(lib.entries).to.deep.equal(expectedLibEntries);
+          expect(globSyncStub).to.have.been.calledOnce;
+          expect(serverless.cli.log).to.not.have.been.called;
+          return null;
+        });
+      });
+
+      it('should ignore `config.includeFunctions` and `config.excludeFunctions` if functions are specified in the command line', () => {
+        const testOutPath = 'test';
+        const testConfig = {
+          entry: 'test',
+          context: 'testcontext',
+          output: {
+            path: testOutPath
+          }
+        };
+        _.set(module.serverless.service, 'custom.webpack.config', testConfig);
+        _.set(module.serverless.service, 'custom.webpack.includeFunctions', [ 'func1', 'func2' ]);
+        _.set(module.serverless.service, 'custom.webpack.excludeFunctions', ['func2']);
+        module.options.function = [ 'func3', 'func4' ];
+        module.serverless.service.functions = testFunctionsConfig;
+        globSyncStub.callsFake(filename => [_.replace(filename, '*', 'js')]);
+        return expect(module.validate()).to.be.fulfilled.then(() => {
+          const lib = require('../lib/index');
+          const expectedLibEntries = {
+            'handlers/func3/module2': './handlers/func3/module2.js',
+            'handlers/module2/func3/module2': './handlers/module2/func3/module2.js'
+          };
+
+          expect(lib.entries).to.deep.equal(expectedLibEntries);
+          expect(globSyncStub).to.have.been.calledTwice;
+          expect(serverless.cli.log).to.not.have.been.called;
+          return null;
+        });
+      });
+
       describe('google provider', () => {
         beforeEach(() => {
           _.set(module.serverless, 'service.provider.name', 'google');
