@@ -89,6 +89,75 @@ module.exports = {
 };
 ```
 
+You can also pass the multi compile configuration as below in webpack configuration:
+
+```js
+// webpack.config.js
+
+module.exports = [
+  {
+    entry: './handler1.js',
+    target: 'node',
+    output: {
+      ...
+      path: '.webpack',
+    },
+    module: {
+      loaders: [ ... ],
+    },
+  },
+  {
+    entry: './handler2.js',
+    target: 'node',
+    output: {
+      ...
+      path: '.webpack',
+    },
+    module: {
+      loaders: [ ... ],
+    },
+  },
+];
+```
+
+```js
+// webpack.config.js
+
+module.exports = [
+  {
+    entry: {
+      'src/handler1': ./src/handler1.js',
+    },
+    output: {
+      ...
+      path: '.webpack/function1',
+    },
+    target: 'node',
+    module: {
+      loaders: [ ... ],
+    },
+  },
+  {
+    entry: {
+      'src/handler2': ./src/handler2.js',
+    },
+    output: {
+      ...
+      path: '.webpack/function2',
+    },
+    target: 'node',
+    module: {
+      loaders: [ ... ],
+    },
+  },
+];
+```
+
+**Note**: While using multi compile configuration, there are some constraints as mentioned below:
+
+- `output.path` should be same for all compile configuration provided when `package.individually` is `false`.
+- Individual entry should be defined for each function and `output.path` should have function name at the end when `package.individually` is `true`.
+
 Alternatively the Webpack configuration can export an asynchronous object (e.g. a promise or async function) which will be awaited by the plugin and resolves to the final configuration object. This is useful if the confguration depends on asynchronous functions, for example, defining the AccountId of the current aws user inside AWS lambda@edge which does not support defining normal process environment variables.
 
 A basic Webpack promise configuration might look like this:
