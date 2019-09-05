@@ -106,17 +106,7 @@ describe('packageModules', () => {
 
       it('should package', () => {
         // Test data
-        const stats = {
-          stats: [
-            {
-              compilation: {
-                compiler: {
-                  outputPath: '/my/Service/Path/.webpack/service'
-                }
-              }
-            }
-          ]
-        };
+        const compileOutputPaths = ['/my/Service/Path/.webpack/service'];
         const files = [ 'README.md', 'src/handler1.js', 'src/handler1.js.map', 'src/handler2.js', 'src/handler2.js.map' ];
         const allFunctions = [ 'func1', 'func2' ];
         const func1 = {
@@ -144,7 +134,7 @@ describe('packageModules', () => {
 
         const expectedArtifactPath = path.join('.serverless', 'test-service.zip');
 
-        module.compileStats = stats;
+        module.compileOutputPaths = compileOutputPaths;
         return expect(module.packageModules()).to.be.fulfilled.then(() =>
           BbPromise.all([
             expect(func1)
@@ -176,17 +166,7 @@ describe('packageModules', () => {
 
         it('should set the service artifact path', () => {
           // Test data
-          const stats = {
-            stats: [
-              {
-                compilation: {
-                  compiler: {
-                    outputPath: '/my/Service/Path/.webpack/service'
-                  }
-                }
-              }
-            ]
-          };
+          const compileOutputPaths = ['/my/Service/Path/.webpack/service'];
           const files = [ 'README.md', 'index.js' ];
           const allFunctions = [ 'func1', 'func2' ];
           const func1 = {
@@ -213,7 +193,7 @@ describe('packageModules', () => {
 
           const expectedArtifactPath = path.join('.serverless', 'test-service.zip');
 
-          module.compileStats = stats;
+          module.compileOutputPaths = compileOutputPaths;
           return expect(module.packageModules()).to.be.fulfilled.then(() =>
             expect(serverless.service)
               .to.have.a.nested.property('package.artifact')
@@ -224,17 +204,7 @@ describe('packageModules', () => {
 
       it('should set the function artifact depending on the serverless version', () => {
         // Test data
-        const stats = {
-          stats: [
-            {
-              compilation: {
-                compiler: {
-                  outputPath: '/my/Service/Path/.webpack/service'
-                }
-              }
-            }
-          ]
-        };
+        const compileOutputPaths = ['/my/Service/Path/.webpack/service'];
         const files = [ 'README.md', 'src/handler1.js', 'src/handler1.js.map', 'src/handler2.js', 'src/handler2.js.map' ];
         const allFunctions = [ 'func1', 'func2' ];
         const func1 = {
@@ -261,7 +231,7 @@ describe('packageModules', () => {
 
         const expectedArtifactPath = path.join('.serverless', 'test-service.zip');
 
-        module.compileStats = stats;
+        module.compileOutputPaths = compileOutputPaths;
         return BbPromise.each([ '1.18.1', '2.17.0', '10.15.3' ], version => {
           getVersionStub.returns(version);
           return expect(module.packageModules()).to.be.fulfilled.then(() =>
@@ -295,17 +265,7 @@ describe('packageModules', () => {
 
       it('should reject if no files are found', () => {
         // Test data
-        const stats = {
-          stats: [
-            {
-              compilation: {
-                compiler: {
-                  outputPath: '/my/Service/Path/.webpack/service'
-                }
-              }
-            }
-          ]
-        };
+        const compileOutputPaths = ['/my/Service/Path/.webpack/service'];
         const files = [];
         const allFunctions = [ 'func1', 'func2' ];
         const func1 = {
@@ -331,31 +291,14 @@ describe('packageModules', () => {
         fsMock._streamMock.on.withArgs('close').yields();
         fsMock._statMock.isDirectory.returns(false);
 
-        module.compileStats = stats;
+        module.compileOutputPaths = compileOutputPaths;
         return expect(module.packageModules()).to.be.rejectedWith('Packaging: No files found');
       });
     });
 
     describe('with individual packaging', () => {
       // Test data
-      const stats = {
-        stats: [
-          {
-            compilation: {
-              compiler: {
-                outputPath: '/my/Service/Path/.webpack/func1'
-              }
-            }
-          },
-          {
-            compilation: {
-              compiler: {
-                outputPath: '/my/Service/Path/.webpack/func2'
-              }
-            }
-          }
-        ]
-      };
+      const compileOutputPaths = [ '/my/Service/Path/.webpack/func1', '/my/Service/Path/.webpack/func2' ];
       const files = [ 'README.md', 'src/handler1.js', 'src/handler1.js.map', 'src/handler2.js', 'src/handler2.js.map' ];
       const allFunctions = [ 'func1', 'func2' ];
       const func1 = {
@@ -401,7 +344,44 @@ describe('packageModules', () => {
         fsMock._streamMock.on.withArgs('close').yields();
         fsMock._statMock.isDirectory.returns(false);
 
-        module.compileStats = stats;
+        module.compileOutputPaths = compileOutputPaths;
+        return expect(module.packageModules()).to.be.fulfilled.then(() =>
+          BbPromise.all([
+            expect(func1)
+              .to.have.a.nested.property('package.artifact')
+              .that.equals(path.join('.serverless', 'func1.zip')),
+            expect(func2)
+              .to.have.a.nested.property('package.artifact')
+              .that.equals(path.join('.serverless', 'func2.zip'))
+          ])
+        );
+      });
+
+      // this will happen only when multi compile config is provided by user with
+      // package.individually set to true
+      it('should package functions package and skip the other location paths', () => {
+        // Test data
+        const compileOutputPaths = [
+          '/my/Service/Path/.webpack/func1',
+          '/my/Service/Path/.webpack/func2',
+          '/my/Service/Path/.webpack/client-lib'
+        ];
+        // Serverless behavior
+        sandbox.stub(serverless.config, 'servicePath').value('/my/Service/Path');
+        getVersionStub.returns('1.18.0');
+        getServiceObjectStub.returns({
+          name: 'test-service'
+        });
+        getAllFunctionsStub.returns(allFunctions);
+        getFunctionStub.withArgs('func1').returns(func1);
+        getFunctionStub.withArgs('func2').returns(func2);
+        // Mock behavior
+        globMock.sync.returns(files);
+        fsMock._streamMock.on.withArgs('open').yields();
+        fsMock._streamMock.on.withArgs('close').yields();
+        fsMock._statMock.isDirectory.returns(false);
+
+        module.compileOutputPaths = compileOutputPaths;
         return expect(module.packageModules()).to.be.fulfilled.then(() =>
           BbPromise.all([
             expect(func1)

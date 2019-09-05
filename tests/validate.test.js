@@ -826,6 +826,160 @@ describe('validate', () => {
           module.validate();
         }).to.throw(new RegExp(`^Function "${testFunction}" doesn't exist`));
       });
+
+      describe('with user provided multi compile webpack config', () => {
+        describe('package.individually is true', () => {
+          it('should fail if all function configuration is not provided', () => {
+            _.set(module.serverless, 'service.package.individually', 'true');
+            _.set(module.serverless.service, 'custom.webpack.config', [
+              {
+                entry: 'test',
+                output: {
+                  path: '.webpack'
+                }
+              },
+              {
+                entry: 'test1',
+                output: {
+                  path: '.webpack'
+                }
+              }
+            ]);
+            module.serverless.service.functions = testFunctionsConfig;
+            globSyncStub.callsFake(filename => [_.replace(filename, '*', 'js')]);
+            return expect(module.validate()).to.be.rejectedWith(/Provide webpack config for each function defined./);
+          });
+
+          it('should fail if all function configuration with indiviual output path not provided', () => {
+            _.set(module.serverless, 'service.package.individually', 'true');
+            _.set(module.serverless.service, 'custom.webpack.config', [
+              {
+                entry: 'test',
+                output: {
+                  path: '.webpack/func1'
+                }
+              },
+              {
+                entry: 'test1',
+                output: {
+                  path: '.webpack/func2'
+                }
+              },
+              {
+                entry: 'test',
+                output: {
+                  path: '.webpack/func3'
+                }
+              },
+              {
+                entry: 'test1',
+                output: {
+                  path: '.webpack/'
+                }
+              }
+            ]);
+            module.serverless.service.functions = testFunctionsConfig;
+            globSyncStub.callsFake(filename => [_.replace(filename, '*', 'js')]);
+            return expect(module.validate()).to.be.rejectedWith(
+              'Provide webpack config for each function with correct entry and webpack compile ' +
+                'output path. Automatic webpack entry detection is disabled with user provided multi ' +
+                'config and package individually is set.'
+            );
+          });
+
+          it('should pass if all function configuration with indiviual output path provided', () => {
+            _.set(module.serverless, 'service.package.individually', 'true');
+            _.set(module.serverless.service, 'custom.webpack.config', [
+              {
+                entry: {
+                  module1: './module1.js'
+                },
+                output: {
+                  path: '.webpack/func1'
+                }
+              },
+              {
+                entry: {
+                  module2: './module2.js'
+                },
+                output: {
+                  path: '.webpack/func2'
+                }
+              },
+              {
+                entry: {
+                  'handlers/func3/module2': './handlers/func3/module2.js'
+                },
+                output: {
+                  path: '.webpack/func3'
+                }
+              },
+              {
+                entry: {
+                  'handlers/module2/func3/module2': './handlers/module2/func3/module2.js'
+                },
+                output: {
+                  path: '.webpack/func4'
+                }
+              }
+            ]);
+            module.serverless.service.functions = testFunctionsConfig;
+            globSyncStub.callsFake(filename => [_.replace(filename, '*', 'js')]);
+            return expect(module.validate()).to.be.fulfilled.then(() => {
+              expect(module.multiCompile).to.be.true;
+              return null;
+            });
+          });
+        });
+
+        describe('package.individually is false', () => {
+          it('should fail if webpack output path is different in provided multi compile config', () => {
+            _.set(module.serverless.service, 'custom.webpack.config', [
+              {
+                entry: 'test',
+                output: {
+                  path: '.webpack/dir1'
+                }
+              },
+              {
+                entry: 'test1',
+                output: {
+                  path: '.webpack/dir2'
+                }
+              }
+            ]);
+            module.serverless.service.functions = testFunctionsConfig;
+            globSyncStub.callsFake(filename => [_.replace(filename, '*', 'js')]);
+            return expect(module.validate()).to.be.rejectedWith(
+              /All multi compile config should have same output.path when package individually is false./
+            );
+          });
+
+          it('should pass if multi compile config is provided', () => {
+            _.set(module.serverless.service, 'custom.webpack.config', [
+              {
+                entry: 'test',
+                output: {
+                  path: '.webpack'
+                }
+              },
+              {
+                entry: 'test1',
+                output: {
+                  path: '.webpack'
+                }
+              }
+            ]);
+            module.serverless.service.functions = testFunctionsConfig;
+            globSyncStub.callsFake(filename => [_.replace(filename, '*', 'js')]);
+            expect(module.multiCompile).to.be.undefined;
+            return expect(module.validate()).to.be.fulfilled.then(() => {
+              expect(module.multiCompile).to.be.true;
+              return null;
+            });
+          });
+        });
+      });
     });
 
     describe('webpack', () => {
