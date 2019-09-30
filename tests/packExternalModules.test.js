@@ -1350,5 +1350,93 @@ describe('packExternalModules', () => {
         });
       });
     });
+
+    describe('transitive dependencies', () => {
+      before(() => {
+        const transitivePackageJson = require('./data/package-transitive.json');
+        mockery.deregisterMock(path.join(process.cwd(), 'package.json'));
+        mockery.registerMock(path.join(process.cwd(), 'package.json'), transitivePackageJson);
+      });
+
+      after(() => {
+        mockery.deregisterMock(path.join(process.cwd(), 'package.json'));
+        mockery.registerMock(path.join(process.cwd(), 'package.json'), packageMock);
+      });
+
+      it('should install transitive dependencies', () => {
+        const expectedCompositePackageJSON = {
+          name: 'test-service',
+          version: '1.0.0',
+          description: 'Packaged externals for test-service',
+          private: true,
+          scripts: {},
+          dependencies: {
+            classnames: '2.2.6'
+          }
+        };
+        const expectedPackageJSON = {
+          name: 'test-service',
+          version: '1.0.0',
+          description: 'Packaged externals for test-service',
+          private: true,
+          scripts: {},
+          dependencies: {
+            classnames: '2.2.6'
+          }
+        };
+
+        const dependencyGraph = {
+          problems: [],
+          dependencies: {
+            'comp-b': { version: '1.0.0', dependencies: {} },
+            'comp-c': { version: '1.0.0', dependencies: {} },
+            classnames: { version: '2.2.6', dependencies: {} }
+          }
+        };
+
+        const transitiveDepStats = {
+          stats: [
+            {
+              compilation: {
+                chunks: [
+                  new ChunkMock([
+                    {
+                      identifier: _.constant('external "classnames"')
+                    }
+                  ])
+                ],
+                compiler: {
+                  outputPath: '/my/Service/Path/.webpack/service'
+                }
+              }
+            }
+          ]
+        };
+
+        module.webpackOutputPath = 'outputPath';
+        fsExtraMock.pathExists.yields(null, false);
+        fsExtraMock.copy.yields();
+        packagerMock.getProdDependencies.returns(BbPromise.resolve(dependencyGraph));
+        packagerMock.install.returns(BbPromise.resolve());
+        packagerMock.prune.returns(BbPromise.resolve());
+        packagerMock.runScripts.returns(BbPromise.resolve());
+        module.compileStats = transitiveDepStats;
+        return expect(module.packExternalModules()).to.be.fulfilled.then(() =>
+          BbPromise.all([
+            // The module package JSON and the composite one should have been stored
+            expect(writeFileSyncStub).to.have.been.calledTwice,
+            expect(writeFileSyncStub.firstCall.args[1]).to.equal(JSON.stringify(expectedCompositePackageJSON, null, 2)),
+            expect(writeFileSyncStub.secondCall.args[1]).to.equal(JSON.stringify(expectedPackageJSON, null, 2)),
+            // The modules should have been copied
+            expect(fsExtraMock.copy).to.have.been.calledOnce,
+            // npm ls and npm prune should have been called
+            expect(packagerMock.getProdDependencies).to.have.been.calledOnce,
+            expect(packagerMock.install).to.have.been.calledOnce,
+            expect(packagerMock.prune).to.have.been.calledOnce,
+            expect(packagerMock.runScripts).to.have.been.calledOnce
+          ])
+        );
+      });
+    });
   });
 });
