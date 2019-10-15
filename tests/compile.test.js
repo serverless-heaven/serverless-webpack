@@ -65,6 +65,11 @@ describe('compile', () => {
   it('should compile with webpack from a context configuration', () => {
     const testWebpackConfig = 'testconfig';
     module.webpackConfig = testWebpackConfig;
+    module.compileStats = {
+      save: function() {
+        return;
+      }
+    };
     return expect(module.compile()).to.be.fulfilled.then(() => {
       expect(webpackMock).to.have.been.calledWith(testWebpackConfig);
       expect(webpackMock.compilerMock.run).to.have.been.calledOnce;
@@ -94,6 +99,11 @@ describe('compile', () => {
     ];
     module.webpackConfig = testWebpackConfig;
     module.multiCompile = true;
+    module.compileStats = {
+      save: function() {
+        return;
+      }
+    };
     webpackMock.compilerMock.run.reset();
     webpackMock.compilerMock.run.yields(null, multiStats);
     return expect(module.compile()).to.be.fulfilled.then(() => {
@@ -115,6 +125,11 @@ describe('compile', () => {
         }
       },
       toString: sandbox.stub().returns('testStats')
+    };
+    module.compileStats = {
+      save: function() {
+        return;
+      }
     };
 
     module.webpackConfig = testWebpackConfig;

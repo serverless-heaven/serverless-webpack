@@ -658,6 +658,12 @@ Options are:
 
 - `--out` or `-o` (optional) The output directory. Defaults to `.webpack`.
 
+You may find this option useful in CI environments where you want to build the package once but deploy the same artifact to many environments. To use existing output, specify the `--no-build` flag.
+
+```bash
+$ serverless deploy --no-build --out dist
+```
+
 ### Simulate API Gateway locally
 
 :exclamation: The serve command has been removed. See above how to achieve the

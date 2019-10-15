@@ -14,6 +14,7 @@ const prepareOfflineInvoke = require('./lib/prepareOfflineInvoke');
 const prepareStepOfflineInvoke = require('./lib/prepareStepOfflineInvoke');
 const packExternalModules = require('./lib/packExternalModules');
 const packageModules = require('./lib/packageModules');
+const compileStats = require('./lib/compileStats');
 const lib = require('./lib');
 
 class ServerlessWebpack {
@@ -47,7 +48,8 @@ class ServerlessWebpack {
       prepareLocalInvoke,
       runPluginSupport,
       prepareOfflineInvoke,
-      prepareStepOfflineInvoke
+      prepareStepOfflineInvoke,
+      compileStats
     );
 
     this.commands = {
@@ -86,8 +88,15 @@ class ServerlessWebpack {
     this.hooks = {
       'before:package:createDeploymentArtifacts': () =>
         BbPromise.bind(this)
-          .then(() => this.serverless.pluginManager.spawn('webpack:validate'))
-          .then(() => this.serverless.pluginManager.spawn('webpack:compile'))
+          .then(() => {
+            // --no-build override
+            if (this.options.build === false) {
+              this.skipCompile = true;
+            }
+
+            return this.serverless.pluginManager.spawn('webpack:validate');
+          })
+          .then(() => (this.skipCompile ? BbPromise.resolve() : this.serverless.pluginManager.spawn('webpack:compile')))
           .then(() => this.serverless.pluginManager.spawn('webpack:package')),
 
       'after:package:createDeploymentArtifacts': () => BbPromise.bind(this).then(this.cleanup),

@@ -130,6 +130,8 @@ describe('ServerlessWebpack', () => {
 
     beforeEach(() => {
       ServerlessWebpack.lib.webpack.isLocal = false;
+      slsw.options.build = true;
+      slsw.skipCompile = false;
     });
 
     after(() => {
@@ -151,6 +153,20 @@ describe('ServerlessWebpack', () => {
                   'webpack:compile'
                 );
                 expect(slsw.serverless.pluginManager.spawn.thirdCall).to.have.been.calledWithExactly('webpack:package');
+                return null;
+              });
+            });
+
+            it('should skip compile if requested', () => {
+              slsw.options.build = false;
+              return expect(slsw.hooks['before:package:createDeploymentArtifacts']()).to.be.fulfilled.then(() => {
+                expect(slsw.serverless.pluginManager.spawn).to.have.been.calledTwice;
+                expect(slsw.serverless.pluginManager.spawn.firstCall).to.have.been.calledWithExactly(
+                  'webpack:validate'
+                );
+                expect(slsw.serverless.pluginManager.spawn.secondCall).to.have.been.calledWithExactly(
+                  'webpack:package'
+                );
                 return null;
               });
             });
