@@ -86,12 +86,11 @@ describe('packageModules', () => {
 
   describe('packageModules()', () => {
     it('should do nothing if no stats are available', () => {
-      module.getCompileStats = function() {
-        return { stats: [] };
-      };
+      module.getCompileStats = sandbox.stub().returns({ stats: [] });
 
       return expect(module.packageModules()).to.be.fulfilled.then(() =>
         BbPromise.all([
+          expect(module.getCompileStats).to.have.been.called,
           expect(archiverMock.create).to.not.have.been.called,
           expect(writeFileDirStub).to.not.have.been.called,
           expect(fsMock.createWriteStream).to.not.have.been.called,
@@ -144,9 +143,7 @@ describe('packageModules', () => {
 
         const expectedArtifactPath = path.join('.serverless', 'test-service.zip');
 
-        module.getCompileStats = function() {
-          return stats;
-        };
+        module.getCompileStats = sandbox.stub().returns(stats);
 
         return expect(module.packageModules()).to.be.fulfilled.then(() =>
           BbPromise.all([
@@ -212,9 +209,8 @@ describe('packageModules', () => {
 
           const expectedArtifactPath = path.join('.serverless', 'test-service.zip');
 
-          module.getCompileStats = function() {
-            return stats;
-          };
+          module.getCompileStats = sandbox.stub().returns(stats);
+
           return expect(module.packageModules()).to.be.fulfilled.then(() =>
             expect(serverless.service)
               .to.have.a.nested.property('package.artifact')
@@ -258,9 +254,7 @@ describe('packageModules', () => {
 
         const expectedArtifactPath = path.join('.serverless', 'test-service.zip');
 
-        module.getCompileStats = function() {
-          return stats;
-        };
+        module.getCompileStats = sandbox.stub().returns(stats);
 
         return BbPromise.each([ '1.18.1', '2.17.0', '10.15.3' ], version => {
           getVersionStub.returns(version);
@@ -331,9 +325,8 @@ describe('packageModules', () => {
         fsMock._streamMock.on.withArgs('close').yields();
         fsMock._statMock.isDirectory.returns(false);
 
-        module.getCompileStats = function() {
-          return stats;
-        };
+        module.getCompileStats = sandbox.stub().returns(stats);
+
         return expect(module.packageModules()).to.be.rejectedWith('Packaging: No files found');
       });
     });
@@ -395,9 +388,8 @@ describe('packageModules', () => {
         fsMock._streamMock.on.withArgs('close').yields();
         fsMock._statMock.isDirectory.returns(false);
 
-        module.getCompileStats = function() {
-          return stats;
-        };
+        module.getCompileStats = sandbox.stub().returns(stats);
+
         return expect(module.packageModules()).to.be.fulfilled.then(() =>
           BbPromise.all([
             expect(func1)

@@ -124,9 +124,9 @@ describe('compile', () => {
       },
       toString: sandbox.stub().returns('testStats')
     };
-    module.saveCompileStats = function() {
-      return;
-    };
+
+    const mockSaveCompileStats = sandbox.stub();
+    module.saveCompileStats = mockSaveCompileStats;
 
     module.webpackConfig = testWebpackConfig;
     webpackMock.compilerMock.run.reset();
@@ -135,6 +135,7 @@ describe('compile', () => {
       .to.be.fulfilled.then(() => {
         expect(webpackMock).to.have.been.calledWith(testWebpackConfig);
         expect(mockStats.toString.firstCall.args).to.eql([testWebpackConfig.stats]);
+        expect(mockSaveCompileStats).to.have.been.calledWith({ stats: [mockStats] });
         module.webpackConfig = [testWebpackConfig];
         return expect(module.compile()).to.be.fulfilled;
       })
