@@ -86,13 +86,9 @@ describe('packageModules', () => {
 
   describe('packageModules()', () => {
     it('should do nothing if no stats are available', () => {
-      module.compileStats = {
-        get: function() {
-          return { stats: [] };
-        }
+      module.getCompileStats = function() {
+        return { stats: [] };
       };
-
-      module.compileStats.get();
 
       return expect(module.packageModules()).to.be.fulfilled.then(() =>
         BbPromise.all([
@@ -116,11 +112,7 @@ describe('packageModules', () => {
         const stats = {
           stats: [
             {
-              compilation: {
-                compiler: {
-                  outputPath: '/my/Service/Path/.webpack/service'
-                }
-              }
+              outputPath: '/my/Service/Path/.webpack/service'
             }
           ]
         };
@@ -152,10 +144,8 @@ describe('packageModules', () => {
 
         const expectedArtifactPath = path.join('.serverless', 'test-service.zip');
 
-        module.compileStats = {
-          get: function() {
-            return stats;
-          }
+        module.getCompileStats = function() {
+          return stats;
         };
 
         return expect(module.packageModules()).to.be.fulfilled.then(() =>
@@ -192,11 +182,7 @@ describe('packageModules', () => {
           const stats = {
             stats: [
               {
-                compilation: {
-                  compiler: {
-                    outputPath: '/my/Service/Path/.webpack/service'
-                  }
-                }
+                outputPath: '/my/Service/Path/.webpack/service'
               }
             ]
           };
@@ -226,10 +212,8 @@ describe('packageModules', () => {
 
           const expectedArtifactPath = path.join('.serverless', 'test-service.zip');
 
-          module.compileStats = {
-            get: function() {
-              return stats;
-            }
+          module.getCompileStats = function() {
+            return stats;
           };
           return expect(module.packageModules()).to.be.fulfilled.then(() =>
             expect(serverless.service)
@@ -244,11 +228,7 @@ describe('packageModules', () => {
         const stats = {
           stats: [
             {
-              compilation: {
-                compiler: {
-                  outputPath: '/my/Service/Path/.webpack/service'
-                }
-              }
+              outputPath: '/my/Service/Path/.webpack/service'
             }
           ]
         };
@@ -278,11 +258,10 @@ describe('packageModules', () => {
 
         const expectedArtifactPath = path.join('.serverless', 'test-service.zip');
 
-        module.compileStats = {
-          get: function() {
-            return stats;
-          }
+        module.getCompileStats = function() {
+          return stats;
         };
+
         return BbPromise.each([ '1.18.1', '2.17.0', '10.15.3' ], version => {
           getVersionStub.returns(version);
           return expect(module.packageModules()).to.be.fulfilled.then(() =>
@@ -352,10 +331,8 @@ describe('packageModules', () => {
         fsMock._streamMock.on.withArgs('close').yields();
         fsMock._statMock.isDirectory.returns(false);
 
-        module.compileStats = {
-          get: function() {
-            return stats;
-          }
+        module.getCompileStats = function() {
+          return stats;
         };
         return expect(module.packageModules()).to.be.rejectedWith('Packaging: No files found');
       });
@@ -366,18 +343,10 @@ describe('packageModules', () => {
       const stats = {
         stats: [
           {
-            compilation: {
-              compiler: {
-                outputPath: '/my/Service/Path/.webpack/func1'
-              }
-            }
+            outputPath: '/my/Service/Path/.webpack/func1'
           },
           {
-            compilation: {
-              compiler: {
-                outputPath: '/my/Service/Path/.webpack/func2'
-              }
-            }
+            outputPath: '/my/Service/Path/.webpack/func2'
           }
         ]
       };
@@ -426,12 +395,9 @@ describe('packageModules', () => {
         fsMock._streamMock.on.withArgs('close').yields();
         fsMock._statMock.isDirectory.returns(false);
 
-        module.compileStats = {
-          get: function() {
-            return stats;
-          }
+        module.getCompileStats = function() {
+          return stats;
         };
-
         return expect(module.packageModules()).to.be.fulfilled.then(() =>
           BbPromise.all([
             expect(func1)
