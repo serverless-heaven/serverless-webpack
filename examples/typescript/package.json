@@ -9,10 +9,16 @@
   "author": "Nicola Peduzzi <thenikso@gmail.com> (http://nikso.net)",
   "license": "MIT",
   "devDependencies": {
-    "serverless": "^1.23.0",
+    "@babel/core": "^7.5.5",
+    "@babel/preset-env": "^7.5.5",
+    "@babel/preset-typescript": "^7.3.3",
+    "babel-loader": "^8.0.6",
+    "cache-loader": "^4.1.0",
+    "fork-ts-checker-webpack-plugin": "^1.4.3",
+    "serverless": "^1.49.0",
     "serverless-webpack": "file:../../",
-    "ts-loader": "^2.3.7",
-    "typescript": "^2.5.3",
-    "webpack": "^3.8.1"
+    "typescript": "^3.5.3",
+    "webpack": "^4.38.0",
+    "webpack-node-externals": "^1.7.2"
   }
 }
