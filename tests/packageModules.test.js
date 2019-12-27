@@ -449,7 +449,13 @@ describe('packageModules', () => {
       beforeEach(() => {
         _.set(module, 'entryFunctions', entryFunctions);
         _.set(serverless.service.package, 'individually', false);
+        getVersionStub.returns('1.18.0');
+        getServiceObjectStub.returns({
+          name: 'test-service'
+        });
         getAllFunctionsStub.returns(allFunctions);
+        getFunctionStub.withArgs('func1').returns(func1);
+        getFunctionStub.withArgs('func2').returns(func2);
       });
 
       it('copies the artifact', () => {
@@ -470,15 +476,33 @@ describe('packageModules', () => {
       beforeEach(() => {
         _.set(module, 'entryFunctions', entryFunctions);
         _.set(serverless.service.package, 'individually', true);
+        getVersionStub.returns('1.18.0');
+        getServiceObjectStub.returns({
+          name: 'test-service'
+        });
         getAllFunctionsStub.returns(allFunctions);
+        getFunctionStub.withArgs('func1').returns(func1);
+        getFunctionStub.withArgs('func2').returns(func2);
       });
 
       it('copies each artifact', () => {
+        const expectedFunc1Destination = path.join('.serverless', 'func1.zip');
+        const expectedFunc2Destination = path.join('.serverless', 'func2.zip');
+
         return expect(module.copyExistingArtifacts()).to.be.fulfilled.then(() =>
           BbPromise.all([
+            // Should copy the artifacts into .serverless
             expect(fsMock.copyFileSync).callCount(2),
-            expect(fsMock.copyFileSync).to.be.calledWith('.webpack/func1.zip', '.serverless/func1.zip'),
-            expect(fsMock.copyFileSync).to.be.calledWith('.webpack/func2.zip', '.serverless/func2.zip')
+            expect(fsMock.copyFileSync).to.be.calledWith('.webpack/func1.zip', expectedFunc1Destination),
+            expect(fsMock.copyFileSync).to.be.calledWith('.webpack/func2.zip', expectedFunc2Destination),
+
+            // Should set package artifact locations
+            expect(func1)
+              .to.have.a.nested.property('package.artifact')
+              .that.equals(expectedFunc1Destination),
+            expect(func2)
+              .to.have.a.nested.property('package.artifact')
+              .that.equals(expectedFunc2Destination)
           ])
         );
       });
