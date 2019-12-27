@@ -462,7 +462,7 @@ describe('packageModules', () => {
         return expect(module.copyExistingArtifacts()).to.be.fulfilled.then(() =>
           BbPromise.all([
             expect(fsMock.copyFileSync).callCount(1),
-            expect(fsMock.copyFileSync).to.be.calledWith('.webpack/service.zip', '.serverless/service.zip')
+            expect(fsMock.copyFileSync).to.be.calledWith('.webpack/test-service.zip', '.serverless/test-service.zip')
           ])
         );
       });
