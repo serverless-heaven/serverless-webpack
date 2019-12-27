@@ -402,6 +402,7 @@ describe('packageModules', () => {
         fsMock._statMock.isDirectory.returns(false);
 
         module.compileStats = stats;
+        expect(_.keys(module)).to.contain('copyExistingArtifacts');
         return expect(module.packageModules()).to.be.fulfilled.then(() =>
           BbPromise.all([
             expect(func1)
@@ -410,6 +411,74 @@ describe('packageModules', () => {
             expect(func2)
               .to.have.a.nested.property('package.artifact')
               .that.equals(path.join('.serverless', 'func2.zip'))
+          ])
+        );
+      });
+    });
+  });
+
+  describe('copyExistingArtifacts', () => {
+    const allFunctions = [ 'func1', 'func2' ];
+    const func1 = {
+      handler: 'src/handler1',
+      events: []
+    };
+    const func2 = {
+      handler: 'src/handler2',
+      events: []
+    };
+
+    const entryFunctions = [
+      {
+        handlerFile: 'src/handler1.js',
+        funcName: 'func1',
+        func: func1
+      },
+      {
+        handlerFile: 'src/handler2.js',
+        funcName: 'func2',
+        func: func2
+      }
+    ];
+
+    describe('with service packaging', () => {
+      afterEach(() => {
+        fsMock.copyFileSync.resetHistory();
+      });
+
+      beforeEach(() => {
+        _.set(module, 'entryFunctions', entryFunctions);
+        _.set(serverless.service.package, 'individually', false);
+        getAllFunctionsStub.returns(allFunctions);
+      });
+
+      it('copies the artifact', () => {
+        return expect(module.copyExistingArtifacts()).to.be.fulfilled.then(() =>
+          BbPromise.all([
+            expect(fsMock.copyFileSync).callCount(1),
+            expect(fsMock.copyFileSync).to.be.calledWith('.webpack/service.zip', '.serverless/service.zip')
+          ])
+        );
+      });
+    });
+
+    describe('with individual packaging', () => {
+      afterEach(() => {
+        fsMock.copyFileSync.resetHistory();
+      });
+
+      beforeEach(() => {
+        _.set(module, 'entryFunctions', entryFunctions);
+        _.set(serverless.service.package, 'individually', true);
+        getAllFunctionsStub.returns(allFunctions);
+      });
+
+      it('copies each artifact', () => {
+        return expect(module.copyExistingArtifacts()).to.be.fulfilled.then(() =>
+          BbPromise.all([
+            expect(fsMock.copyFileSync).callCount(2),
+            expect(fsMock.copyFileSync).to.be.calledWith('.webpack/func1.zip', '.serverless/func1.zip'),
+            expect(fsMock.copyFileSync).to.be.calledWith('.webpack/func2.zip', '.serverless/func2.zip')
           ])
         );
       });
