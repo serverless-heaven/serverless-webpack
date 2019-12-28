@@ -459,10 +459,22 @@ describe('packageModules', () => {
       });
 
       it('copies the artifact', () => {
+        const expectedArtifactSource = path.join('.webpack', 'test-service.zip');
+        const expectedArtifactDestination = path.join('.serverless', 'test-service.zip');
+
         return expect(module.copyExistingArtifacts()).to.be.fulfilled.then(() =>
           BbPromise.all([
+            // Should copy the artifact into .serverless
             expect(fsMock.copyFileSync).callCount(1),
-            expect(fsMock.copyFileSync).to.be.calledWith('.webpack/test-service.zip', '.serverless/test-service.zip')
+            expect(fsMock.copyFileSync).to.be.calledWith(expectedArtifactSource, expectedArtifactDestination),
+
+            // Should set package artifact for each function to the single artifact
+            expect(func1)
+              .to.have.a.nested.property('package.artifact')
+              .that.equals(expectedArtifactDestination),
+            expect(func2)
+              .to.have.a.nested.property('package.artifact')
+              .that.equals(expectedArtifactDestination)
           ])
         );
       });
@@ -491,7 +503,7 @@ describe('packageModules', () => {
 
         return expect(module.copyExistingArtifacts()).to.be.fulfilled.then(() =>
           BbPromise.all([
-            // Should copy the artifacts into .serverless
+            // Should copy an artifact per function into .serverless
             expect(fsMock.copyFileSync).callCount(2),
             expect(fsMock.copyFileSync).to.be.calledWith('.webpack/func1.zip', expectedFunc1Destination),
             expect(fsMock.copyFileSync).to.be.calledWith('.webpack/func2.zip', expectedFunc2Destination),
