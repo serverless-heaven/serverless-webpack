@@ -142,7 +142,7 @@ describe('packageModules', () => {
         fsMock._streamMock.on.withArgs('close').yields();
         fsMock._statMock.isDirectory.returns(false);
 
-        const expectedArtifactPath = path.join('.serverless', 'test-service.zip');
+        const expectedArtifactPath = path.join('.webpack', 'test-service.zip');
 
         module.compileStats = stats;
         return expect(module.packageModules()).to.be.fulfilled.then(() =>
@@ -211,7 +211,7 @@ describe('packageModules', () => {
           fsMock._streamMock.on.withArgs('close').yields();
           fsMock._statMock.isDirectory.returns(false);
 
-          const expectedArtifactPath = path.join('.serverless', 'test-service.zip');
+          const expectedArtifactPath = path.join('.webpack', 'test-service.zip');
 
           module.compileStats = stats;
           return expect(module.packageModules()).to.be.fulfilled.then(() =>
@@ -259,7 +259,7 @@ describe('packageModules', () => {
         fsMock._streamMock.on.withArgs('close').yields();
         fsMock._statMock.isDirectory.returns(false);
 
-        const expectedArtifactPath = path.join('.serverless', 'test-service.zip');
+        const expectedArtifactPath = path.join('.webpack', 'test-service.zip');
 
         module.compileStats = stats;
         return BbPromise.each([ '1.18.1', '2.17.0', '10.15.3' ], version => {
@@ -407,10 +407,10 @@ describe('packageModules', () => {
           BbPromise.all([
             expect(func1)
               .to.have.a.nested.property('package.artifact')
-              .that.equals(path.join('.serverless', 'func1.zip')),
+              .that.equals(path.join('.webpack', 'func1.zip')),
             expect(func2)
               .to.have.a.nested.property('package.artifact')
-              .that.equals(path.join('.serverless', 'func2.zip'))
+              .that.equals(path.join('.webpack', 'func2.zip'))
           ])
         );
       });
