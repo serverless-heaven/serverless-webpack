@@ -72,7 +72,8 @@ describe('packageModules', () => {
     module = _.assign(
       {
         serverless,
-        options: {}
+        options: {},
+        webpackOutputPath: '.webpack'
       },
       baseModule
     );
