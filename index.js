@@ -151,6 +151,8 @@ class ServerlessWebpack {
 
       'webpack:package:packageModules': () => BbPromise.bind(this).then(this.packageModules),
 
+      'webpack:package:copyExistingArtifacts': () => BbPromise.bind(this).then(this.copyExistingArtifacts),
+
       'before:offline:start': () =>
         BbPromise.bind(this)
           .tap(() => {

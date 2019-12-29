@@ -118,6 +118,7 @@ describe('ServerlessWebpack', () => {
       sandbox.stub(slsw, 'watch').returns(BbPromise.resolve());
       sandbox.stub(slsw, 'wpwatch').returns(BbPromise.resolve());
       sandbox.stub(slsw, 'packExternalModules').returns(BbPromise.resolve());
+      sandbox.stub(slsw, 'copyExistingArtifacts').returns(BbPromise.resolve());
       sandbox.stub(slsw, 'prepareRun').returns(BbPromise.resolve());
       sandbox.stub(slsw, 'watchRun').returns(BbPromise.resolve());
       sandbox.stub(slsw, 'validate').returns(BbPromise.resolve());
@@ -356,6 +357,17 @@ describe('ServerlessWebpack', () => {
             it('should call packageModules', () => {
               return expect(slsw.hooks['webpack:package:packageModules']()).to.be.fulfilled.then(() => {
                 expect(slsw.packageModules).to.have.been.calledOnce;
+                return null;
+              });
+            });
+          }
+        },
+        {
+          name: 'webpack:package:copyExistingArtifacts',
+          test: () => {
+            it('should call copyExistingArtifacts', () => {
+              return expect(slsw.hooks['webpack:package:copyExistingArtifacts']()).to.be.fulfilled.then(() => {
+                expect(slsw.copyExistingArtifacts).to.have.been.calledOnce;
                 return null;
               });
             });
