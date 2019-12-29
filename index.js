@@ -87,7 +87,7 @@ class ServerlessWebpack {
       'before:package:createDeploymentArtifacts': () =>
         BbPromise.bind(this)
           .then(() => this.serverless.pluginManager.spawn('webpack:validate'))
-          .then(() => this.serverless.pluginManager.spawn('webpack:compile'))
+          .then(() => (this.skipCompile ? BbPromise.resolve() : this.serverless.pluginManager.spawn('webpack:compile')))
           .then(() => this.serverless.pluginManager.spawn('webpack:package')),
 
       'after:package:createDeploymentArtifacts': () => BbPromise.bind(this).then(this.cleanup),
@@ -102,10 +102,6 @@ class ServerlessWebpack {
         BbPromise.bind(this)
           .then(() => {
             lib.webpack.isLocal = true;
-            // --no-build override
-            if (this.options.build === false) {
-              this.skipCompile = true;
-            }
 
             return this.serverless.pluginManager.spawn('webpack:validate');
           })
