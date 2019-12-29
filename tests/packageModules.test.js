@@ -97,6 +97,18 @@ describe('packageModules', () => {
       );
     });
 
+    it('should do nothing if skipCompile is true', () => {
+      module.skipCompile = true;
+      return expect(module.packageModules()).to.be.fulfilled.then(() =>
+        BbPromise.all([
+          expect(archiverMock.create).to.not.have.been.called,
+          expect(writeFileDirStub).to.not.have.been.called,
+          expect(fsMock.createWriteStream).to.not.have.been.called,
+          expect(globMock.sync).to.not.have.been.called
+        ])
+      );
+    });
+
     describe('with service packaging', () => {
       beforeEach(() => {
         // Setup behavior for service packaging
