@@ -15,25 +15,25 @@ and much more!
 
 ## Highlights
 
-* Configuration possibilities range from zero-config to fully customizable
-* Support of `serverless package`, `serverless deploy` and `serverless deploy function`
-* Support of `serverless invoke local` and `serverless invoke local --watch`
-* Support of `serverless run` and `serverless run --watch`
-* Integrates with [`serverless-offline`][link-serverless-offline] to simulate local API Gateway endpoints
-* When enabled in your service configuration, functions are packaged and compiled
-individually, resulting in smaller Lambda packages that contain only the code and
-dependencies needed to run the function. This allows the plugin to fully utilize
-WebPack's [Tree-Shaking][link-webpack-tree] optimization.
-* Webpack version 3, 4 and 5 support
-* Support NPM and Yarn for packaging
-* Support asynchronous webpack configuration
+- Configuration possibilities range from zero-config to fully customizable
+- Support of `serverless package`, `serverless deploy` and `serverless deploy function`
+- Support of `serverless invoke local` and `serverless invoke local --watch`
+- Support of `serverless run` and `serverless run --watch`
+- Integrates with [`serverless-offline`][link-serverless-offline] to simulate local API Gateway endpoints
+- When enabled in your service configuration, functions are packaged and compiled
+  individually, resulting in smaller Lambda packages that contain only the code and
+  dependencies needed to run the function. This allows the plugin to fully utilize
+  WebPack's [Tree-Shaking][link-webpack-tree] optimization.
+- Webpack version 3, 4 and 5 support
+- Support NPM and Yarn for packaging
+- Support asynchronous webpack configuration
 
 ## Recent improvements and important changes for 5.x
 
-* Support Yarn
-* Support Webpack 4 and 5
-* Cleaned up configuration. You should now use a `custom.webpack` object to configure everything relevant for the plugin. The old configuration still works but will be removed in the next major release. For details see below.
-* Added support for asynchronous webpack configuration
+- Support Yarn
+- Support Webpack 4 and 5
+- Cleaned up configuration. You should now use a `custom.webpack` object to configure everything relevant for the plugin. The old configuration still works but will be removed in the next major release. For details see below.
+- Added support for asynchronous webpack configuration
 
 For the complete release notes see the end of this document.
 
@@ -59,9 +59,9 @@ See the sections below for detailed descriptions of the settings. The defaults a
 ```yaml
 custom:
   webpack:
-    webpackConfig: 'webpack.config.js'   # Name of webpack configuration file
-    includeModules: false   # Node modules configuration for packaging
-    packager: 'npm'   # Packager that will be used to package your external modules
+    webpackConfig: 'webpack.config.js' # Name of webpack configuration file
+    includeModules: false # Node modules configuration for packaging
+    packager: 'npm' # Packager that will be used to package your external modules
     excludeFiles: src/**/*.test.js # Provide a glob for files to ignore
 ```
 
@@ -92,6 +92,7 @@ module.exports = {
 Alternatively the Webpack configuration can export an asynchronous object (e.g. a promise or async function) which will be awaited by the plugin and resolves to the final configuration object. This is useful if the confguration depends on asynchronous functions, for example, defining the AccountId of the current aws user inside AWS lambda@edge which does not support defining normal process environment variables.
 
 A basic Webpack promise configuration might look like this:
+
 ```js
 // Version if the local Node.js version supports async/await
 // webpack.config.js
@@ -115,6 +116,7 @@ module.exports = (async () => {
   };
 })();
 ```
+
 ```js
 // Version with promises
 // webpack.config.js
@@ -212,6 +214,7 @@ This allows to set properties in the webpack configuration differently depending
 if the lambda code is run on the local machine or deployed.
 
 A sample is to set the compile mode with Webpack 4:
+
 ```
 mode: slsw.lib.webpack.isLocal ? "development" : "production"
 ```
@@ -232,8 +235,8 @@ module.exports = {
   output: {
     libraryTarget: 'commonjs',
     path: path.resolve(__dirname, '.webpack'),
-    filename: '[name].js',
-  },
+    filename: '[name].js'
+  }
   // ...
 };
 ```
@@ -250,11 +253,10 @@ module.exports = {
   // ...
   stats: 'minimal'
   // ...
-}
+};
 ```
 
 All the stats config can be found in [webpack's documentation][link-webpack-stats]
-
 
 ### Node modules / externals
 
@@ -269,13 +271,13 @@ option in `serverless.yml`:
 
 ```js
 // webpack.config.js
-var nodeExternals = require('webpack-node-externals')
+var nodeExternals = require('webpack-node-externals');
 
 module.exports = {
   // we use webpack-node-externals to excludes all node deps.
   // You can manually set the externals too.
-  externals: [nodeExternals()],
-}
+  externals: [nodeExternals()]
+};
 ```
 
 ```yaml
@@ -284,7 +286,6 @@ custom:
   webpack:
     includeModules: true # enable auto-packing of external modules
 ```
-
 
 All modules stated in `externals` will be excluded from bundled files. If an excluded module
 is stated as `dependencies` in `package.json` and it is used by the webpack chunk, it will be
@@ -300,6 +301,7 @@ custom:
     includeModules:
       packagePath: '../package.json' # relative path to custom package.json file.
 ```
+
 > Note that only relative path is supported at the moment.
 
 #### Runtime dependencies
@@ -337,8 +339,8 @@ or 'yarn' and defaults to using npm when not set.
 # serverless.yml
 custom:
   webpack:
-    packager: 'yarn'      # Defaults to npm
-    packagerOptions: {}   # Optional, depending on the selected packager
+    packager: 'yarn' # Defaults to npm
+    packagerOptions: {} # Optional, depending on the selected packager
 ```
 
 You should select the packager, that you use to develop your projects, because only
@@ -361,10 +363,11 @@ Using yarn will switch the whole packaging pipeline to use yarn, so does it use 
 
 The yarn packager supports the following `packagerOptions`:
 
-| Option           | Type | Default  | Description                                         |
-|------------------|------|----------|-----------------------------------------------------|
-| ignoreScripts    | bool | false    | Do not execute package.json hook scripts on install |
-| noFrozenLockfile | bool | false    | Do not require an up-to-date yarn.lock              |
+| Option             | Type | Default | Description                                         |
+| ------------------ | ---- | ------- | --------------------------------------------------- |
+| ignoreScripts      | bool | false   | Do not execute package.json hook scripts on install |
+| noFrozenLockfile   | bool | false   | Do not require an up-to-date yarn.lock              |
+| networkConcurrency | int  |         | Specify number of concurrent network requests       |
 
 ##### Common packager options
 
@@ -497,7 +500,6 @@ exampleFunction:
 ⚠️ **Note: this will only work if your custom runtime and function are written in JavaScript.
 Make sure you know what you are doing when this option is set to `true`**
 
-
 #### Examples
 
 You can find an example setups in the [`examples`][link-examples] folder.
@@ -517,10 +519,9 @@ service:
 
 ```yaml
 # serverless.yml
-...
+---
 package:
   individually: true
-...
 ```
 
 This will switch the plugin to per function packaging which makes use of the multi-compiler
@@ -542,13 +543,15 @@ The individual packaging needs more time at the packaging phase, but you'll
 get that paid back twice at runtime.
 
 #### Individual packaging concurrency
+
 ```yaml
 # serverless.yml
 custom:
   webpack:
-    concurrency: 5          # desired concurrency, defaults to the number of available cores
+    concurrency: 5 # desired concurrency, defaults to the number of available cores
     serializedCompile: true # backward compatible, this translates to concurrency: 1
 ```
+
 Will run each webpack build one at a time which helps reduce memory usage and in some cases impoves overall build performance.
 
 ## Usage
@@ -582,7 +585,7 @@ All options that are supported by invoke local can be used as usual:
 
 On CI systems it is likely that you'll run multiple integration tests with `invoke local`
 sequentially. To improve this, you can do one compile and run multiple invokes on the
-compiled output -  it is not necessary to compile again before each and every invoke.
+compiled output - it is not necessary to compile again before each and every invoke.
 
 ```bash
 $ serverless webpack
@@ -635,13 +638,13 @@ simulate AWS Lambda and AWS API Gateway locally.
 
 Add the plugins to your `serverless.yml` file and make sure that `serverless-webpack`
 precedes `serverless-offline` as the order is important:
+
 ```yaml
-  plugins:
-    ...
-    - serverless-webpack
-    ...
-    - serverless-offline
-    ...
+plugins: ...
+  - serverless-webpack
+  ...
+  - serverless-offline
+  ...
 ```
 
 Run `serverless offline` or `serverless offline start` to start the Lambda/API simulation.
@@ -668,11 +671,12 @@ you have use the `--location` option.
 
 Configure your service the same as mentioned above, but additionally add the `serverless-dynamodb-local`
 plugin as follows:
+
 ```yaml
-  plugins:
-    - serverless-webpack
-    - serverless-dynamodb-local
-    - serverless-offline
+plugins:
+  - serverless-webpack
+  - serverless-dynamodb-local
+  - serverless-offline
 ```
 
 Run `serverless offline start`.
@@ -719,19 +723,19 @@ plugin with Babel. To try it, from inside the example folder:
 
 Plugin commands are supported by the following providers. ⁇ indicates that command has not been tested with that provider.
 
-|                       | AWS Lambda | Apache OpenWhisk | Azure Functions | Google Cloud Functions |
-|-----------------------|------------|------------------|-----------------|------------------------|
-| webpack               |      ✔︎     |         ✔︎        |        ⁇        |            ⁇           |
-| invoke local          |      ✔︎     |         ✔︎        |        ⁇        |            ⁇           |
-| invoke local --watch  |      ✔︎     |         ✔︎        |        ⁇        |            ⁇           |
+|                      | AWS Lambda | Apache OpenWhisk | Azure Functions | Google Cloud Functions |
+| -------------------- | ---------- | ---------------- | --------------- | ---------------------- |
+| webpack              | ✔︎         | ✔︎               | ⁇               | ⁇                      |
+| invoke local         | ✔︎         | ✔︎               | ⁇               | ⁇                      |
+| invoke local --watch | ✔︎         | ✔︎               | ⁇               | ⁇                      |
 
 ## Plugin support
 
 The following serverless plugins are explicitly supported with `serverless-webpack`
 
-| Plugin                            | NPM |
-|-----------------------------------|-----|
-| serverless-offline | [![NPM][ico-serverless-offline]][link-serverless-offline] |
+| Plugin                            | NPM                                                               |
+| --------------------------------- | ----------------------------------------------------------------- |
+| serverless-offline                | [![NPM][ico-serverless-offline]][link-serverless-offline]         |
 | serverless-step-functions-offline | [![NPM][ico-step-functions-offline]][link-step-functions-offline] |
 
 ## For developers
@@ -803,14 +807,12 @@ See [CHANGELOG.md](./CHANGELOG.md)
 [ico-build]: https://travis-ci.org/serverless-heaven/serverless-webpack.svg?branch=master
 [ico-coverage]: https://coveralls.io/repos/github/serverless-heaven/serverless-webpack/badge.svg?branch=master
 [ico-contributors]: https://img.shields.io/github/contributors/serverless-heaven/serverless-webpack.svg
-
 [link-serverless]: https://www.serverless.com/
 [link-license]: ./blob/master/LICENSE
 [link-npm]: https://www.npmjs.com/package/serverless-webpack
 [link-build]: https://travis-ci.org/serverless-heaven/serverless-webpack
 [link-coverage]: https://coveralls.io/github/serverless-heaven/serverless-webpack?branch=master
 [link-contributors]: https://github.com/serverless-heaven/serverless-webpack/graphs/contributors
-
 [link-webpack]: https://webpack.github.io/
 [link-babel]: https://babeljs.io/
 [link-webpack-stats]: https://webpack.js.org/configuration/stats/
