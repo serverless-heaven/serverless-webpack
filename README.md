@@ -439,7 +439,7 @@ If you have a project structure that uses something like `index.js` and a
 co-located `index.test.js` then you have likely seen an error like:
 `WARNING: More than one matching handlers found for index. Using index.js`
 
-This config option allows you to exlcude files that match a glob from function
+This config option allows you to exclude files that match a glob from function
 resolution. Just add: `excludeFiles: **/*.test.js` (with whatever glob you want
 to exclude).
 
@@ -451,6 +451,19 @@ custom:
 ```
 
 This is also useful for projects that use TypeScript.
+
+#### Exclude Files with Regular Expression
+
+This config option allows you to filter files that match a regex pattern before
+adding to the zip file. Just add: `excludeRegex: \.ts|test|\.map` (with whatever 
+regex you want to exclude).
+
+```yaml
+# serverless.yml
+custom:
+  webpack:
+    excludeRegex: \.ts|test|\.map
+```
 
 #### Keep output directory after packaging
 
