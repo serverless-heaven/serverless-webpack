@@ -592,8 +592,8 @@ describe('packageModules', () => {
           BbPromise.all([
             // Should copy an artifact per function into .serverless
             expect(fsMock.copyFileSync).callCount(2),
-            expect(fsMock.copyFileSync).to.be.calledWith('.webpack/func1.zip', expectedFunc1Destination),
-            expect(fsMock.copyFileSync).to.be.calledWith('.webpack/func2.zip', expectedFunc2Destination),
+            expect(fsMock.copyFileSync).to.be.calledWith(path.join('.webpack', 'func1.zip'), expectedFunc1Destination),
+            expect(fsMock.copyFileSync).to.be.calledWith(path.join('.webpack', 'func2.zip'), expectedFunc2Destination),
 
             // Should set package artifact locations
             expect(func1)
