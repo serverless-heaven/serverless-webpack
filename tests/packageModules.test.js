@@ -109,11 +109,7 @@ describe('packageModules', () => {
         const stats = {
           stats: [
             {
-              compilation: {
-                compiler: {
-                  outputPath: '/my/Service/Path/.webpack/service'
-                }
-              }
+              outputPath: '/my/Service/Path/.webpack/service'
             }
           ]
         };
@@ -179,11 +175,7 @@ describe('packageModules', () => {
           const stats = {
             stats: [
               {
-                compilation: {
-                  compiler: {
-                    outputPath: '/my/Service/Path/.webpack/service'
-                  }
-                }
+                outputPath: '/my/Service/Path/.webpack/service'
               }
             ]
           };
@@ -227,11 +219,7 @@ describe('packageModules', () => {
         const stats = {
           stats: [
             {
-              compilation: {
-                compiler: {
-                  outputPath: '/my/Service/Path/.webpack/service'
-                }
-              }
+              outputPath: '/my/Service/Path/.webpack/service'
             }
           ]
         };
@@ -298,11 +286,7 @@ describe('packageModules', () => {
         const stats = {
           stats: [
             {
-              compilation: {
-                compiler: {
-                  outputPath: '/my/Service/Path/.webpack/service'
-                }
-              }
+              outputPath: '/my/Service/Path/.webpack/service'
             }
           ]
         };
@@ -341,18 +325,10 @@ describe('packageModules', () => {
       const stats = {
         stats: [
           {
-            compilation: {
-              compiler: {
-                outputPath: '/my/Service/Path/.webpack/func1'
-              }
-            }
+            outputPath: '/my/Service/Path/.webpack/func1'
           },
           {
-            compilation: {
-              compiler: {
-                outputPath: '/my/Service/Path/.webpack/func2'
-              }
-            }
+            outputPath: '/my/Service/Path/.webpack/func2'
           }
         ]
       };

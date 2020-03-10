@@ -55,7 +55,8 @@
     "is-builtin-module": "^3.0.0",
     "lodash": "^4.17.15",
     "semver": "^6.2.0",
-    "ts-node": "^8.3.0"
+    "ts-node": "^8.3.0",
+    "worker-farm": "^1.7.0"
   },
   "devDependencies": {
     "babel-eslint": "^10.0.2",

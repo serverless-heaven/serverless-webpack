@@ -2,14 +2,15 @@
 
 const sinon = require('sinon');
 
-const StatsMock = () => ({
+const StatsMock = sandbox => ({
   compilation: {
     errors: [],
     compiler: {
       outputPath: 'statsMock-outputPath'
     }
   },
-  toString: sinon.stub().returns('testStats')
+  toString: sandbox.stub().returns('testStats'),
+  toJson: sandbox.stub().returns({})
 });
 
 const CompilerMock = (sandbox, statsMock) => ({

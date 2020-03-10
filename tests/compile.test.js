@@ -6,7 +6,6 @@ const chai = require('chai');
 const sinon = require('sinon');
 const mockery = require('mockery');
 const Serverless = require('serverless');
-const makeWebpackMock = require('./webpack.mock');
 
 chai.use(require('chai-as-promised'));
 chai.use(require('sinon-chai'));
@@ -15,7 +14,8 @@ const expect = chai.expect;
 
 describe('compile', () => {
   let sandbox;
-  let webpackMock;
+  let compilerMock;
+  let multiCompilerMock;
   let baseModule;
   let serverless;
   let module;
@@ -24,10 +24,13 @@ describe('compile', () => {
     sandbox = sinon.createSandbox();
     sandbox.usingPromise(BbPromise);
 
-    webpackMock = makeWebpackMock(sandbox);
+    compilerMock = sandbox.stub();
+    multiCompilerMock = sandbox.stub();
 
     mockery.enable({ warnOnUnregistered: false });
-    mockery.registerMock('webpack', webpackMock);
+    mockery.registerMock('./compiler', { compiler: compilerMock });
+    mockery.registerMock('./multiCompiler/compiler', { multiCompiler: multiCompilerMock });
+
     baseModule = require('../lib/compile');
     Object.freeze(baseModule);
   });
@@ -54,83 +57,139 @@ describe('compile', () => {
   });
 
   afterEach(() => {
-    // This will reset the webpackMock too
+    // This will reset the compilerMock too
     sandbox.restore();
+    compilerMock.resetHistory();
+    multiCompilerMock.resetHistory();
   });
 
   it('should expose a `compile` method', () => {
     expect(module.compile).to.be.a('function');
   });
 
-  it('should compile with webpack from a context configuration', () => {
-    const testWebpackConfig = 'testconfig';
-    module.webpackConfig = testWebpackConfig;
-    return expect(module.compile()).to.be.fulfilled.then(() => {
-      expect(webpackMock).to.have.been.calledWith(testWebpackConfig);
-      expect(webpackMock.compilerMock.run).to.have.been.calledOnce;
-      return null;
-    });
-  });
-
-  it('should fail if there are compilation errors', () => {
-    module.webpackConfig = 'testconfig';
-    // We stub errors here. It will be reset again in afterEach()
-    sandbox.stub(webpackMock.statsMock.compilation, 'errors').value(['error']);
-    return expect(module.compile()).to.be.rejectedWith(/compilation error/);
-  });
-
-  it('should work with multi compile', () => {
-    const testWebpackConfig = 'testconfig';
-    const multiStats = [
-      {
-        compilation: {
-          errors: [],
-          compiler: {
-            outputPath: 'statsMock-outputPath'
+  describe('single compile', () => {
+    it('should fail if there are compilation errors', () => {
+      module.webpackConfig = {};
+      const mockStats = {
+        stats: [
+          {
+            errors: ['error']
           }
-        },
-        toString: sandbox.stub().returns('testStats')
-      }
-    ];
-    module.webpackConfig = testWebpackConfig;
-    module.multiCompile = true;
-    webpackMock.compilerMock.run.reset();
-    webpackMock.compilerMock.run.yields(null, multiStats);
-    return expect(module.compile()).to.be.fulfilled.then(() => {
-      expect(webpackMock).to.have.been.calledWith(testWebpackConfig);
-      expect(webpackMock.compilerMock.run).to.have.been.calledOnce;
-      return null;
+        ]
+      };
+      // We stub errors here. It will be reset again in afterEach()
+      compilerMock.resolves(mockStats);
+
+      const testServicePath = 'testpath';
+      module.serverless.config.servicePath = testServicePath;
+      return expect(module.compile()).to.be.rejectedWith(/compilation error/);
     });
-  });
 
-  it('should use correct stats option', () => {
-    const testWebpackConfig = {
-      stats: 'minimal'
-    };
-    const mockStats = {
-      compilation: {
-        errors: [],
-        compiler: {
-          outputPath: 'statsMock-outputPath'
-        }
-      },
-      toString: sandbox.stub().returns('testStats')
-    };
+    it('should compile', () => {
+      const testConsoleStats = 'minimal';
+      const testWebpackConfig = {
+        stats: testConsoleStats
+      };
+      const testWebpackConfigFilePath = 'testconfig.js';
 
-    module.webpackConfig = testWebpackConfig;
-    webpackMock.compilerMock.run.reset();
-    webpackMock.compilerMock.run.yields(null, mockStats);
-    return expect(module.compile())
-      .to.be.fulfilled.then(() => {
-        expect(webpackMock).to.have.been.calledWith(testWebpackConfig);
-        expect(mockStats.toString.firstCall.args).to.eql([testWebpackConfig.stats]);
-        module.webpackConfig = [testWebpackConfig];
-        return expect(module.compile()).to.be.fulfilled;
-      })
-      .then(() => {
-        expect(webpackMock).to.have.been.calledWith([testWebpackConfig]);
-        expect(mockStats.toString.args).to.eql([ [testWebpackConfig.stats], [testWebpackConfig.stats] ]);
+      const testServicePath = 'testpath';
+      const testOut = 'testout';
+      const testConfigOptions = {
+        servicePath: testServicePath,
+        out: testOut
+      };
+      const testEntryFunctions = [];
+      const testCompileOptions = {
+        webpackConfigFilePath: testWebpackConfigFilePath,
+        webpackConfig: testWebpackConfig,
+
+        entryFunctions: testEntryFunctions,
+
+        configOptions: testConfigOptions,
+        consoleStats: testConsoleStats
+      };
+      const mockStats = {
+        stats: [
+          {
+            errors: []
+          }
+        ]
+      };
+      compilerMock.resolves(mockStats);
+
+      module.webpackConfig = testWebpackConfig;
+      module.webpackConfigFilePath = testWebpackConfigFilePath;
+      module.serverless.config.servicePath = testServicePath;
+      module.options.out = testOut;
+      module.entryFunctions = testEntryFunctions;
+      return expect(module.compile()).to.be.fulfilled.then(() => {
+        expect(compilerMock).to.have.been.calledWith(testCompileOptions);
         return null;
       });
+    });
+  });
+
+  describe('multi compile', () => {
+    it('should fail if there are compilation errors', () => {
+      module.webpackConfig = {};
+      const mockStats = {
+        stats: [
+          {
+            errors: ['error']
+          }
+        ]
+      };
+      // We stub errors here. It will be reset again in afterEach()
+      multiCompilerMock.resolves(mockStats);
+
+      module.multiCompile = true;
+      const testServicePath = 'testpath';
+      module.serverless.config.servicePath = testServicePath;
+      return expect(module.compile()).to.be.rejectedWith(/compilation error/);
+    });
+
+    it('should compile', () => {
+      const testConsoleStats = 'minimal';
+      const testWebpackConfig = {
+        stats: testConsoleStats
+      };
+      const testWebpackConfigFilePath = 'testconfig.js';
+
+      const testServicePath = 'testpath';
+      const testOut = 'testout';
+      const testConfigOptions = {
+        servicePath: testServicePath,
+        out: testOut
+      };
+      const testEntryFunctions = [];
+      const testMultiCompileOptions = {
+        webpackConfigFilePath: testWebpackConfigFilePath,
+        webpackConfig: testWebpackConfig,
+
+        entryFunctions: testEntryFunctions,
+
+        configOptions: testConfigOptions,
+        consoleStats: testConsoleStats
+      };
+      const mockStats = {
+        stats: [
+          {
+            errors: []
+          }
+        ]
+      };
+      multiCompilerMock.resolves(mockStats);
+
+      module.webpackConfig = testWebpackConfig;
+      module.webpackConfigFilePath = testWebpackConfigFilePath;
+      module.multiCompile = true;
+      module.serverless.config.servicePath = testServicePath;
+      module.options.out = testOut;
+      module.entryFunctions = testEntryFunctions;
+      return expect(module.compile()).to.be.fulfilled.then(() => {
+        expect(multiCompilerMock).to.have.been.calledWith(testMultiCompileOptions);
+        return null;
+      });
+    });
   });
 });
