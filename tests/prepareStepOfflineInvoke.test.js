@@ -31,10 +31,13 @@ describe('prepareStepOfflineInvoke', () => {
       log: sandbox.stub()
     };
     sandbox.stub(serverless.pluginManager, 'spawn');
-    module = _.assign({
-      serverless,
-      options: {},
-    }, baseModule);
+    module = _.assign(
+      {
+        serverless,
+        options: {}
+      },
+      baseModule
+    );
   });
 
   afterEach(() => {
@@ -47,8 +50,7 @@ describe('prepareStepOfflineInvoke', () => {
     module.webpackOutputPath = '.';
     module.serverless.service.package = {};
 
-    return expect(module.prepareStepOfflineInvoke()).to.be.fulfilled
-    .then(() => {
+    return expect(module.prepareStepOfflineInvoke()).to.be.fulfilled.then(() => {
       expect(module.serverless.service.package).to.have.a.property('individually').that.is.false;
       return null;
     });
@@ -62,8 +64,7 @@ describe('prepareStepOfflineInvoke', () => {
       individually: true
     };
 
-    return expect(module.prepareStepOfflineInvoke()).to.be.fulfilled
-    .then(() => {
+    return expect(module.prepareStepOfflineInvoke()).to.be.fulfilled.then(() => {
       expect(module.serverless.service.package).to.have.a.property('individually').that.is.false;
       return null;
     });
@@ -74,8 +75,7 @@ describe('prepareStepOfflineInvoke', () => {
     serverless.config.servicePath = 'myPath';
     module.webpackOutputPath = '.';
 
-    return expect(module.prepareStepOfflineInvoke()).to.be.fulfilled
-    .then(() => {
+    return expect(module.prepareStepOfflineInvoke()).to.be.fulfilled.then(() => {
       expect(serverless.pluginManager.spawn).to.have.been.calledOnce;
       expect(serverless.pluginManager.spawn).to.have.been.calledWithExactly('webpack:validate');
       return null;
@@ -95,8 +95,7 @@ describe('prepareStepOfflineInvoke', () => {
     serverless.config.servicePath = '.';
     module.webpackOutputPath = '.';
 
-    return expect(module.prepareStepOfflineInvoke()).to.be.fulfilled
-    .then(() => {
+    return expect(module.prepareStepOfflineInvoke()).to.be.fulfilled.then(() => {
       expect(serverless.service).to.have.a.nested.property('custom.stepFunctionsOffline.location', 'service');
       return null;
     });
@@ -108,8 +107,7 @@ describe('prepareStepOfflineInvoke', () => {
     module.webpackOutputPath = '.';
     _.set(module.serverless, 'service.custom.stepFunctionsOffline.location', 'myLocation');
 
-    return expect(module.prepareStepOfflineInvoke()).to.be.fulfilled
-    .then(() => {
+    return expect(module.prepareStepOfflineInvoke()).to.be.fulfilled.then(() => {
       expect(serverless.service).to.have.a.nested.property('custom.stepFunctionsOffline.location', 'myLocation');
       return null;
     });
@@ -123,8 +121,7 @@ describe('prepareStepOfflineInvoke', () => {
       location: 'myLocation'
     };
 
-    return expect(module.prepareStepOfflineInvoke()).to.be.fulfilled
-    .then(() => {
+    return expect(module.prepareStepOfflineInvoke()).to.be.fulfilled.then(() => {
       expect(serverless.service).to.not.have.a.nested.property('custom.stepFunctionsOffline.location');
       return null;
     });

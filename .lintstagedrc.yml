@@ -1,6 +1,4 @@
-linters:
-  "*.js":
-    - "eslint --fix"                        # Run TSLint
-    - "prettier --write"                    # Run Prettier
-    - "npm test"                            # Run tests
-    - "git add"
+"*.js":
+  - "prettier-eslint --write"             # Run Prettier
+  - "eslint"                              # Run TSLint
+  - "git add"
