@@ -64,7 +64,7 @@
     "coveralls": "^3.0.5",
     "eslint": "^5.16.0",
     "eslint-plugin-import": "^2.18.2",
-    "eslint-plugin-lodash": "^5.1.0",
+    "eslint-plugin-lodash": "^7.1.0",
     "eslint-plugin-promise": "^4.2.1",
     "husky": "^3.0.1",
     "lint-staged": "^9.2.0",
