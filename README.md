@@ -230,7 +230,7 @@ const path = require('path');
 module.exports = {
   // ...
   output: {
-    libraryTarget: 'commonjs2',
+    libraryTarget: 'commonjs',
     path: path.resolve(__dirname, '.webpack'),
     filename: '[name].js',
   },
@@ -305,17 +305,17 @@ custom:
 #### Runtime dependencies
 
 If a runtime dependency is detected that is found in the `devDependencies` section and
-so would not be packaged, the plugin will error until you explicitly exclude it (see `forceExclude` below)
+so would not be packaged, the plugin will error until you explicitly exclude it (see `forceExclude` below) 
 or move it to the `dependencies` section.
 
 #### AWS-SDK
 
 An exception for the runtime dependency error is the AWS-SDK. All projects using the AWS-SDK normally
-have it listed in `devDependencies` because AWS provides it already in their Lambda environment. In this case
+have it listed in `devDependencies` because AWS provides it already in their Lambda environment. In this case 
 the aws-sdk is automatically excluded and only an informational message is printed (in `--verbose` mode).
 
 The main reason for the warning is, that silently ignoring anything contradicts the declarative nature
-of Serverless' service definition. So the correct way to define the handling for the aws-sdk is, as
+of Serverless' service definition. So the correct way to define the handling for the aws-sdk is, as 
 you would do for all other excluded modules (see `forceExclude` below).
 
 ```yaml
@@ -342,7 +342,7 @@ custom:
 ```
 
 You should select the packager, that you use to develop your projects, because only
-then locked versions will be handled correctly, i.e. the plugin uses the generated
+then locked versions will be handled correctly, i.e. the plugin uses the generated 
 (and usually committed) package lock file that is created by your favorite packager.
 
 Each packager might support specific options that can be set in the `packagerOptions`
@@ -375,7 +375,7 @@ You can specify custom scripts that are executed after the installation of the f
 has been finished. These are standard packager scripts as they can be used in any `package.json`.
 
 Warning: The use cases for them are very rare and specific and you should investigate first,
-if your use case can be covered with webpack plugins first. They should never access files
+if your use case can be covered with webpack plugins first. They should never access files 
 outside of their current working directory which is the compiled function folder, if any.
 A valid use case would be to start anything available as binary from `node_modules`.
 
@@ -756,6 +756,11 @@ me to take it over and continue working on the project. That helped to revive it
 
 ## Release Notes
 
+* 5.3.1
+  * Fixed bug that prevented to use handlers using import [#505][link-505]
+  * Do not print empty lines in webpack stats [#499][link-499]
+  * Added git hooks to improved code quality and developer experience [#496][link-496]
+
 * 5.3.0
   * Restore compatibility with TypeScript [#449][link-449] [#465][link-465]
   * Allow glob for excludeFiles [#471][link-471]
@@ -1028,3 +1033,7 @@ me to take it over and continue working on the project. That helped to revive it
 [link-433]: https://github.com/serverless-heaven/serverless-webpack/issues/433
 [link-471]: https://github.com/serverless-heaven/serverless-webpack/issues/471
 [link-472]: https://github.com/serverless-heaven/serverless-webpack/pull/472
+
+[link-505]: https://github.com/serverless-heaven/serverless-webpack/issues/505
+[link-499]: https://github.com/serverless-heaven/serverless-webpack/issues/499
+[link-496]: https://github.com/serverless-heaven/serverless-webpack/pull/496

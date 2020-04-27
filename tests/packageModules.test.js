@@ -69,10 +69,13 @@ describe('packageModules', () => {
     getServiceObjectStub = sandbox.stub(serverless.service, 'getServiceObject');
     getVersionStub = sandbox.stub(serverless, 'getVersion');
 
-    module = _.assign({
-      serverless,
-      options: {},
-    }, baseModule);
+    module = _.assign(
+      {
+        serverless,
+        options: {}
+      },
+      baseModule
+    );
   });
 
   afterEach(() => {
@@ -84,13 +87,14 @@ describe('packageModules', () => {
   describe('packageModules()', () => {
     it('should do nothing if no compile stats are available', () => {
       module.compileStats = { stats: [] };
-      return expect(module.packageModules()).to.be.fulfilled
-      .then(() => BbPromise.all([
-        expect(archiverMock.create).to.not.have.been.called,
-        expect(writeFileDirStub).to.not.have.been.called,
-        expect(fsMock.createWriteStream).to.not.have.been.called,
-        expect(globMock.sync).to.not.have.been.called
-      ]));
+      return expect(module.packageModules()).to.be.fulfilled.then(() =>
+        BbPromise.all([
+          expect(archiverMock.create).to.not.have.been.called,
+          expect(writeFileDirStub).to.not.have.been.called,
+          expect(fsMock.createWriteStream).to.not.have.been.called,
+          expect(globMock.sync).to.not.have.been.called
+        ])
+      );
     });
 
     describe('with service packaging', () => {
@@ -113,9 +117,7 @@ describe('packageModules', () => {
             }
           ]
         };
-        const files = [
-          'README.md', 'src/handler1.js', 'src/handler1.js.map', 'src/handler2.js', 'src/handler2.js.map'
-        ];
+        const files = [ 'README.md', 'src/handler1.js', 'src/handler1.js.map', 'src/handler2.js', 'src/handler2.js.map' ];
         const allFunctions = [ 'func1', 'func2' ];
         const func1 = {
           handler: 'src/handler1',
@@ -143,11 +145,16 @@ describe('packageModules', () => {
         const expectedArtifactPath = path.join('.serverless', 'test-service.zip');
 
         module.compileStats = stats;
-        return expect(module.packageModules()).to.be.fulfilled
-        .then(() => BbPromise.all([
-          expect(func1).to.have.a.nested.property('package.artifact').that.equals(expectedArtifactPath),
-          expect(func2).to.have.a.nested.property('package.artifact').that.equals(expectedArtifactPath),
-        ]));
+        return expect(module.packageModules()).to.be.fulfilled.then(() =>
+          BbPromise.all([
+            expect(func1)
+              .to.have.a.nested.property('package.artifact')
+              .that.equals(expectedArtifactPath),
+            expect(func2)
+              .to.have.a.nested.property('package.artifact')
+              .that.equals(expectedArtifactPath)
+          ])
+        );
       });
 
       describe('with the Google provider', () => {
@@ -180,9 +187,7 @@ describe('packageModules', () => {
               }
             ]
           };
-          const files = [
-            'README.md', 'index.js'
-          ];
+          const files = [ 'README.md', 'index.js' ];
           const allFunctions = [ 'func1', 'func2' ];
           const func1 = {
             handler: 'handler1',
@@ -209,8 +214,11 @@ describe('packageModules', () => {
           const expectedArtifactPath = path.join('.serverless', 'test-service.zip');
 
           module.compileStats = stats;
-          return expect(module.packageModules()).to.be.fulfilled
-          .then(() => expect(serverless.service).to.have.a.nested.property('package.artifact').that.equals(expectedArtifactPath));
+          return expect(module.packageModules()).to.be.fulfilled.then(() =>
+            expect(serverless.service)
+              .to.have.a.nested.property('package.artifact')
+              .that.equals(expectedArtifactPath)
+          );
         });
       });
 
@@ -227,9 +235,7 @@ describe('packageModules', () => {
             }
           ]
         };
-        const files = [
-          'README.md', 'src/handler1.js', 'src/handler1.js.map', 'src/handler2.js', 'src/handler2.js.map'
-        ];
+        const files = [ 'README.md', 'src/handler1.js', 'src/handler1.js.map', 'src/handler2.js', 'src/handler2.js.map' ];
         const allFunctions = [ 'func1', 'func2' ];
         const func1 = {
           handler: 'src/handler1',
@@ -256,24 +262,35 @@ describe('packageModules', () => {
         const expectedArtifactPath = path.join('.serverless', 'test-service.zip');
 
         module.compileStats = stats;
-        return BbPromise.each([ '1.18.1', '2.17.0', '10.15.3', ], version => {
+        return BbPromise.each([ '1.18.1', '2.17.0', '10.15.3' ], version => {
           getVersionStub.returns(version);
-          return expect(module.packageModules()).to.be.fulfilled
-          .then(() => BbPromise.all([
-            expect(func1).to.have.a.nested.property('package.artifact').that.equals(expectedArtifactPath),
-            expect(func2).to.have.a.nested.property('package.artifact').that.equals(expectedArtifactPath),
-          ]));
-        })
-        .then(() => BbPromise.each([ '1.17.0', '1.16.0-alpha', '1.15.3', ], version => {
-          getVersionStub.returns(version);
-          return expect(module.packageModules()).to.be.fulfilled
-          .then(() => BbPromise.all([
-            expect(func1).to.have.a.nested.property('artifact').that.equals(expectedArtifactPath),
-            expect(func2).to.have.a.nested.property('artifact').that.equals(expectedArtifactPath),
-            expect(func1).to.have.a.nested.property('package.disable').that.is.true,
-            expect(func2).to.have.a.nested.property('package.disable').that.is.true,
-          ]));
-        }));
+          return expect(module.packageModules()).to.be.fulfilled.then(() =>
+            BbPromise.all([
+              expect(func1)
+                .to.have.a.nested.property('package.artifact')
+                .that.equals(expectedArtifactPath),
+              expect(func2)
+                .to.have.a.nested.property('package.artifact')
+                .that.equals(expectedArtifactPath)
+            ])
+          );
+        }).then(() =>
+          BbPromise.each([ '1.17.0', '1.16.0-alpha', '1.15.3' ], version => {
+            getVersionStub.returns(version);
+            return expect(module.packageModules()).to.be.fulfilled.then(() =>
+              BbPromise.all([
+                expect(func1)
+                  .to.have.a.nested.property('artifact')
+                  .that.equals(expectedArtifactPath),
+                expect(func2)
+                  .to.have.a.nested.property('artifact')
+                  .that.equals(expectedArtifactPath),
+                expect(func1).to.have.a.nested.property('package.disable').that.is.true,
+                expect(func2).to.have.a.nested.property('package.disable').that.is.true
+              ])
+            );
+          })
+        );
       });
 
       it('should reject if no files are found', () => {
@@ -339,9 +356,7 @@ describe('packageModules', () => {
           }
         ]
       };
-      const files = [
-        'README.md', 'src/handler1.js', 'src/handler1.js.map', 'src/handler2.js', 'src/handler2.js.map'
-      ];
+      const files = [ 'README.md', 'src/handler1.js', 'src/handler1.js.map', 'src/handler2.js', 'src/handler2.js.map' ];
       const allFunctions = [ 'func1', 'func2' ];
       const func1 = {
         handler: 'src/handler1',
@@ -361,7 +376,7 @@ describe('packageModules', () => {
           handlerFile: 'src/handler2.js',
           funcName: 'func2',
           func: func2
-        },
+        }
       ];
 
       beforeEach(() => {
@@ -387,11 +402,16 @@ describe('packageModules', () => {
         fsMock._statMock.isDirectory.returns(false);
 
         module.compileStats = stats;
-        return expect(module.packageModules()).to.be.fulfilled
-        .then(() => BbPromise.all([
-          expect(func1).to.have.a.nested.property('package.artifact').that.equals(path.join('.serverless', 'func1.zip')),
-          expect(func2).to.have.a.nested.property('package.artifact').that.equals(path.join('.serverless', 'func2.zip')),
-        ]));
+        return expect(module.packageModules()).to.be.fulfilled.then(() =>
+          BbPromise.all([
+            expect(func1)
+              .to.have.a.nested.property('package.artifact')
+              .that.equals(path.join('.serverless', 'func1.zip')),
+            expect(func2)
+              .to.have.a.nested.property('package.artifact')
+              .that.equals(path.join('.serverless', 'func2.zip'))
+          ])
+        );
       });
     });
   });
