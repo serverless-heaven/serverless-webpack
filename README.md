@@ -756,6 +756,25 @@ me to take it over and continue working on the project. That helped to revive it
 
 ## Release Notes
 
+* 5.3.2
+  * Fix eslint prettier #518
+  * Add TypeScript definition #520
+  * Project dependencies updated #524
+  * fix typescript example lockfile #526
+  * Typescript example babel loader #527
+  * Bump tar from 2.2.1 to 2.2.2 in /examples/babel #544
+  * Bump acorn from 6.3.0 to 6.4.1 in /examples/typescript #562
+  * Bump eslint-utils from 1.4.0 to 1.4.3 #567
+  * Bump handlebars from 4.1.2 to 4.7.6 #568
+  * Addressed npm security vulnerabilities #569
+  * Bump https-proxy-agent from 2.2.2 to 2.2.4 #572
+  * Bump https-proxy-agent from 2.2.2 to 2.2.4 in /examples/typescript #573
+  * Bump extend from 3.0.1 to 3.0.2 in /examples/babel #574
+  * Bump stringstream from 0.0.5 to 0.0.6 in /examples/babel #575
+  * Bump tough-cookie from 2.3.2 to 2.3.4 in /examples/babel #576
+  * Bump sshpk from 1.13.1 to 1.16.1 in /examples/babel #577
+  * Bump debug from 2.6.8 to 2.6.9 in /examples/babel #578
+
 * 5.3.1
   * Fixed bug that prevented to use handlers using import [#505][link-505]
   * Do not print empty lines in webpack stats [#499][link-499]
