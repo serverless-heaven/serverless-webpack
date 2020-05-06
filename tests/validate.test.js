@@ -224,7 +224,7 @@ describe('validate', () => {
       return module
         .validate()
         .then(() => expect(module.webpackConfig.node).to.eql(false));
-    })
+    });
   });
 
   describe('config file load', () => {
