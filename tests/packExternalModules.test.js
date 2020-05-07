@@ -334,6 +334,24 @@ describe('packExternalModules', () => {
       );
     });
 
+    it('should do nothing if skipCompile is true', () => {
+      module.configuration = new Configuration({
+        webpack: {
+          includeModules: {
+            packagePath: path.join('locals', 'package.json')
+          }
+        }
+      });
+      module.skipCompile = true;
+      return expect(module.packExternalModules()).to.be.fulfilled.then(() =>
+        BbPromise.all([
+          expect(fsExtraMock.copy).to.not.have.been.called,
+          expect(packagerFactoryMock.get).to.not.have.been.called,
+          expect(writeFileSyncStub).to.not.have.been.called
+        ])
+      );
+    });
+
     it('should copy needed package sections if available', () => {
       const originalPackageJSON = {
         name: 'test-service',
