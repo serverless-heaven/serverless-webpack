@@ -55,9 +55,7 @@ describe('cleanup', () => {
     module = _.assign(
       {
         serverless,
-        options: {
-          verbose: true
-        },
+        options: {},
         webpackOutputPath: 'my/Output/Path'
       },
       baseModule
