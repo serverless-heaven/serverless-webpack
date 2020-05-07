@@ -23,6 +23,7 @@ module.exports.create = sandbox => {
     readFileSync: sandbox.stub(),
     statSync: sinon.stub().returns(statMock), // Persistent stub
     writeFileSync: sandbox.stub(),
+    copyFileSync: sandbox.stub(),
 
     _streamMock: streamMock,
     _statMock: statMock

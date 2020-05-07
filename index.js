@@ -81,7 +81,7 @@ class ServerlessWebpack {
           },
           package: {
             type: 'entrypoint',
-            lifecycleEvents: [ 'packExternalModules', 'packageModules' ]
+            lifecycleEvents: [ 'packExternalModules', 'packageModules', 'copyExistingArtifacts' ]
           }
         }
       }
@@ -91,7 +91,7 @@ class ServerlessWebpack {
       'before:package:createDeploymentArtifacts': () =>
         BbPromise.bind(this)
           .then(() => this.serverless.pluginManager.spawn('webpack:validate'))
-          .then(() => this.serverless.pluginManager.spawn('webpack:compile'))
+          .then(() => (this.skipCompile ? BbPromise.resolve() : this.serverless.pluginManager.spawn('webpack:compile')))
           .then(() => this.serverless.pluginManager.spawn('webpack:package')),
 
       'after:package:createDeploymentArtifacts': () => BbPromise.bind(this).then(this.cleanup),
@@ -106,10 +106,6 @@ class ServerlessWebpack {
         BbPromise.bind(this)
           .then(() => {
             lib.webpack.isLocal = true;
-            // --no-build override
-            if (this.options.build === false) {
-              this.skipCompile = true;
-            }
 
             return this.serverless.pluginManager.spawn('webpack:validate');
           })
@@ -158,6 +154,8 @@ class ServerlessWebpack {
       'webpack:package:packExternalModules': () => BbPromise.bind(this).then(this.packExternalModules),
 
       'webpack:package:packageModules': () => BbPromise.bind(this).then(this.packageModules),
+
+      'webpack:package:copyExistingArtifacts': () => BbPromise.bind(this).then(this.copyExistingArtifacts),
 
       'before:offline:start': () =>
         BbPromise.bind(this)
