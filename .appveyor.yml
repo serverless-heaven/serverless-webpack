@@ -1,6 +1,6 @@
 environment:
   matrix:
-    - NODEJS_VERSION: "6"
+    - NODEJS_VERSION: "10"
 
 install:
   # Get the version of Node.js
