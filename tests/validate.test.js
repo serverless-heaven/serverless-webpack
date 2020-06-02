@@ -212,6 +212,21 @@ describe('validate', () => {
     });
   });
 
+  describe('default node', () => {
+    it('should turn NodeStuffPlugin and NodeSourcePlugin plugins off by default', () => {
+      const testEntry = 'testentry';
+      const testConfig = {
+        entry: testEntry,
+      };
+      const testServicePath = 'testpath';
+      module.serverless.config.servicePath = testServicePath;
+      _.set(module.serverless.service, 'custom.webpack.config', testConfig);
+      return module
+        .validate()
+        .then(() => expect(module.webpackConfig.node).to.eql(false));
+    });
+  });
+
   describe('config file load', () => {
     it('should load a webpack config from file if `custom.webpack` is a string', () => {
       const testConfig = 'testconfig';
@@ -897,3 +912,4 @@ describe('validate', () => {
     });
   });
 });
+
