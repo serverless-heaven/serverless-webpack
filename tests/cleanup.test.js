@@ -55,8 +55,7 @@ describe('cleanup', () => {
       {
         serverless,
         options: {},
-        webpackOutputPath: 'my/Output/Path',
-        configuration: {}
+        webpackOutputPath: 'my/Output/Path'
       },
       baseModule
     );
@@ -96,7 +95,7 @@ describe('cleanup', () => {
     fseMock.removeSync.reset();
 
     const configuredModule = _.assign({}, module, {
-      configuration: { keepOutputDirectory: true }
+      keepOutputDirectory: true
     });
     return expect(configuredModule.cleanup()).to.be.fulfilled.then(() => {
       expect(dirExistsSyncStub).to.not.have.been.calledOnce;
