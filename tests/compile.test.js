@@ -103,7 +103,7 @@ describe('compile', () => {
     });
   });
 
-  it('should work with serialized compile', () => {
+  it('should work with concurrent compile', () => {
     const testWebpackConfig = ['testconfig'];
     const multiStats = {
       stats: [{
@@ -119,7 +119,7 @@ describe('compile', () => {
     };
     module.webpackConfig = testWebpackConfig;
     module.multiCompile = true;
-    module.serializedCompile = true;
+    module.concurrency = 1;
     webpackMock.compilerMock.run.reset();
     webpackMock.compilerMock.run.yields(null, multiStats);
     return expect(module.compile()).to.be.fulfilled
