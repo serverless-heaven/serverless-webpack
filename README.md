@@ -540,12 +540,12 @@ if you are trying to override the entry in webpack.config.js with other unsuppor
 The individual packaging needs more time at the packaging phase, but you'll
 get that paid back twice at runtime.
 
-#### Individual packaging serializedCompile
+#### Individual packaging concurrency
 ```yaml
 # serverless.yml
 custom:
   webpack:
-    serializedCompile: true
+    concurrency: 5
 ```
 Will run each webpack build one at a time which helps reduce memory usage and in some cases impoves overall build performance.
 
