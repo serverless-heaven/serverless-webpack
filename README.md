@@ -1046,3 +1046,4 @@ me to take it over and continue working on the project. That helped to revive it
 [link-505]: https://github.com/serverless-heaven/serverless-webpack/issues/505
 [link-499]: https://github.com/serverless-heaven/serverless-webpack/issues/499
 [link-496]: https://github.com/serverless-heaven/serverless-webpack/pull/496
+
