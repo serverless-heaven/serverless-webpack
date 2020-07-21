@@ -756,6 +756,14 @@ me to take it over and continue working on the project. That helped to revive it
 
 ## Release Notes
 
+* 5.3.3
+  * default webpackConfig.node should be false #502
+  * Fix yarn list --json stdOut parsing. fixes #388 #516
+  * Updated release notes #585
+  * Updated Node versions in CI #587
+  * Remove optional peer dependencies #542
+  * Check for node runtimes first #579
+
 * 5.3.2
   * Fix eslint prettier #518
   * Add TypeScript definition #520
