@@ -7,6 +7,7 @@
   * Updated Node versions in CI #587
   * Remove optional peer dependencies #542
   * Check for node runtimes first #579
+  * Bumps lodash from 4.17.15 to 4.17.19 #602
 
 * 5.3.2
   * Fix eslint prettier #518
