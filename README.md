@@ -305,17 +305,17 @@ custom:
 #### Runtime dependencies
 
 If a runtime dependency is detected that is found in the `devDependencies` section and
-so would not be packaged, the plugin will error until you explicitly exclude it (see `forceExclude` below) 
+so would not be packaged, the plugin will error until you explicitly exclude it (see `forceExclude` below)
 or move it to the `dependencies` section.
 
 #### AWS-SDK
 
 An exception for the runtime dependency error is the AWS-SDK. All projects using the AWS-SDK normally
-have it listed in `devDependencies` because AWS provides it already in their Lambda environment. In this case 
+have it listed in `devDependencies` because AWS provides it already in their Lambda environment. In this case
 the aws-sdk is automatically excluded and only an informational message is printed (in `--verbose` mode).
 
 The main reason for the warning is, that silently ignoring anything contradicts the declarative nature
-of Serverless' service definition. So the correct way to define the handling for the aws-sdk is, as 
+of Serverless' service definition. So the correct way to define the handling for the aws-sdk is, as
 you would do for all other excluded modules (see `forceExclude` below).
 
 ```yaml
@@ -342,7 +342,7 @@ custom:
 ```
 
 You should select the packager, that you use to develop your projects, because only
-then locked versions will be handled correctly, i.e. the plugin uses the generated 
+then locked versions will be handled correctly, i.e. the plugin uses the generated
 (and usually committed) package lock file that is created by your favorite packager.
 
 Each packager might support specific options that can be set in the `packagerOptions`
@@ -375,7 +375,7 @@ You can specify custom scripts that are executed after the installation of the f
 has been finished. These are standard packager scripts as they can be used in any `package.json`.
 
 Warning: The use cases for them are very rare and specific and you should investigate first,
-if your use case can be covered with webpack plugins first. They should never access files 
+if your use case can be covered with webpack plugins first. They should never access files
 outside of their current working directory which is the compiled function folder, if any.
 A valid use case would be to start anything available as binary from `node_modules`.
 
@@ -751,7 +751,7 @@ plugin when running a command or invoked by a hook.
 
 ## Thanks
 
-Special thanks go to the initial author of serverless-webpack, Nicola Peduzzi (https://github.com/thenikso), who allowed
+Special thanks go to the initial author of serverless-webpack, [Nicola Peduzzi](https://github.com/thenikso), who allowed
 me to take it over and continue working on the project. That helped to revive it and lead it to new horizons.
 
 ## Release Notes
@@ -765,7 +765,7 @@ See [CHANGELOG.md](./CHANGELOG.md)
 [ico-coverage]: https://coveralls.io/repos/github/serverless-heaven/serverless-webpack/badge.svg?branch=master
 [ico-contributors]: https://img.shields.io/github/contributors/serverless-heaven/serverless-webpack.svg
 
-[link-serverless]: http://www.serverless.com/
+[link-serverless]: https://www.serverless.com/
 [link-license]: ./blob/master/LICENSE
 [link-npm]: https://www.npmjs.com/package/serverless-webpack
 [link-build]: https://travis-ci.org/serverless-heaven/serverless-webpack
@@ -786,123 +786,3 @@ See [CHANGELOG.md](./CHANGELOG.md)
 [link-serverless-dynamodb-local]: https://www.npmjs.com/package/serverless-dynamodb-local
 [link-step-functions-offline]: https://www.npmjs.com/package/serverless-step-functions-offline
 [ico-step-functions-offline]: https://img.shields.io/npm/v/serverless-step-functions-offline.svg
-
-[comment]: # (Referenced issues)
-
-[link-135]: https://github.com/serverless-heaven/serverless-webpack/issues/135
-
-[link-83]: https://github.com/serverless-heaven/serverless-webpack/pull/83
-[link-88]: https://github.com/serverless-heaven/serverless-webpack/pull/88
-[link-127]: https://github.com/serverless-heaven/serverless-webpack/pull/127
-[link-131]: https://github.com/serverless-heaven/serverless-webpack/pull/131
-[link-132]: https://github.com/serverless-heaven/serverless-webpack/pull/132
-[link-140]: https://github.com/serverless-heaven/serverless-webpack/pull/140
-[link-141]: https://github.com/serverless-heaven/serverless-webpack/issues/141
-[link-144]: https://github.com/serverless-heaven/serverless-webpack/issues/144
-
-[link-11]: https://github.com/serverless-heaven/serverless-webpack/issues/11
-[link-107]: https://github.com/serverless-heaven/serverless-webpack/issues/107
-[link-129]: https://github.com/serverless-heaven/serverless-webpack/pull/129
-[link-154]: https://github.com/serverless-heaven/serverless-webpack/issues/154
-[link-159]: https://github.com/serverless-heaven/serverless-webpack/issues/159
-
-[link-158]: https://github.com/serverless-heaven/serverless-webpack/issues/158
-[link-165]: https://github.com/serverless-heaven/serverless-webpack/issues/165
-
-[link-193]: https://github.com/serverless-heaven/serverless-webpack/issues/193
-
-[link-116]: https://github.com/serverless-heaven/serverless-webpack/issues/116
-[link-117]: https://github.com/serverless-heaven/serverless-webpack/issues/117
-[link-120]: https://github.com/serverless-heaven/serverless-webpack/issues/120
-[link-145]: https://github.com/serverless-heaven/serverless-webpack/issues/145
-[link-151]: https://github.com/serverless-heaven/serverless-webpack/issues/151
-[link-152]: https://github.com/serverless-heaven/serverless-webpack/issues/152
-[link-173]: https://github.com/serverless-heaven/serverless-webpack/issues/173
-[link-179]: https://github.com/serverless-heaven/serverless-webpack/pull/179
-[link-185]: https://github.com/serverless-heaven/serverless-webpack/pull/185
-[link-186]: https://github.com/serverless-heaven/serverless-webpack/pull/186
-
-[link-202]: https://github.com/serverless-heaven/serverless-webpack/issues/202
-
-[link-215]: https://github.com/serverless-heaven/serverless-webpack/issues/215
-[link-217]: https://github.com/serverless-heaven/serverless-webpack/issues/217
-[link-221]: https://github.com/serverless-heaven/serverless-webpack/pull/221
-[link-223]: https://github.com/serverless-heaven/serverless-webpack/issues/223
-[link-227]: https://github.com/serverless-heaven/serverless-webpack/pull/227
-[link-234]: https://github.com/serverless-heaven/serverless-webpack/pull/234
-
-[link-245]: https://github.com/serverless-heaven/serverless-webpack/issues/245
-
-[link-251]: https://github.com/serverless-heaven/serverless-webpack/issues/251
-
-[link-126]: https://github.com/serverless-heaven/serverless-webpack/issues/126
-[link-247]: https://github.com/serverless-heaven/serverless-webpack/issues/247
-[link-250]: https://github.com/serverless-heaven/serverless-webpack/issues/250
-[link-254]: https://github.com/serverless-heaven/serverless-webpack/pull/254
-[link-260]: https://github.com/serverless-heaven/serverless-webpack/issues/260
-[link-264]: https://github.com/serverless-heaven/serverless-webpack/pull/264
-[link-265]: https://github.com/serverless-heaven/serverless-webpack/pull/265
-
-[link-272]: https://github.com/serverless-heaven/serverless-webpack/issues/272
-[link-278]: https://github.com/serverless-heaven/serverless-webpack/pull/278
-[link-279]: https://github.com/serverless-heaven/serverless-webpack/issues/279
-[link-276]: https://github.com/serverless-heaven/serverless-webpack/issues/276
-[link-269]: https://github.com/serverless-heaven/serverless-webpack/issues/269
-
-[link-263]: https://github.com/serverless-heaven/serverless-webpack/issues/263
-
-[link-286]: https://github.com/serverless-heaven/serverless-webpack/issues/286
-
-[link-315]: https://github.com/serverless-heaven/serverless-webpack/issues/315
-[link-316]: https://github.com/serverless-heaven/serverless-webpack/issues/316
-[link-253]: https://github.com/serverless-heaven/serverless-webpack/issues/253
-[link-317]: https://github.com/serverless-heaven/serverless-webpack/pull/317
-[link-321]: https://github.com/serverless-heaven/serverless-webpack/pull/321
-
-[link-313]: https://github.com/serverless-heaven/serverless-webpack/pull/313
-[link-326]: https://github.com/serverless-heaven/serverless-webpack/pull/326
-[link-329]: https://github.com/serverless-heaven/serverless-webpack/issues/329
-
-[link-232]: https://github.com/serverless-heaven/serverless-webpack/issues/232
-[link-331]: https://github.com/serverless-heaven/serverless-webpack/issues/331
-[link-328]: https://github.com/serverless-heaven/serverless-webpack/pull/328
-[link-336]: https://github.com/serverless-heaven/serverless-webpack/pull/336
-[link-337]: https://github.com/serverless-heaven/serverless-webpack/pull/337
-
-[link-275]: https://github.com/serverless-heaven/serverless-webpack/issues/275
-[link-286]: https://github.com/serverless-heaven/serverless-webpack/issues/286
-[link-341]: https://github.com/serverless-heaven/serverless-webpack/issues/341
-[link-342]: https://github.com/serverless-heaven/serverless-webpack/issues/342
-[link-343]: https://github.com/serverless-heaven/serverless-webpack/issues/343
-
-[link-349]: https://github.com/serverless-heaven/serverless-webpack/issues/349
-[link-354]: https://github.com/serverless-heaven/serverless-webpack/pull/354
-[link-355]: https://github.com/serverless-heaven/serverless-webpack/pull/355
-
-[link-309]: https://github.com/serverless-heaven/serverless-webpack/issues/309
-[link-365]: https://github.com/serverless-heaven/serverless-webpack/pull/365
-[link-373]: https://github.com/serverless-heaven/serverless-webpack/pull/373
-
-[link-370]: https://github.com/serverless-heaven/serverless-webpack/issues/370
-
-[link-379]: https://github.com/serverless-heaven/serverless-webpack/issues/379
-[link-382]: https://github.com/serverless-heaven/serverless-webpack/pull/382
-[link-384]: https://github.com/serverless-heaven/serverless-webpack/pull/384
-
-[link-393]: https://github.com/serverless-heaven/serverless-webpack/issues/393
-[link-412]: https://github.com/serverless-heaven/serverless-webpack/issues/412
-[link-418]: https://github.com/serverless-heaven/serverless-webpack/issues/418
-
-[link-453]: https://github.com/serverless-heaven/serverless-webpack/issues/453
-[link-467]: https://github.com/serverless-heaven/serverless-webpack/issues/467
-[link-449]: https://github.com/serverless-heaven/serverless-webpack/issues/449
-[link-465]: https://github.com/serverless-heaven/serverless-webpack/issues/465
-[link-480]: https://github.com/serverless-heaven/serverless-webpack/issues/480
-[link-429]: https://github.com/serverless-heaven/serverless-webpack/pull/429
-[link-433]: https://github.com/serverless-heaven/serverless-webpack/issues/433
-[link-471]: https://github.com/serverless-heaven/serverless-webpack/issues/471
-[link-472]: https://github.com/serverless-heaven/serverless-webpack/pull/472
-
-[link-505]: https://github.com/serverless-heaven/serverless-webpack/issues/505
-[link-499]: https://github.com/serverless-heaven/serverless-webpack/issues/499
-[link-496]: https://github.com/serverless-heaven/serverless-webpack/pull/496
