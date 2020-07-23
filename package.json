@@ -53,7 +53,7 @@
     "fs-extra": "^8.1.0",
     "glob": "^7.1.4",
     "is-builtin-module": "^3.0.0",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.19",
     "semver": "^6.2.0",
     "ts-node": "^8.3.0"
   },
