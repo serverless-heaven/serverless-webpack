@@ -1,10 +1,11 @@
 environment:
   matrix:
-    - NODEJS_VERSION: "10"
+    - nodejs_version: "10"
+    - nodejs_version: "12"
 
 install:
   # Get the version of Node.js
-  - ps: Install-Product node $Env:NODEJS_VERSION
+  - ps: Install-Product node $env:nodejs_version
   # install modules
   - npm install
   - node --version
