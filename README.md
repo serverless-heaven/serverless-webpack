@@ -455,14 +455,14 @@ This is also useful for projects that use TypeScript.
 #### Exclude Files with Regular Expression
 
 This config option allows you to filter files that match a regex pattern before
-adding to the zip file. Just add: `excludeRegex: \.ts|test|\.map` (with whatever 
+adding to the zip file. Just add: `excludeRegex: \.ts|test|\.map` (with whatever
 regex you want to exclude).
 
 ```yaml
 # serverless.yml
 custom:
   webpack:
-    excludeRegex: \.ts|test|\.map
+    excludeRegex: /\.ts|test|\.map/
 ```
 
 #### Keep output directory after packaging
