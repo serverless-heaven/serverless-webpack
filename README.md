@@ -305,17 +305,17 @@ custom:
 #### Runtime dependencies
 
 If a runtime dependency is detected that is found in the `devDependencies` section and
-so would not be packaged, the plugin will error until you explicitly exclude it (see `forceExclude` below) 
+so would not be packaged, the plugin will error until you explicitly exclude it (see `forceExclude` below)
 or move it to the `dependencies` section.
 
 #### AWS-SDK
 
 An exception for the runtime dependency error is the AWS-SDK. All projects using the AWS-SDK normally
-have it listed in `devDependencies` because AWS provides it already in their Lambda environment. In this case 
+have it listed in `devDependencies` because AWS provides it already in their Lambda environment. In this case
 the aws-sdk is automatically excluded and only an informational message is printed (in `--verbose` mode).
 
 The main reason for the warning is, that silently ignoring anything contradicts the declarative nature
-of Serverless' service definition. So the correct way to define the handling for the aws-sdk is, as 
+of Serverless' service definition. So the correct way to define the handling for the aws-sdk is, as
 you would do for all other excluded modules (see `forceExclude` below).
 
 ```yaml
@@ -342,7 +342,7 @@ custom:
 ```
 
 You should select the packager, that you use to develop your projects, because only
-then locked versions will be handled correctly, i.e. the plugin uses the generated 
+then locked versions will be handled correctly, i.e. the plugin uses the generated
 (and usually committed) package lock file that is created by your favorite packager.
 
 Each packager might support specific options that can be set in the `packagerOptions`
@@ -375,7 +375,7 @@ You can specify custom scripts that are executed after the installation of the f
 has been finished. These are standard packager scripts as they can be used in any `package.json`.
 
 Warning: The use cases for them are very rare and specific and you should investigate first,
-if your use case can be covered with webpack plugins first. They should never access files 
+if your use case can be covered with webpack plugins first. They should never access files
 outside of their current working directory which is the compiled function folder, if any.
 A valid use case would be to start anything available as binary from `node_modules`.
 
@@ -439,7 +439,7 @@ If you have a project structure that uses something like `index.js` and a
 co-located `index.test.js` then you have likely seen an error like:
 `WARNING: More than one matching handlers found for index. Using index.js`
 
-This config option allows you to exlcude files that match a glob from function
+This config option allows you to exclude files that match a glob from function
 resolution. Just add: `excludeFiles: **/*.test.js` (with whatever glob you want
 to exclude).
 
@@ -451,6 +451,19 @@ custom:
 ```
 
 This is also useful for projects that use TypeScript.
+
+#### Exclude Files with Regular Expression
+
+This config option allows you to filter files that match a regex pattern before
+adding to the zip file. Just add: `excludeRegex: \.ts|test|\.map` (with whatever
+regex you want to exclude).
+
+```yaml
+# serverless.yml
+custom:
+  webpack:
+    excludeRegex: /\.ts|test|\.map/
+```
 
 #### Keep output directory after packaging
 
