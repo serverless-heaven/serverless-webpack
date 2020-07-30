@@ -1,7 +1,3 @@
-if (!global._babelPolyfill) {
-   require('babel-polyfill');
-}
-
 export const hello = (event, context, cb) => {
   const p = new Promise((resolve, reject) => {
     resolve('success');

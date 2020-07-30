@@ -1,7 +1,14 @@
 {
   "comments": false,
   "presets": [
-    [ "env", { "node": "6.10" } ]
+    [
+      "@babel/preset-env",
+      {
+        "targets": {
+          "node": "12"
+        }
+      }
+    ]
   ],
   "plugins": [
     "source-map-support"
