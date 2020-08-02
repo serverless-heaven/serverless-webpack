@@ -334,6 +334,24 @@ describe('packExternalModules', () => {
       );
     });
 
+    it('should do nothing if skipCompile is true', () => {
+      module.configuration = new Configuration({
+        webpack: {
+          includeModules: {
+            packagePath: path.join('locals', 'package.json')
+          }
+        }
+      });
+      module.skipCompile = true;
+      return expect(module.packExternalModules()).to.be.fulfilled.then(() =>
+        BbPromise.all([
+          expect(fsExtraMock.copy).to.not.have.been.called,
+          expect(packagerFactoryMock.get).to.not.have.been.called,
+          expect(writeFileSyncStub).to.not.have.been.called
+        ])
+      );
+    });
+
     it('should copy needed package sections if available', () => {
       const originalPackageJSON = {
         name: 'test-service',
@@ -1114,107 +1132,222 @@ describe('packExternalModules', () => {
     });
 
     describe('peer dependencies', () => {
-      before(() => {
-        const peerDepPackageJson = require('./data/package-peerdeps.json');
-        mockery.deregisterMock(path.join(process.cwd(), 'package.json'));
-        mockery.registerMock(path.join(process.cwd(), 'package.json'), peerDepPackageJson);
-        // Mock request-promise package.json
-        const rpPackageJson = require('./data/rp-package.json');
-        const rpPackagePath = path.join(process.cwd(), 'node_modules', 'request-promise', 'package.json');
-        mockery.registerMock(rpPackagePath, rpPackageJson);
-      });
+      /**
+       * Both "default" & "optinal" behaviors are mostly equal.
+       * The only difference between each scenario is they don't use the same package.json as mock
+       */
+      describe('default behavior', () => {
+        before(() => {
+          const peerDepPackageJson = require('./data/package-peerdeps.json');
+          mockery.deregisterMock(path.join(process.cwd(), 'package.json'));
+          mockery.registerMock(path.join(process.cwd(), 'package.json'), peerDepPackageJson);
+          // Mock request-promise package.json
+          const rpPackageJson = require('./data/rp-package.json');
+          const rpPackagePath = path.join(process.cwd(), 'node_modules', 'request-promise', 'package.json');
+          mockery.registerMock(rpPackagePath, rpPackageJson);
+        });
 
-      after(() => {
-        mockery.deregisterMock(path.join(process.cwd(), 'package.json'));
-        mockery.registerMock(path.join(process.cwd(), 'package.json'), packageMock);
-        const rpPackagePath = path.join(process.cwd(), 'node_modules', 'request-promise', 'package.json');
-        mockery.deregisterMock(rpPackagePath);
-      });
+        after(() => {
+          mockery.deregisterMock(path.join(process.cwd(), 'package.json'));
+          mockery.registerMock(path.join(process.cwd(), 'package.json'), packageMock);
+          const rpPackagePath = path.join(process.cwd(), 'node_modules', 'request-promise', 'package.json');
+          mockery.deregisterMock(rpPackagePath);
+        });
 
-      it('should install external peer dependencies', () => {
-        const expectedCompositePackageJSON = {
-          name: 'test-service',
-          version: '1.0.0',
-          description: 'Packaged externals for test-service',
-          private: true,
-          scripts: {},
-          dependencies: {
-            bluebird: '^3.5.0',
-            'request-promise': '^4.2.1',
-            request: '^2.82.0'
-          }
-        };
-        const expectedPackageJSON = {
-          name: 'test-service',
-          version: '1.0.0',
-          description: 'Packaged externals for test-service',
-          private: true,
-          scripts: {},
-          dependencies: {
-            bluebird: '^3.5.0',
-            'request-promise': '^4.2.1',
-            request: '^2.82.0'
-          }
-        };
+        it('should install external peer dependencies', () => {
+          const expectedCompositePackageJSON = {
+            name: 'test-service',
+            version: '1.0.0',
+            description: 'Packaged externals for test-service',
+            private: true,
+            scripts: {},
+            dependencies: {
+              bluebird: '^3.5.0',
+              'request-promise': '^4.2.1',
+              request: '^2.82.0'
+            }
+          };
+          const expectedPackageJSON = {
+            name: 'test-service',
+            version: '1.0.0',
+            description: 'Packaged externals for test-service',
+            private: true,
+            scripts: {},
+            dependencies: {
+              bluebird: '^3.5.0',
+              'request-promise': '^4.2.1',
+              request: '^2.82.0'
+            }
+          };
 
-        const dependencyGraph = require('./data/npm-ls-peerdeps.json');
-        const peerDepStats = {
-          stats: [
-            {
-              compilation: {
-                chunks: [
-                  new ChunkMock([
-                    {
-                      identifier: _.constant('"crypto"')
-                    },
-                    {
-                      identifier: _.constant('"uuid/v4"')
-                    },
-                    {
-                      identifier: _.constant('"mockery"')
-                    },
-                    {
-                      identifier: _.constant('"@scoped/vendor/module1"')
-                    },
-                    {
-                      identifier: _.constant('external "bluebird"')
-                    },
-                    {
-                      identifier: _.constant('external "request-promise"')
-                    }
-                  ])
-                ],
-                compiler: {
-                  outputPath: '/my/Service/Path/.webpack/service'
+          const dependencyGraph = require('./data/npm-ls-peerdeps.json');
+          const peerDepStats = {
+            stats: [
+              {
+                compilation: {
+                  chunks: [
+                    new ChunkMock([
+                      {
+                        identifier: _.constant('"crypto"')
+                      },
+                      {
+                        identifier: _.constant('"uuid/v4"')
+                      },
+                      {
+                        identifier: _.constant('"mockery"')
+                      },
+                      {
+                        identifier: _.constant('"@scoped/vendor/module1"')
+                      },
+                      {
+                        identifier: _.constant('external "bluebird"')
+                      },
+                      {
+                        identifier: _.constant('external "request-promise"')
+                      }
+                    ])
+                  ],
+                  compiler: {
+                    outputPath: '/my/Service/Path/.webpack/service'
+                  }
                 }
               }
-            }
-          ]
-        };
+            ]
+          };
 
-        module.webpackOutputPath = 'outputPath';
-        fsExtraMock.pathExists.yields(null, false);
-        fsExtraMock.copy.yields();
-        packagerMock.getProdDependencies.returns(BbPromise.resolve(dependencyGraph));
-        packagerMock.install.returns(BbPromise.resolve());
-        packagerMock.prune.returns(BbPromise.resolve());
-        packagerMock.runScripts.returns(BbPromise.resolve());
-        module.compileStats = peerDepStats;
-        return expect(module.packExternalModules()).to.be.fulfilled.then(() =>
-          BbPromise.all([
-            // The module package JSON and the composite one should have been stored
-            expect(writeFileSyncStub).to.have.been.calledTwice,
-            expect(writeFileSyncStub.firstCall.args[1]).to.equal(JSON.stringify(expectedCompositePackageJSON, null, 2)),
-            expect(writeFileSyncStub.secondCall.args[1]).to.equal(JSON.stringify(expectedPackageJSON, null, 2)),
-            // The modules should have been copied
-            expect(fsExtraMock.copy).to.have.been.calledOnce,
-            // npm ls and npm prune should have been called
-            expect(packagerMock.getProdDependencies).to.have.been.calledOnce,
-            expect(packagerMock.install).to.have.been.calledOnce,
-            expect(packagerMock.prune).to.have.been.calledOnce,
-            expect(packagerMock.runScripts).to.have.been.calledOnce
-          ])
-        );
+          module.webpackOutputPath = 'outputPath';
+          fsExtraMock.pathExists.yields(null, false);
+          fsExtraMock.copy.yields();
+          packagerMock.getProdDependencies.returns(BbPromise.resolve(dependencyGraph));
+          packagerMock.install.returns(BbPromise.resolve());
+          packagerMock.prune.returns(BbPromise.resolve());
+          packagerMock.runScripts.returns(BbPromise.resolve());
+          module.compileStats = peerDepStats;
+          return expect(module.packExternalModules()).to.be.fulfilled.then(() =>
+            BbPromise.all([
+              // The module package JSON and the composite one should have been stored
+              expect(writeFileSyncStub).to.have.been.calledTwice,
+              expect(writeFileSyncStub.firstCall.args[1]).to.equal(
+                JSON.stringify(expectedCompositePackageJSON, null, 2)
+              ),
+              expect(writeFileSyncStub.secondCall.args[1]).to.equal(JSON.stringify(expectedPackageJSON, null, 2)),
+              // The modules should have been copied
+              expect(fsExtraMock.copy).to.have.been.calledOnce,
+              // npm ls and npm prune should have been called
+              expect(packagerMock.getProdDependencies).to.have.been.calledOnce,
+              expect(packagerMock.install).to.have.been.calledOnce,
+              expect(packagerMock.prune).to.have.been.calledOnce,
+              expect(packagerMock.runScripts).to.have.been.calledOnce
+            ])
+          );
+        });
+      });
+
+      describe('optional behavior', () => {
+        before(() => {
+          const peerDepPackageJson = require('./data/package-peerdeps.json');
+          mockery.deregisterMock(path.join(process.cwd(), 'package.json'));
+          mockery.registerMock(path.join(process.cwd(), 'package.json'), peerDepPackageJson);
+          // Mock request-promise package.json
+          const rpPackageJson = require('./data/rp-package-optional.json');
+          const rpPackagePath = path.join(process.cwd(), 'node_modules', 'request-promise', 'package.json');
+          mockery.registerMock(rpPackagePath, rpPackageJson);
+        });
+
+        after(() => {
+          mockery.deregisterMock(path.join(process.cwd(), 'package.json'));
+          mockery.registerMock(path.join(process.cwd(), 'package.json'), packageMock);
+          const rpPackagePath = path.join(process.cwd(), 'node_modules', 'request-promise', 'package.json');
+          mockery.deregisterMock(rpPackagePath);
+        });
+
+        it('should skip optional peer dependencies', () => {
+          const expectedCompositePackageJSON = {
+            name: 'test-service',
+            version: '1.0.0',
+            description: 'Packaged externals for test-service',
+            private: true,
+            scripts: {},
+            dependencies: {
+              bluebird: '^3.5.0',
+              'request-promise': '^4.2.1',
+              request: '^2.82.0'
+            }
+          };
+          const expectedPackageJSON = {
+            name: 'test-service',
+            version: '1.0.0',
+            description: 'Packaged externals for test-service',
+            private: true,
+            scripts: {},
+            dependencies: {
+              bluebird: '^3.5.0',
+              'request-promise': '^4.2.1',
+              request: '^2.82.0'
+            }
+          };
+
+          const dependencyGraph = require('./data/npm-ls-peerdeps.json');
+          const peerDepStats = {
+            stats: [
+              {
+                compilation: {
+                  chunks: [
+                    new ChunkMock([
+                      {
+                        identifier: _.constant('"crypto"')
+                      },
+                      {
+                        identifier: _.constant('"uuid/v4"')
+                      },
+                      {
+                        identifier: _.constant('"mockery"')
+                      },
+                      {
+                        identifier: _.constant('"@scoped/vendor/module1"')
+                      },
+                      {
+                        identifier: _.constant('external "bluebird"')
+                      },
+                      {
+                        identifier: _.constant('external "request-promise"')
+                      }
+                    ])
+                  ],
+                  compiler: {
+                    outputPath: '/my/Service/Path/.webpack/service'
+                  }
+                }
+              }
+            ]
+          };
+
+          module.webpackOutputPath = 'outputPath';
+          fsExtraMock.pathExists.yields(null, false);
+          fsExtraMock.copy.yields();
+          packagerMock.getProdDependencies.returns(BbPromise.resolve(dependencyGraph));
+          packagerMock.install.returns(BbPromise.resolve());
+          packagerMock.prune.returns(BbPromise.resolve());
+          packagerMock.runScripts.returns(BbPromise.resolve());
+          module.compileStats = peerDepStats;
+          return expect(module.packExternalModules()).to.be.fulfilled.then(() =>
+            BbPromise.all([
+              // The module package JSON and the composite one should have been stored
+              expect(writeFileSyncStub).to.have.been.calledTwice,
+              expect(writeFileSyncStub.firstCall.args[1]).to.equal(
+                JSON.stringify(expectedCompositePackageJSON, null, 2)
+              ),
+              expect(writeFileSyncStub.secondCall.args[1]).to.equal(JSON.stringify(expectedPackageJSON, null, 2)),
+              // The modules should have been copied
+              expect(fsExtraMock.copy).to.have.been.calledOnce,
+              // npm ls and npm prune should have been called
+              expect(packagerMock.getProdDependencies).to.have.been.calledOnce,
+              expect(packagerMock.install).to.have.been.calledOnce,
+              expect(packagerMock.prune).to.have.been.calledOnce,
+              expect(packagerMock.runScripts).to.have.been.calledOnce
+            ])
+          );
+        });
       });
     });
   });

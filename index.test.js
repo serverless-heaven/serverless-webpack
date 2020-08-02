@@ -118,6 +118,7 @@ describe('ServerlessWebpack', () => {
       sandbox.stub(slsw, 'watch').returns(BbPromise.resolve());
       sandbox.stub(slsw, 'wpwatch').returns(BbPromise.resolve());
       sandbox.stub(slsw, 'packExternalModules').returns(BbPromise.resolve());
+      sandbox.stub(slsw, 'copyExistingArtifacts').returns(BbPromise.resolve());
       sandbox.stub(slsw, 'prepareRun').returns(BbPromise.resolve());
       sandbox.stub(slsw, 'watchRun').returns(BbPromise.resolve());
       sandbox.stub(slsw, 'validate').returns(BbPromise.resolve());
@@ -130,6 +131,7 @@ describe('ServerlessWebpack', () => {
 
     beforeEach(() => {
       ServerlessWebpack.lib.webpack.isLocal = false;
+      slsw.skipCompile = false;
     });
 
     after(() => {
@@ -151,6 +153,20 @@ describe('ServerlessWebpack', () => {
                   'webpack:compile'
                 );
                 expect(slsw.serverless.pluginManager.spawn.thirdCall).to.have.been.calledWithExactly('webpack:package');
+                return null;
+              });
+            });
+
+            it('should skip compile if requested', () => {
+              slsw.skipCompile = true;
+              return expect(slsw.hooks['before:package:createDeploymentArtifacts']()).to.be.fulfilled.then(() => {
+                expect(slsw.serverless.pluginManager.spawn).to.have.been.calledTwice;
+                expect(slsw.serverless.pluginManager.spawn.firstCall).to.have.been.calledWithExactly(
+                  'webpack:validate'
+                );
+                expect(slsw.serverless.pluginManager.spawn.secondCall).to.have.been.calledWithExactly(
+                  'webpack:package'
+                );
                 return null;
               });
             });
@@ -222,7 +238,7 @@ describe('ServerlessWebpack', () => {
             });
 
             it('should skip compile if requested', () => {
-              slsw.options.build = false;
+              slsw.skipCompile = true;
               return expect(slsw.hooks['before:invoke:local:invoke']()).to.be.fulfilled.then(() => {
                 expect(slsw.serverless.pluginManager.spawn).to.have.been.calledOnce;
                 expect(slsw.serverless.pluginManager.spawn).to.have.been.calledWithExactly('webpack:validate');
@@ -341,6 +357,17 @@ describe('ServerlessWebpack', () => {
             it('should call packageModules', () => {
               return expect(slsw.hooks['webpack:package:packageModules']()).to.be.fulfilled.then(() => {
                 expect(slsw.packageModules).to.have.been.calledOnce;
+                return null;
+              });
+            });
+          }
+        },
+        {
+          name: 'webpack:package:copyExistingArtifacts',
+          test: () => {
+            it('should call copyExistingArtifacts', () => {
+              return expect(slsw.hooks['webpack:package:copyExistingArtifacts']()).to.be.fulfilled.then(() => {
+                expect(slsw.copyExistingArtifacts).to.have.been.calledOnce;
                 return null;
               });
             });
