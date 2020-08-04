@@ -12,7 +12,7 @@ install:
   - npm --version
 
 test_script:
-  - npm test
+  - npm run test
 
 # Don't actually build.
 build: off

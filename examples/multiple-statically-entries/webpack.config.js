@@ -8,6 +8,7 @@
  */
 
 const path = require('path');
+const slsw = require('serverless-webpack');
 
 module.exports = {
   entry: {
@@ -15,6 +16,7 @@ module.exports = {
     second: './second.js'
   },
   target: 'node',
+  mode: slsw.lib.webpack.isLocal ? 'development': 'production',
   output: {
     libraryTarget: 'commonjs',
     path: path.join(__dirname, '.webpack'),
