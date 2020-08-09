@@ -9,3 +9,8 @@ yarn.lock
 yarn-error.log
 .appveyor.yml
 .travis.yml
+.editorconfig
+.eslintrc.yml
+.huskyrc
+.lintstagedrc.yml
+prettier.config.js
