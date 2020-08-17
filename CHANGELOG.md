@@ -1,5 +1,15 @@
 # Change Log
 
+* 5.3.4
+  * Bump lodash from 4.17.15 to 4.17.19 [#597](https://github.com/serverless-heaven/serverless-webpack/pull/597)
+  * Bump lodash from 4.17.15 to 4.17.19 in /examples/typescript [#598](https://github.com/serverless-heaven/serverless-webpack/pull/598)
+  * Bump lodash from 4.17.4 to 4.17.19 in /examples/multiple-statically-entries [#599](https://github.com/serverless-heaven/serverless-webpack/pull/599)
+  * Bump lodash from 4.17.4 to 4.17.19 in /examples/include-external-npm-packages [#600](https://github.com/serverless-heaven/serverless-webpack/pull/600)
+  * Bump lodash from 4.17.4 to 4.17.19 in /examples/babel-multiple-statically-entries [#601](https://github.com/serverless-heaven/serverless-webpack/pull/601)
+  * Bump lodash from 4.17.4 to 4.17.19 in /examples/babel [#603] (https://github.com/serverless-heaven/serverless-webpack/pull/603)
+  * Ignore more files from NPM [#609](https://github.com/serverless-heaven/serverless-webpack/pull/609)
+  * Update all examples [#626](https://github.com/serverless-heaven/serverless-webpack/pull/626)
+
 * 5.3.3
   * default webpackConfig.node should be false [#502](https://github.com/serverless-heaven/serverless-webpack/pull/502)
   * Fix yarn list --json stdOut parsing [#516](https://github.com/serverless-heaven/serverless-webpack/pull/516)
