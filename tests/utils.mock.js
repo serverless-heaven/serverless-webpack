@@ -5,7 +5,7 @@ const sinon = require('sinon');
 module.exports = () => ({
   _resetSpies() {
     for (const p in this) {
-      if (this.hasOwnProperty(p) && p !== '_resetSpies') {
+      if (Object.prototype.hasOwnProperty.call(this, p) && p !== '_resetSpies') {
         this[p].reset();
       }
     }

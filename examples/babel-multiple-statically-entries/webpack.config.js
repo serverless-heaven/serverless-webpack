@@ -7,7 +7,7 @@ module.exports = {
     second: ['./second.js']
   },
   target: 'node',
-  mode: slsw.lib.webpack.isLocal ? 'development': 'production',
+  mode: slsw.lib.webpack.isLocal ? 'development' : 'production',
   module: {
     rules: [
       {
@@ -18,7 +18,7 @@ module.exports = {
           {
             loader: 'babel-loader'
           }
-        ],
+        ]
       }
     ]
   },

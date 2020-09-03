@@ -14,7 +14,7 @@ chai.use(require('sinon-chai'));
 
 const expect = chai.expect;
 
-describe('wpwatch', function() {
+describe('wpwatch', function () {
   let sandbox;
   let webpackMock;
   let utilsMock;

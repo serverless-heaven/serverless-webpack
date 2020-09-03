@@ -1,8 +1,8 @@
 'use strict';
 
-var AWS = require('aws-sdk');
-var fbgraph = require('fbgraph');
+const AWS = require('aws-sdk');
+const fbgraph = require('fbgraph');
 
 module.exports.hello = function (event, context, cb) {
- cb(null, { message: 'hello fb & aws', event });
-}
+  cb(null, { message: 'hello fb & aws', event });
+};

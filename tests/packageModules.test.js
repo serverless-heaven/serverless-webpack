@@ -147,12 +147,8 @@ describe('packageModules', () => {
         module.compileStats = stats;
         return expect(module.packageModules()).to.be.fulfilled.then(() =>
           BbPromise.all([
-            expect(func1)
-              .to.have.a.nested.property('package.artifact')
-              .that.equals(expectedArtifactPath),
-            expect(func2)
-              .to.have.a.nested.property('package.artifact')
-              .that.equals(expectedArtifactPath)
+            expect(func1).to.have.a.nested.property('package.artifact').that.equals(expectedArtifactPath),
+            expect(func2).to.have.a.nested.property('package.artifact').that.equals(expectedArtifactPath)
           ])
         );
       });
@@ -215,9 +211,7 @@ describe('packageModules', () => {
 
           module.compileStats = stats;
           return expect(module.packageModules()).to.be.fulfilled.then(() =>
-            expect(serverless.service)
-              .to.have.a.nested.property('package.artifact')
-              .that.equals(expectedArtifactPath)
+            expect(serverless.service).to.have.a.nested.property('package.artifact').that.equals(expectedArtifactPath)
           );
         });
       });
@@ -266,12 +260,8 @@ describe('packageModules', () => {
           getVersionStub.returns(version);
           return expect(module.packageModules()).to.be.fulfilled.then(() =>
             BbPromise.all([
-              expect(func1)
-                .to.have.a.nested.property('package.artifact')
-                .that.equals(expectedArtifactPath),
-              expect(func2)
-                .to.have.a.nested.property('package.artifact')
-                .that.equals(expectedArtifactPath)
+              expect(func1).to.have.a.nested.property('package.artifact').that.equals(expectedArtifactPath),
+              expect(func2).to.have.a.nested.property('package.artifact').that.equals(expectedArtifactPath)
             ])
           );
         }).then(() =>
@@ -279,12 +269,8 @@ describe('packageModules', () => {
             getVersionStub.returns(version);
             return expect(module.packageModules()).to.be.fulfilled.then(() =>
               BbPromise.all([
-                expect(func1)
-                  .to.have.a.nested.property('artifact')
-                  .that.equals(expectedArtifactPath),
-                expect(func2)
-                  .to.have.a.nested.property('artifact')
-                  .that.equals(expectedArtifactPath),
+                expect(func1).to.have.a.nested.property('artifact').that.equals(expectedArtifactPath),
+                expect(func2).to.have.a.nested.property('artifact').that.equals(expectedArtifactPath),
                 expect(func1).to.have.a.nested.property('package.disable').that.is.true,
                 expect(func2).to.have.a.nested.property('package.disable').that.is.true
               ])

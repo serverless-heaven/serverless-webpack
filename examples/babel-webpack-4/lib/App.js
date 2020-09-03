@@ -9,7 +9,7 @@ export class App {
       from: 'First lambda ;-)',
       event
     };
-    
+
     return BbPromise.resolve(myDemoResult);
   }
 
@@ -19,7 +19,7 @@ export class App {
       from: 'Second lambda ;-)',
       event
     };
-    
+
     return BbPromise.resolve(myDemoResult);
   }
 }

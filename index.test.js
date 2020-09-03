@@ -22,7 +22,7 @@ describe('ServerlessWebpack', () => {
   let ServerlessWebpack;
   let moduleStub;
 
-  before(function() {
+  before(function () {
     // Mockery might take some time to clear the cache. So add 3 seconds to the default timeout.
     this.timeout(5000);
 
@@ -59,15 +59,10 @@ describe('ServerlessWebpack', () => {
   it('should expose a lib object', () => {
     const lib = ServerlessWebpack.lib;
     expect(lib).to.be.an('object');
-    expect(lib)
-      .to.have.a.property('entries')
-      .that.is.an('object').that.is.empty;
-    expect(lib)
-      .to.have.a.property('webpack')
-      .that.is.an('object')
-      .that.deep.equals({
-        isLocal: false
-      });
+    expect(lib).to.have.a.property('entries').that.is.an('object').that.is.empty;
+    expect(lib).to.have.a.property('webpack').that.is.an('object').that.deep.equals({
+      isLocal: false
+    });
   });
 
   describe('with a TS webpack configuration', () => {
