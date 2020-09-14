@@ -5,7 +5,7 @@ const nodeExternals = require('webpack-node-externals');
 module.exports = {
   entry: slsw.lib.entries,
   target: 'node',
-  mode: slsw.lib.webpack.isLocal ? 'development': 'production',
+  mode: slsw.lib.webpack.isLocal ? 'development' : 'production',
   optimization: {
     // We no not want to minimize our code.
     minimize: false
@@ -25,7 +25,7 @@ module.exports = {
           {
             loader: 'babel-loader'
           }
-        ],
+        ]
       }
     ]
   },
