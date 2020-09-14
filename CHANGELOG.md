@@ -1,5 +1,10 @@
 # Change Log
 
+* 5.3.5
+  * Improve runtime validation [#629](https://github.com/serverless-heaven/serverless-webpack/pull/629)
+  * Move `ts-node` as optional dependency [#636](https://github.com/serverless-heaven/serverless-webpack/pull/636)
+  * Upgrade deps [#637](https://github.com/serverless-heaven/serverless-webpack/pull/637)
+
 * 5.3.4
   * Bump lodash from 4.17.15 to 4.17.19 [#597](https://github.com/serverless-heaven/serverless-webpack/pull/597)
   * Bump lodash from 4.17.15 to 4.17.19 in /examples/typescript [#598](https://github.com/serverless-heaven/serverless-webpack/pull/598)
