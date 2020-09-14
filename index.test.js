@@ -20,6 +20,7 @@ describe('ServerlessWebpack', () => {
   let sandbox;
   let serverless;
   let ServerlessWebpack;
+  let moduleStub;
 
   before(function() {
     // Mockery might take some time to clear the cache. So add 3 seconds to the default timeout.
@@ -32,7 +33,7 @@ describe('ServerlessWebpack', () => {
     mockery.registerMock('webpack', {});
 
     ServerlessWebpack = require('./index');
-    sandbox.spy(Module, '_load');
+    moduleStub = sandbox.stub(Module, '_load');
   });
 
   beforeEach(() => {
@@ -82,6 +83,25 @@ describe('ServerlessWebpack', () => {
       new ServerlessWebpack(serverless, {});
       expect(Module._load).to.have.been.calledOnce;
       expect(Module._load).to.have.been.calledWith('ts-node/register');
+    });
+
+    it('should throw an error if config use TS but ts-node was not added as dependency', () => {
+      moduleStub.throws();
+
+      _.set(serverless, 'service.custom.webpack.webpackConfig', 'webpack.config.ts');
+
+      const badDeps = function() {
+        new ServerlessWebpack(serverless, {});
+      };
+
+      expect(badDeps).to.throw(
+        'If you want to use TypeScript with serverless-webpack, please add "ts-node" as dependency.'
+      );
+
+      expect(Module._load).to.have.been.calledOnce;
+      expect(Module._load).to.have.been.calledWith('ts-node/register');
+
+      moduleStub.reset();
     });
   });
 

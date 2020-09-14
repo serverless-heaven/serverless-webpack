@@ -216,14 +216,12 @@ describe('validate', () => {
     it('should turn NodeStuffPlugin and NodeSourcePlugin plugins off by default', () => {
       const testEntry = 'testentry';
       const testConfig = {
-        entry: testEntry,
+        entry: testEntry
       };
       const testServicePath = 'testpath';
       module.serverless.config.servicePath = testServicePath;
       _.set(module.serverless.service, 'custom.webpack.config', testConfig);
-      return module
-        .validate()
-        .then(() => expect(module.webpackConfig.node).to.eql(false));
+      return module.validate().then(() => expect(module.webpackConfig.node).to.eql(false));
     });
   });
 
@@ -913,4 +911,3 @@ describe('validate', () => {
     });
   });
 });
-
