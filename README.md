@@ -426,6 +426,19 @@ custom:
 If you specify a module in both arrays, `forceInclude` and `forceExclude`, the
 exclude wins and the module will not be packaged.
 
+#### Workspace modules
+
+When making use of workspaces is might occur that the node_modules directory isn't in the root of your service but in a parent directory.
+To direct the modules packager to the correct directory you can define the path with the `custom: webpack: includeModules: modulesRoot` option in `serverless.yml`:
+
+```yaml
+# serverless.yml
+custom:
+  webpack:
+    includeModules: 
+      modulesRoot: '../../node_modules' # enable auto-packing of external modules
+```
+
 #### Local modules
 
 You can use `file:` version references in your `package.json` to use a node module
