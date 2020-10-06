@@ -1,4 +1,4 @@
-declare module 'serverless-webpack' {
+declare module '@gearshift/serverless-webpack' {
   import serverless from 'serverless';
 
   const lib: {
