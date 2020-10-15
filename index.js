@@ -51,7 +51,7 @@ class ServerlessWebpack {
       prepareLocalInvoke,
       runPluginSupport,
       prepareOfflineInvoke,
-      prepareStepOfflineInvoke,
+      prepareStepOfflineInvoke
     );
 
     this.commands = {
@@ -169,7 +169,7 @@ class ServerlessWebpack {
             }
           })
           .then(this.prepareOfflineInvoke)
-          .then(this.skipCompile? BbPromise.resolve() : this.wpwatch),
+          .then(() => (this.skipCompile ? BbPromise.resolve() : this.wpwatch())),
 
       'before:offline:start:init': () =>
         BbPromise.bind(this)
@@ -181,7 +181,7 @@ class ServerlessWebpack {
             }
           })
           .then(this.prepareOfflineInvoke)
-          .then(this.skipCompile? BbPromise.resolve() : this.wpwatch),
+          .then(() => (this.skipCompile ? BbPromise.resolve() : this.wpwatch())),
 
       'before:step-functions-offline:start': () =>
         BbPromise.bind(this)
