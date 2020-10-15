@@ -85,7 +85,7 @@ describe('ServerlessWebpack', () => {
 
       _.set(serverless, 'service.custom.webpack.webpackConfig', 'webpack.config.ts');
 
-      const badDeps = function () {
+      const badDeps = function() {
         new ServerlessWebpack(serverless, {});
       };
 
