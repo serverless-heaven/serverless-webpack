@@ -620,6 +620,8 @@ e.g. a mounted volume in a Docker container, you can enable polling with the
 `--webpack-use-polling=<time in ms>` option. If you omit the value, it defaults
 to 3000 ms.
 
+If you don't want the plugin to build when using `serverless-offline`, select the `--no-build` option.
+
 #### Custom paths
 
 If you do not use the default path and override it in your Webpack configuration,
