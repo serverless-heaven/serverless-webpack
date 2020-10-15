@@ -230,7 +230,7 @@ const path = require('path');
 module.exports = {
   // ...
   output: {
-    libraryTarget: 'commonjs2',
+    libraryTarget: 'commonjs',
     path: path.resolve(__dirname, '.webpack'),
     filename: '[name].js',
   },
@@ -751,138 +751,12 @@ plugin when running a command or invoked by a hook.
 
 ## Thanks
 
-Special thanks go to the initial author of serverless-webpack, Nicola Peduzzi (https://github.com/thenikso), who allowed
+Special thanks go to the initial author of serverless-webpack, [Nicola Peduzzi](https://github.com/thenikso), who allowed
 me to take it over and continue working on the project. That helped to revive it and lead it to new horizons.
 
 ## Release Notes
 
-* 5.3.0
-  * Restore compatibility with TypeScript [#449][link-449] [#465][link-465]
-  * Allow glob for excludeFiles [#471][link-471]
-  * Support Webpack 5 [#472][link-472]
-  * Use colored output depending on tty [#480][link-480]
-  * Allow to keep webpack folder [#453][link-453] [#467][link-467]
-  * Add ability to exclude files from handler lookup [#433][link-433]
-  * Documentation fixes [#429][link-429]
-
-* 5.2.0
-  * Show info message in verbose mode if aws-sdk has been excluded automatically [#393][link-393]
-  * Added support for asynchronous webpack configuration [#412][link-412]
-  * Better error message if handlers are not found [#418][link-418]
-
-* 5.1.5
-  * Re-publish of 5.1.4 without yarn.lock
-
-* 5.1.4
-  * Fix support for Yarn resolutions definitions [#379][link-379]
-  * Better debugging for "Unable to import module ..." errors: Detect runtime dependencies that are only declared as devDependencies [#384][link-384]
-  * Documentation updates [#382][link-382]
-
-* 5.1.3
-  * Fixed issue with Yarn and file references as dependencies [#370][link-370]
-
-* 5.1.2
-  * Fixed issue that leads to `Unexpected end of JSON` in projects with lots of dependencies [#309][link-309][#373][link-373]
-  * Update webpack-4 example with VSCode debugging configuration [#365][link-365]
-
-* 5.1.1
-  * Fixed local invoke watch mode not executing changed files [#349][link-349]
-  * Added Webpack 4 example [#355][link-355]
-  * Documentation updates [#354][link-354]
-
-* 5.1.0
-  * Support Yarn [#286][link-286]
-  * Allow local invoke to use existing compiled output [#341][link-341] [#275][link-275]
-  * Support custom packager scripts [#343][link-343] [#342][link-342]
-
-* 5.0.0
-  * Support Webpack 4 [#331][link-331] [#328][link-328]
-  * BREAKING: Drop support for Webpack 2
-  * Allow to check for local invocation in the webpack configuration [#232][link-232]
-  * New centralized configuration with fallback to the old one [#336][link-336]
-  * Improved unit tests and actual coverage calculation [#337][link-337]
-
-* 4.4.0
-  * Support serverless-step-functions-offline [#313][link-313]
-  * Fixed webpack documentation links [#326][link-326]
-  * Abstracted packager interface [#329][link-329]
-
-* 4.3.0
-  * Add new `webpack:compile:watch:compile` event [#315][link-315]
-  * Added note to README about using yarn [#316][link-316]
-  * Made babel dynamic example the default babel example [#253][link-253]
-  * Documentation fixes [#317][link-317] [#321][link-321]
-
-* 4.2.0
-  * Support local file references in package.json [#263][link-263]
-  * Updated used tools (dev dependencies)
-
-* 4.1.0
-  * Prohibit manual entry configuration with individual packaging [#272][link-272]
-  * Fixed bug with stats in webpack config for individual packaging [#278][link-278]
-  * Fixed bug with startup order in combination with serverless-offline [#279][link-279]
-  * Default target to "node" if not set [#276][link-276]
-  * Support `serverless run` including watch mode [#269][link-269]
-
-* 4.0.0
-  * BREAKING: Expose lifecycle events for plugin authors [#254][link-254]
-  * Fixed deprecated hook warning [#126][link-126]
-  * Support forceExclude option for external modules [#247][link-247]
-  * Support stats output configuration in webpack config [#260][link-260]
-  * Google: Only integrate package.json but not node modules into artifact [#264][link-264]
-  * Documentation fixes and updates [#265][link-265]
-  * Updated examples [#250][link-250]
-
-* 3.1.2
-  * Fix issue where dependencies with dots in their names would not be installed [#251][link-251]
-
-* 3.1.1
-  * Fix issue where locked dependencies (package-lock.json) were ignored [#245][link-245]
-
-* 3.1.0
-  * Allow filesystem polling in watch mode (`--webpack-use-polling`) [#215][link-215]
-  * Allow forced include of not referenced modules [#217][link-217]
-  * Automatically include peer dependencies of used modules [#223][link-223]
-  * Show explicit message if the provided webpack config can not be loaded [#234][link-234]
-  * Improve examples [#227][link-227]
-  * Update 3rd party provider compatibility table [#221][link-221]
-  * Added automatic Travis and Coveralls builds to increase stability
-
-* 3.0.0
-  * Integrate with `serverless invoke local` [#151][link-151]
-  * Support watch mode with `serverless invoke local --watch`
-  * Stabilized and improved the bundling of node modules [#116][link-116], [#117][link-117]
-  * Improved interoperability with Serverless and 3rd party plugins [#173][link-173]
-  * Support individual packaging of the functions in a service [#120][link-120]
-  * Allow setting stdio max buffers for NPM operations [#185][link-185]
-  * Support bundling of node modules via node-externals whitelist [#186][link-186]
-  * Removed the `webpack serve` command in favor of [`serverless-offline`][link-serverless-offline] [#152][link-152]
-  * Updated examples [#179][link-179]
-  * Added missing unit tests to improve code stability
-  * Fixed unit tests to run on Windows [#145][link-145]
-
-* 2.2.2
-  * Reverted breaking change introduced in default output config [#202][link-202]
-
-* 2.2.1
-  * Restore functionality for Google provider [#193][link-193]
-
-* 2.2.0
-  * Allow full dynamic configurations [#158][link-158]
-  * Fix a bug that prevented the entries lib export to work with TypeScript [#165][link-165]
-
-* 2.1.0
-  * Added support for webpack configuration in TypeScript format [#129][link-129]
-  * Fixed bug with serverless-offline exec [#154][link-154]
-  * Added unit tests for cleanup. Updated test framework [#11][link-11]
-  * Support single function deploy and packaging [#107][link-107]
-  * Fixed path exception bug with individual packaging and SLS 1.18 [#159][link-159]
-
-* 2.0.0
-  * Support arbitrary Webpack versions as peer dependency [#83][link-83]
-  * Support `serverless offline start` invocation [#131][link-131]
-  * Documentation updates [#88][link-88], [#132][link-132], [#140][link-140], [#141][link-141], [#144][link-144]
-  * Print Webpack stats on recompile [#127][link-127]
+See [CHANGELOG.md](./CHANGELOG.md)
 
 [ico-serverless]: http://public.serverless.com/badges/v3.svg
 [ico-license]: https://img.shields.io/github/license/serverless-heaven/serverless-webpack.svg
@@ -891,7 +765,7 @@ me to take it over and continue working on the project. That helped to revive it
 [ico-coverage]: https://coveralls.io/repos/github/serverless-heaven/serverless-webpack/badge.svg?branch=master
 [ico-contributors]: https://img.shields.io/github/contributors/serverless-heaven/serverless-webpack.svg
 
-[link-serverless]: http://www.serverless.com/
+[link-serverless]: https://www.serverless.com/
 [link-license]: ./blob/master/LICENSE
 [link-npm]: https://www.npmjs.com/package/serverless-webpack
 [link-build]: https://travis-ci.org/serverless-heaven/serverless-webpack
@@ -912,119 +786,3 @@ me to take it over and continue working on the project. That helped to revive it
 [link-serverless-dynamodb-local]: https://www.npmjs.com/package/serverless-dynamodb-local
 [link-step-functions-offline]: https://www.npmjs.com/package/serverless-step-functions-offline
 [ico-step-functions-offline]: https://img.shields.io/npm/v/serverless-step-functions-offline.svg
-
-[comment]: # (Referenced issues)
-
-[link-135]: https://github.com/serverless-heaven/serverless-webpack/issues/135
-
-[link-83]: https://github.com/serverless-heaven/serverless-webpack/pull/83
-[link-88]: https://github.com/serverless-heaven/serverless-webpack/pull/88
-[link-127]: https://github.com/serverless-heaven/serverless-webpack/pull/127
-[link-131]: https://github.com/serverless-heaven/serverless-webpack/pull/131
-[link-132]: https://github.com/serverless-heaven/serverless-webpack/pull/132
-[link-140]: https://github.com/serverless-heaven/serverless-webpack/pull/140
-[link-141]: https://github.com/serverless-heaven/serverless-webpack/issues/141
-[link-144]: https://github.com/serverless-heaven/serverless-webpack/issues/144
-
-[link-11]: https://github.com/serverless-heaven/serverless-webpack/issues/11
-[link-107]: https://github.com/serverless-heaven/serverless-webpack/issues/107
-[link-129]: https://github.com/serverless-heaven/serverless-webpack/pull/129
-[link-154]: https://github.com/serverless-heaven/serverless-webpack/issues/154
-[link-159]: https://github.com/serverless-heaven/serverless-webpack/issues/159
-
-[link-158]: https://github.com/serverless-heaven/serverless-webpack/issues/158
-[link-165]: https://github.com/serverless-heaven/serverless-webpack/issues/165
-
-[link-193]: https://github.com/serverless-heaven/serverless-webpack/issues/193
-
-[link-116]: https://github.com/serverless-heaven/serverless-webpack/issues/116
-[link-117]: https://github.com/serverless-heaven/serverless-webpack/issues/117
-[link-120]: https://github.com/serverless-heaven/serverless-webpack/issues/120
-[link-145]: https://github.com/serverless-heaven/serverless-webpack/issues/145
-[link-151]: https://github.com/serverless-heaven/serverless-webpack/issues/151
-[link-152]: https://github.com/serverless-heaven/serverless-webpack/issues/152
-[link-173]: https://github.com/serverless-heaven/serverless-webpack/issues/173
-[link-179]: https://github.com/serverless-heaven/serverless-webpack/pull/179
-[link-185]: https://github.com/serverless-heaven/serverless-webpack/pull/185
-[link-186]: https://github.com/serverless-heaven/serverless-webpack/pull/186
-
-[link-202]: https://github.com/serverless-heaven/serverless-webpack/issues/202
-
-[link-215]: https://github.com/serverless-heaven/serverless-webpack/issues/215
-[link-217]: https://github.com/serverless-heaven/serverless-webpack/issues/217
-[link-221]: https://github.com/serverless-heaven/serverless-webpack/pull/221
-[link-223]: https://github.com/serverless-heaven/serverless-webpack/issues/223
-[link-227]: https://github.com/serverless-heaven/serverless-webpack/pull/227
-[link-234]: https://github.com/serverless-heaven/serverless-webpack/pull/234
-
-[link-245]: https://github.com/serverless-heaven/serverless-webpack/issues/245
-
-[link-251]: https://github.com/serverless-heaven/serverless-webpack/issues/251
-
-[link-126]: https://github.com/serverless-heaven/serverless-webpack/issues/126
-[link-247]: https://github.com/serverless-heaven/serverless-webpack/issues/247
-[link-250]: https://github.com/serverless-heaven/serverless-webpack/issues/250
-[link-254]: https://github.com/serverless-heaven/serverless-webpack/pull/254
-[link-260]: https://github.com/serverless-heaven/serverless-webpack/issues/260
-[link-264]: https://github.com/serverless-heaven/serverless-webpack/pull/264
-[link-265]: https://github.com/serverless-heaven/serverless-webpack/pull/265
-
-[link-272]: https://github.com/serverless-heaven/serverless-webpack/issues/272
-[link-278]: https://github.com/serverless-heaven/serverless-webpack/pull/278
-[link-279]: https://github.com/serverless-heaven/serverless-webpack/issues/279
-[link-276]: https://github.com/serverless-heaven/serverless-webpack/issues/276
-[link-269]: https://github.com/serverless-heaven/serverless-webpack/issues/269
-
-[link-263]: https://github.com/serverless-heaven/serverless-webpack/issues/263
-
-[link-286]: https://github.com/serverless-heaven/serverless-webpack/issues/286
-
-[link-315]: https://github.com/serverless-heaven/serverless-webpack/issues/315
-[link-316]: https://github.com/serverless-heaven/serverless-webpack/issues/316
-[link-253]: https://github.com/serverless-heaven/serverless-webpack/issues/253
-[link-317]: https://github.com/serverless-heaven/serverless-webpack/pull/317
-[link-321]: https://github.com/serverless-heaven/serverless-webpack/pull/321
-
-[link-313]: https://github.com/serverless-heaven/serverless-webpack/pull/313
-[link-326]: https://github.com/serverless-heaven/serverless-webpack/pull/326
-[link-329]: https://github.com/serverless-heaven/serverless-webpack/issues/329
-
-[link-232]: https://github.com/serverless-heaven/serverless-webpack/issues/232
-[link-331]: https://github.com/serverless-heaven/serverless-webpack/issues/331
-[link-328]: https://github.com/serverless-heaven/serverless-webpack/pull/328
-[link-336]: https://github.com/serverless-heaven/serverless-webpack/pull/336
-[link-337]: https://github.com/serverless-heaven/serverless-webpack/pull/337
-
-[link-275]: https://github.com/serverless-heaven/serverless-webpack/issues/275
-[link-286]: https://github.com/serverless-heaven/serverless-webpack/issues/286
-[link-341]: https://github.com/serverless-heaven/serverless-webpack/issues/341
-[link-342]: https://github.com/serverless-heaven/serverless-webpack/issues/342
-[link-343]: https://github.com/serverless-heaven/serverless-webpack/issues/343
-
-[link-349]: https://github.com/serverless-heaven/serverless-webpack/issues/349
-[link-354]: https://github.com/serverless-heaven/serverless-webpack/pull/354
-[link-355]: https://github.com/serverless-heaven/serverless-webpack/pull/355
-
-[link-309]: https://github.com/serverless-heaven/serverless-webpack/issues/309
-[link-365]: https://github.com/serverless-heaven/serverless-webpack/pull/365
-[link-373]: https://github.com/serverless-heaven/serverless-webpack/pull/373
-
-[link-370]: https://github.com/serverless-heaven/serverless-webpack/issues/370
-
-[link-379]: https://github.com/serverless-heaven/serverless-webpack/issues/379
-[link-382]: https://github.com/serverless-heaven/serverless-webpack/pull/382
-[link-384]: https://github.com/serverless-heaven/serverless-webpack/pull/384
-
-[link-393]: https://github.com/serverless-heaven/serverless-webpack/issues/393
-[link-412]: https://github.com/serverless-heaven/serverless-webpack/issues/412
-[link-418]: https://github.com/serverless-heaven/serverless-webpack/issues/418
-
-[link-453]: https://github.com/serverless-heaven/serverless-webpack/issues/453
-[link-467]: https://github.com/serverless-heaven/serverless-webpack/issues/467
-[link-449]: https://github.com/serverless-heaven/serverless-webpack/issues/449
-[link-465]: https://github.com/serverless-heaven/serverless-webpack/issues/465
-[link-480]: https://github.com/serverless-heaven/serverless-webpack/issues/480
-[link-429]: https://github.com/serverless-heaven/serverless-webpack/pull/429
-[link-433]: https://github.com/serverless-heaven/serverless-webpack/issues/433
-[link-471]: https://github.com/serverless-heaven/serverless-webpack/issues/471
-[link-472]: https://github.com/serverless-heaven/serverless-webpack/pull/472

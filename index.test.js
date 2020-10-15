@@ -20,8 +20,9 @@ describe('ServerlessWebpack', () => {
   let sandbox;
   let serverless;
   let ServerlessWebpack;
+  let moduleStub;
 
-  before(function() {
+  before(function () {
     // Mockery might take some time to clear the cache. So add 3 seconds to the default timeout.
     this.timeout(5000);
 
@@ -32,7 +33,7 @@ describe('ServerlessWebpack', () => {
     mockery.registerMock('webpack', {});
 
     ServerlessWebpack = require('./index');
-    sandbox.spy(Module, '_load');
+    moduleStub = sandbox.stub(Module, '_load');
   });
 
   beforeEach(() => {
@@ -89,6 +90,25 @@ describe('ServerlessWebpack', () => {
       expect(Module._load).to.have.been.calledOnce;
       expect(Module._load).to.have.been.calledWith('ts-node/register');
     });
+
+    it('should throw an error if config use TS but ts-node was not added as dependency', () => {
+      moduleStub.throws();
+
+      _.set(serverless, 'service.custom.webpack.webpackConfig', 'webpack.config.ts');
+
+      const badDeps = function() {
+        new ServerlessWebpack(serverless, {});
+      };
+
+      expect(badDeps).to.throw(
+        'If you want to use TypeScript with serverless-webpack, please add "ts-node" as dependency.'
+      );
+
+      expect(Module._load).to.have.been.calledOnce;
+      expect(Module._load).to.have.been.calledWith('ts-node/register');
+
+      moduleStub.reset();
+    });
   });
 
   describe('with a JS webpack configuration', () => {
@@ -105,16 +125,14 @@ describe('ServerlessWebpack', () => {
       'commands.webpack.commands.validate',
       'commands.webpack.commands.compile',
       'commands.webpack.commands.compile.commands.watch',
-      'commands.webpack.commands.package',
+      'commands.webpack.commands.package'
     ],
-    (command) => {
-      it(`should expose command/entrypoint ${_.last(
-        _.split(command, '.'),
-      )}`, () => {
+    command => {
+      it(`should expose command/entrypoint ${_.last(_.split(command, '.'))}`, () => {
         const slsw = new ServerlessWebpack(serverless, {});
         expect(slsw).to.have.a.nested.property(command);
       });
-    },
+    }
   );
 
   describe('hooks', () => {
@@ -152,100 +170,80 @@ describe('ServerlessWebpack', () => {
           name: 'before:package:createDeploymentArtifacts',
           test: () => {
             it('should spawn validate, compile and package', () => {
-              return expect(
-                slsw.hooks['before:package:createDeploymentArtifacts'](),
-              ).to.be.fulfilled.then(() => {
-                expect(slsw.serverless.pluginManager.spawn).to.have.been
-                  .calledThrice;
-                expect(
-                  slsw.serverless.pluginManager.spawn.firstCall,
-                ).to.have.been.calledWithExactly('webpack:validate');
-                expect(
-                  slsw.serverless.pluginManager.spawn.secondCall,
-                ).to.have.been.calledWithExactly('webpack:compile');
-                expect(
-                  slsw.serverless.pluginManager.spawn.thirdCall,
-                ).to.have.been.calledWithExactly('webpack:package');
+              return expect(slsw.hooks['before:package:createDeploymentArtifacts']()).to.be.fulfilled.then(() => {
+                expect(slsw.serverless.pluginManager.spawn).to.have.been.calledThrice;
+                expect(slsw.serverless.pluginManager.spawn.firstCall).to.have.been.calledWithExactly(
+                  'webpack:validate'
+                );
+                expect(slsw.serverless.pluginManager.spawn.secondCall).to.have.been.calledWithExactly(
+                  'webpack:compile'
+                );
+                expect(slsw.serverless.pluginManager.spawn.thirdCall).to.have.been.calledWithExactly('webpack:package');
                 return null;
               });
             });
-          },
+          }
         },
         {
           name: 'after:package:createDeploymentArtifacts',
           test: () => {
             it('should call cleanup', () => {
-              return expect(
-                slsw.hooks['after:package:createDeploymentArtifacts'](),
-              ).to.be.fulfilled.then(() => {
+              return expect(slsw.hooks['after:package:createDeploymentArtifacts']()).to.be.fulfilled.then(() => {
                 expect(slsw.cleanup).to.have.been.calledOnce;
                 return null;
               });
             });
-          },
+          }
         },
         {
           name: 'before:deploy:function:packageFunction',
           test: () => {
             it('should spawn validate, compile and package', () => {
-              return expect(
-                slsw.hooks['before:deploy:function:packageFunction'](),
-              ).to.be.fulfilled.then(() => {
-                expect(slsw.serverless.pluginManager.spawn).to.have.been
-                  .calledThrice;
-                expect(
-                  slsw.serverless.pluginManager.spawn.firstCall,
-                ).to.have.been.calledWithExactly('webpack:validate');
-                expect(
-                  slsw.serverless.pluginManager.spawn.secondCall,
-                ).to.have.been.calledWithExactly('webpack:compile');
-                expect(
-                  slsw.serverless.pluginManager.spawn.thirdCall,
-                ).to.have.been.calledWithExactly('webpack:package');
+              return expect(slsw.hooks['before:deploy:function:packageFunction']()).to.be.fulfilled.then(() => {
+                expect(slsw.serverless.pluginManager.spawn).to.have.been.calledThrice;
+                expect(slsw.serverless.pluginManager.spawn.firstCall).to.have.been.calledWithExactly(
+                  'webpack:validate'
+                );
+                expect(slsw.serverless.pluginManager.spawn.secondCall).to.have.been.calledWithExactly(
+                  'webpack:compile'
+                );
+                expect(slsw.serverless.pluginManager.spawn.thirdCall).to.have.been.calledWithExactly('webpack:package');
                 return null;
               });
             });
-          },
+          }
         },
         {
           name: 'webpack:webpack',
           test: () => {
             it('should spawn validate, compile and package', () => {
-              return expect(
-                slsw.hooks['webpack:webpack'](),
-              ).to.be.fulfilled.then(() => {
-                expect(slsw.serverless.pluginManager.spawn).to.have.been
-                  .calledThrice;
-                expect(
-                  slsw.serverless.pluginManager.spawn.firstCall,
-                ).to.have.been.calledWithExactly('webpack:validate');
-                expect(
-                  slsw.serverless.pluginManager.spawn.secondCall,
-                ).to.have.been.calledWithExactly('webpack:compile');
-                expect(
-                  slsw.serverless.pluginManager.spawn.thirdCall,
-                ).to.have.been.calledWithExactly('webpack:package');
+              return expect(slsw.hooks['webpack:webpack']()).to.be.fulfilled.then(() => {
+                expect(slsw.serverless.pluginManager.spawn).to.have.been.calledThrice;
+                expect(slsw.serverless.pluginManager.spawn.firstCall).to.have.been.calledWithExactly(
+                  'webpack:validate'
+                );
+                expect(slsw.serverless.pluginManager.spawn.secondCall).to.have.been.calledWithExactly(
+                  'webpack:compile'
+                );
+                expect(slsw.serverless.pluginManager.spawn.thirdCall).to.have.been.calledWithExactly('webpack:package');
                 return null;
               });
             });
-          },
+          }
         },
         {
           name: 'before:invoke:local:invoke',
           test: () => {
             it('should prepare for local invoke', () => {
-              return expect(
-                slsw.hooks['before:invoke:local:invoke'](),
-              ).to.be.fulfilled.then(() => {
+              return expect(slsw.hooks['before:invoke:local:invoke']()).to.be.fulfilled.then(() => {
                 expect(ServerlessWebpack.lib.webpack.isLocal).to.be.true;
-                expect(slsw.serverless.pluginManager.spawn).to.have.been
-                  .calledTwice;
-                expect(
-                  slsw.serverless.pluginManager.spawn.firstCall,
-                ).to.have.been.calledWithExactly('webpack:validate');
-                expect(
-                  slsw.serverless.pluginManager.spawn.secondCall,
-                ).to.have.been.calledWithExactly('webpack:compile');
+                expect(slsw.serverless.pluginManager.spawn).to.have.been.calledTwice;
+                expect(slsw.serverless.pluginManager.spawn.firstCall).to.have.been.calledWithExactly(
+                  'webpack:validate'
+                );
+                expect(slsw.serverless.pluginManager.spawn.secondCall).to.have.been.calledWithExactly(
+                  'webpack:compile'
+                );
                 expect(slsw.prepareLocalInvoke).to.have.been.calledOnce;
                 return null;
               });
@@ -253,28 +251,21 @@ describe('ServerlessWebpack', () => {
 
             it('should skip compile if requested', () => {
               slsw.options.build = false;
-              return expect(
-                slsw.hooks['before:invoke:local:invoke'](),
-              ).to.be.fulfilled.then(() => {
-                expect(slsw.serverless.pluginManager.spawn).to.have.been
-                  .calledOnce;
-                expect(
-                  slsw.serverless.pluginManager.spawn,
-                ).to.have.been.calledWithExactly('webpack:validate');
+              return expect(slsw.hooks['before:invoke:local:invoke']()).to.be.fulfilled.then(() => {
+                expect(slsw.serverless.pluginManager.spawn).to.have.been.calledOnce;
+                expect(slsw.serverless.pluginManager.spawn).to.have.been.calledWithExactly('webpack:validate');
                 expect(slsw.prepareLocalInvoke).to.have.been.calledOnce;
                 return null;
               });
             });
-          },
+          }
         },
         {
           name: 'after:invoke:local:invoke',
           test: () => {
             it('should return if watch is disabled', () => {
               slsw.options.watch = false;
-              return expect(
-                slsw.hooks['after:invoke:local:invoke'](),
-              ).to.be.fulfilled.then(() => {
+              return expect(slsw.hooks['after:invoke:local:invoke']()).to.be.fulfilled.then(() => {
                 expect(slsw.watch).to.not.have.been.called;
                 return null;
               });
@@ -282,137 +273,112 @@ describe('ServerlessWebpack', () => {
 
             it('should watch if enabled', () => {
               slsw.options.watch = true;
-              return expect(
-                slsw.hooks['after:invoke:local:invoke'](),
-              ).to.be.fulfilled.then(() => {
+              return expect(slsw.hooks['after:invoke:local:invoke']()).to.be.fulfilled.then(() => {
                 expect(slsw.watch).to.have.been.calledOnce;
-                expect(slsw.watch).to.have.been.calledWithExactly(
-                  'invoke:local',
-                );
+                expect(slsw.watch).to.have.been.calledWithExactly('invoke:local');
                 return null;
               });
             });
-          },
+          }
         },
         {
           name: 'before:run:run',
           test: () => {
             it('should prepare for run', () => {
-              return expect(
-                slsw.hooks['before:run:run'](),
-              ).to.be.fulfilled.then(() => {
-                expect(slsw.serverless.service.package.individually).to.be
-                  .false;
-                expect(slsw.serverless.pluginManager.spawn).to.have.been
-                  .calledTwice;
-                expect(
-                  slsw.serverless.pluginManager.spawn.firstCall,
-                ).to.have.been.calledWithExactly('webpack:validate');
-                expect(
-                  slsw.serverless.pluginManager.spawn.secondCall,
-                ).to.have.been.calledWithExactly('webpack:compile');
+              return expect(slsw.hooks['before:run:run']()).to.be.fulfilled.then(() => {
+                expect(slsw.serverless.service.package.individually).to.be.false;
+                expect(slsw.serverless.pluginManager.spawn).to.have.been.calledTwice;
+                expect(slsw.serverless.pluginManager.spawn.firstCall).to.have.been.calledWithExactly(
+                  'webpack:validate'
+                );
+                expect(slsw.serverless.pluginManager.spawn.secondCall).to.have.been.calledWithExactly(
+                  'webpack:compile'
+                );
                 expect(slsw.packExternalModules).to.have.been.calledOnce;
                 expect(slsw.prepareRun).to.have.been.calledOnce;
                 return null;
               });
             });
-          },
+          }
         },
         {
           name: 'after:run:run',
           test: () => {
             it('should return if watch is disabled', () => {
               slsw.options.watch = false;
-              return expect(slsw.hooks['after:run:run']()).to.be.fulfilled.then(
-                () => {
-                  expect(slsw.watch).to.not.have.been.called;
-                  return null;
-                },
-              );
+              return expect(slsw.hooks['after:run:run']()).to.be.fulfilled.then(() => {
+                expect(slsw.watch).to.not.have.been.called;
+                return null;
+              });
             });
 
             it('should watch if enabled', () => {
               slsw.options.watch = true;
-              return expect(slsw.hooks['after:run:run']()).to.be.fulfilled.then(
-                () => {
-                  expect(slsw.watch).to.have.been.calledOnce;
-                  expect(slsw.watch).to.have.been.calledOnce;
-                  return null;
-                },
-              );
+              return expect(slsw.hooks['after:run:run']()).to.be.fulfilled.then(() => {
+                expect(slsw.watch).to.have.been.calledOnce;
+                expect(slsw.watch).to.have.been.calledOnce;
+                return null;
+              });
             });
-          },
+          }
         },
         {
           name: 'webpack:validate:validate',
           test: () => {
             it('should call validate', () => {
-              return expect(
-                slsw.hooks['webpack:validate:validate'](),
-              ).to.be.fulfilled.then(() => {
+              return expect(slsw.hooks['webpack:validate:validate']()).to.be.fulfilled.then(() => {
                 expect(slsw.validate).to.have.been.calledOnce;
                 return null;
               });
             });
-          },
+          }
         },
         {
           name: 'webpack:compile:compile',
           test: () => {
             it('should call compile', () => {
-              return expect(
-                slsw.hooks['webpack:compile:compile'](),
-              ).to.be.fulfilled.then(() => {
+              return expect(slsw.hooks['webpack:compile:compile']()).to.be.fulfilled.then(() => {
                 expect(slsw.compile).to.have.been.calledOnce;
                 return null;
               });
             });
-          },
+          }
         },
         {
           name: 'webpack:compile:watch:compile',
           test: () => {
             it('should resolve', () => {
-              return expect(slsw.hooks['webpack:compile:watch:compile']()).to.be
-                .fulfilled;
+              return expect(slsw.hooks['webpack:compile:watch:compile']()).to.be.fulfilled;
             });
-          },
+          }
         },
         {
           name: 'webpack:package:packExternalModules',
           test: () => {
             it('should call packExternalModules', () => {
-              return expect(
-                slsw.hooks['webpack:package:packExternalModules'](),
-              ).to.be.fulfilled.then(() => {
+              return expect(slsw.hooks['webpack:package:packExternalModules']()).to.be.fulfilled.then(() => {
                 expect(slsw.packExternalModules).to.have.been.calledOnce;
                 return null;
               });
             });
-          },
+          }
         },
         {
           name: 'webpack:package:packageModules',
           test: () => {
             it('should call packageModules', () => {
-              return expect(
-                slsw.hooks['webpack:package:packageModules'](),
-              ).to.be.fulfilled.then(() => {
+              return expect(slsw.hooks['webpack:package:packageModules']()).to.be.fulfilled.then(() => {
                 expect(slsw.packageModules).to.have.been.calledOnce;
                 return null;
               });
             });
-          },
+          }
         },
         {
           name: 'before:offline:start',
           test: () => {
             it('should prepare offline', () => {
-              slsw.options.build = true;
-              slsw.skipCompile = false;
-              return expect(
-                slsw.hooks['before:offline:start'](),
-              ).to.be.fulfilled.then(() => {
+              return expect(slsw.hooks['before:offline:start']()).to.be.fulfilled.then(() => {
                 expect(ServerlessWebpack.lib.webpack.isLocal).to.be.true;
                 expect(slsw.prepareOfflineInvoke).to.have.been.calledOnce;
                 expect(slsw.wpwatch).to.have.been.calledOnce;
@@ -431,17 +397,14 @@ describe('ServerlessWebpack', () => {
                 return null;
               });
             });
-          },
+
+          }
         },
         {
           name: 'before:offline:start:init',
           test: () => {
             it('should prepare offline', () => {
-              slsw.skipCompile = false;
-              slsw.options.build = true;
-              return expect(
-                slsw.hooks['before:offline:start:init'](),
-              ).to.be.fulfilled.then(() => {
+              return expect(slsw.hooks['before:offline:start:init']()).to.be.fulfilled.then(() => {
                 expect(ServerlessWebpack.lib.webpack.isLocal).to.be.true;
                 expect(slsw.prepareOfflineInvoke).to.have.been.calledOnce;
                 expect(slsw.wpwatch).to.have.been.calledOnce;
@@ -460,29 +423,25 @@ describe('ServerlessWebpack', () => {
                 return null;
               });
             });
-          },
+
+          }
         },
         {
           name: 'before:step-functions-offline:start',
           test: () => {
             it('should prepare offline', () => {
-              return expect(
-                slsw.hooks['before:step-functions-offline:start'](),
-              ).to.be.fulfilled.then(() => {
+              return expect(slsw.hooks['before:step-functions-offline:start']()).to.be.fulfilled.then(() => {
                 expect(ServerlessWebpack.lib.webpack.isLocal).to.be.true;
                 expect(slsw.prepareStepOfflineInvoke).to.have.been.calledOnce;
-                expect(slsw.serverless.pluginManager.spawn).to.have.been
-                  .calledOnce;
-                expect(
-                  slsw.serverless.pluginManager.spawn,
-                ).to.have.been.calledWithExactly('webpack:compile');
+                expect(slsw.serverless.pluginManager.spawn).to.have.been.calledOnce;
+                expect(slsw.serverless.pluginManager.spawn).to.have.been.calledWithExactly('webpack:compile');
                 return null;
               });
             });
-          },
-        },
+          }
+        }
       ],
-      (hook) => {
+      hook => {
         it(`should expose hook ${hook.name}`, () => {
           expect(slsw).to.have.a.nested.property(`hooks.${hook.name}`);
         });
@@ -490,7 +449,7 @@ describe('ServerlessWebpack', () => {
         describe(hook.name, () => {
           hook.test();
         });
-      },
+      }
     );
   });
 });

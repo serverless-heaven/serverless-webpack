@@ -19,9 +19,9 @@ module.exports.create = sandbox => {
   const streamMock = StreamMock(sandbox);
   const statMock = StatMock(sandbox);
   const fsMock = {
-    createWriteStream: sinon.stub().returns(streamMock),  // Persistent stub
+    createWriteStream: sinon.stub().returns(streamMock), // Persistent stub
     readFileSync: sandbox.stub(),
-    statSync: sinon.stub().returns(statMock),  // Persistent stub
+    statSync: sinon.stub().returns(statMock), // Persistent stub
     writeFileSync: sandbox.stub(),
 
     _streamMock: streamMock,

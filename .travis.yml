@@ -1,18 +1,28 @@
+os: linux
+dist: xenial
 language: node_js
 
-matrix:
-  include:
-    - node_js: '6.10.1'
-    - node_js: '8.11.3'
+# avoid double Travis build when the PR is created on upstream
+if: |
+  type = pull_request OR \
+  branch = master
 
-sudo: false
+jobs:
+  include:
+    - node_js: '10'
+    - node_js: '12'
+      env: COVERAGE=run
 
 install:
   - travis_retry npm install
 
 script:
   - npm run eslint
-  - npm test
+  - if [[ $COVERAGE = run ]]; then npm run test-coverage ; fi;
+  - if [[ $COVERAGE = '' ]]; then npm run test ; fi;
 
 after_success:
-  - cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage
+  - |
+    if [[ $COVERAGE = run ]]; then
+      cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage
+    fi
