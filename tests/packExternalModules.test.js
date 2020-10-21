@@ -20,19 +20,19 @@ chai.use(require('sinon-chai'));
 
 const expect = chai.expect;
 
-class ChunkMock {
-  constructor(modules) {
-    this._modules = modules;
-  }
-
-  get modulesIterable() {
-    return this._modules;
+class WebpackModuleGraphMock {
+  getIssuer(module) {
+    return module.issuer;
   }
 }
 
-class ChunkMockNoModulesIterable {
+class WebpackCompilationMock {
   constructor(modules) {
-    this._modules = modules;
+    this.moduleGraph = new WebpackModuleGraphMock();
+    this.modules = modules;
+    this.compiler = {
+      outputPath: '/my/Service/Path/.webpack/service'
+    };
   }
 }
 
@@ -137,187 +137,151 @@ describe('packExternalModules', () => {
     const stats = {
       stats: [
         {
-          compilation: {
-            chunks: [
-              new ChunkMock([
-                {
-                  identifier: _.constant('"crypto"')
-                },
-                {
-                  identifier: _.constant('"uuid/v4"')
-                },
-                {
-                  identifier: _.constant('"mockery"')
-                },
-                {
-                  identifier: _.constant('"@scoped/vendor/module1"')
-                },
-                {
-                  identifier: _.constant('external "@scoped/vendor/module2"')
-                },
-                {
-                  identifier: _.constant('external "uuid/v4"')
-                },
-                {
-                  identifier: _.constant('external "bluebird"')
-                }
-              ]),
-              new ChunkMockNoModulesIterable([])
-            ],
-            compiler: {
-              outputPath: '/my/Service/Path/.webpack/service'
+          compilation: new WebpackCompilationMock([
+            {
+              identifier: _.constant('"crypto"')
+            },
+            {
+              identifier: _.constant('"uuid/v4"')
+            },
+            {
+              identifier: _.constant('"mockery"')
+            },
+            {
+              identifier: _.constant('"@scoped/vendor/module1"')
+            },
+            {
+              identifier: _.constant('external "@scoped/vendor/module2"')
+            },
+            {
+              identifier: _.constant('external "uuid/v4"')
+            },
+            {
+              identifier: _.constant('external "bluebird"')
             }
-          }
+          ])
         }
       ]
     };
     const noExtStats = {
       stats: [
         {
-          compilation: {
-            chunks: [
-              new ChunkMock([
-                {
-                  identifier: _.constant('"crypto"')
-                },
-                {
-                  identifier: _.constant('"uuid/v4"')
-                },
-                {
-                  identifier: _.constant('"mockery"')
-                },
-                {
-                  identifier: _.constant('"@scoped/vendor/module1"')
-                }
-              ])
-            ],
-            compiler: {
-              outputPath: '/my/Service/Path/.webpack/service'
+          compilation: new WebpackCompilationMock([
+            {
+              identifier: _.constant('"crypto"')
+            },
+            {
+              identifier: _.constant('"uuid/v4"')
+            },
+            {
+              identifier: _.constant('"mockery"')
+            },
+            {
+              identifier: _.constant('"@scoped/vendor/module1"')
             }
-          }
+          ])
         }
       ]
     };
     const statsWithFileRef = {
       stats: [
         {
-          compilation: {
-            chunks: [
-              new ChunkMock([
-                {
-                  identifier: _.constant('"crypto"')
-                },
-                {
-                  identifier: _.constant('"uuid/v4"')
-                },
-                {
-                  identifier: _.constant('"mockery"')
-                },
-                {
-                  identifier: _.constant('"@scoped/vendor/module1"')
-                },
-                {
-                  identifier: _.constant('external "@scoped/vendor/module2"')
-                },
-                {
-                  identifier: _.constant('external "uuid/v4"')
-                },
-                {
-                  identifier: _.constant('external "localmodule"')
-                },
-                {
-                  identifier: _.constant('external "bluebird"')
-                }
-              ])
-            ],
-            compiler: {
-              outputPath: '/my/Service/Path/.webpack/service'
+          compilation: new WebpackCompilationMock([
+            {
+              identifier: _.constant('"crypto"')
+            },
+            {
+              identifier: _.constant('"uuid/v4"')
+            },
+            {
+              identifier: _.constant('"mockery"')
+            },
+            {
+              identifier: _.constant('"@scoped/vendor/module1"')
+            },
+            {
+              identifier: _.constant('external "@scoped/vendor/module2"')
+            },
+            {
+              identifier: _.constant('external "uuid/v4"')
+            },
+            {
+              identifier: _.constant('external "localmodule"')
+            },
+            {
+              identifier: _.constant('external "bluebird"')
             }
-          }
+          ])
         }
       ]
     };
     const statsWithDevDependency = {
       stats: [
         {
-          compilation: {
-            chunks: [
-              new ChunkMock([
-                {
-                  identifier: _.constant('"crypto"')
-                },
-                {
-                  identifier: _.constant('"uuid/v4"')
-                },
-                {
-                  identifier: _.constant('external "eslint"')
-                },
-                {
-                  identifier: _.constant('"mockery"')
-                },
-                {
-                  identifier: _.constant('"@scoped/vendor/module1"')
-                },
-                {
-                  identifier: _.constant('external "@scoped/vendor/module2"')
-                },
-                {
-                  identifier: _.constant('external "uuid/v4"')
-                },
-                {
-                  identifier: _.constant('external "localmodule"')
-                },
-                {
-                  identifier: _.constant('external "bluebird"')
-                }
-              ])
-            ],
-            compiler: {
-              outputPath: '/my/Service/Path/.webpack/service'
+          compilation: new WebpackCompilationMock([
+            {
+              identifier: _.constant('"crypto"')
+            },
+            {
+              identifier: _.constant('"uuid/v4"')
+            },
+            {
+              identifier: _.constant('external "eslint"')
+            },
+            {
+              identifier: _.constant('"mockery"')
+            },
+            {
+              identifier: _.constant('"@scoped/vendor/module1"')
+            },
+            {
+              identifier: _.constant('external "@scoped/vendor/module2"')
+            },
+            {
+              identifier: _.constant('external "uuid/v4"')
+            },
+            {
+              identifier: _.constant('external "localmodule"')
+            },
+            {
+              identifier: _.constant('external "bluebird"')
             }
-          }
+          ])
         }
       ]
     };
     const statsWithIgnoredDevDependency = {
       stats: [
         {
-          compilation: {
-            chunks: [
-              new ChunkMock([
-                {
-                  identifier: _.constant('"crypto"')
-                },
-                {
-                  identifier: _.constant('"uuid/v4"')
-                },
-                {
-                  identifier: _.constant('"mockery"')
-                },
-                {
-                  identifier: _.constant('"@scoped/vendor/module1"')
-                },
-                {
-                  identifier: _.constant('external "@scoped/vendor/module2"')
-                },
-                {
-                  identifier: _.constant('external "uuid/v4"')
-                },
-                {
-                  identifier: _.constant('external "localmodule"')
-                },
-                {
-                  identifier: _.constant('external "bluebird"')
-                },
-                {
-                  identifier: _.constant('external "aws-sdk"')
-                }
-              ])
-            ],
-            compiler: {
-              outputPath: '/my/Service/Path/.webpack/service'
+          compilation: new WebpackCompilationMock([
+            {
+              identifier: _.constant('"crypto"')
+            },
+            {
+              identifier: _.constant('"uuid/v4"')
+            },
+            {
+              identifier: _.constant('"mockery"')
+            },
+            {
+              identifier: _.constant('"@scoped/vendor/module1"')
+            },
+            {
+              identifier: _.constant('external "@scoped/vendor/module2"')
+            },
+            {
+              identifier: _.constant('external "uuid/v4"')
+            },
+            {
+              identifier: _.constant('external "localmodule"')
+            },
+            {
+              identifier: _.constant('external "bluebird"')
+            },
+            {
+              identifier: _.constant('external "aws-sdk"')
             }
-          }
+          ])
         }
       ]
     };
@@ -1184,33 +1148,26 @@ describe('packExternalModules', () => {
           const peerDepStats = {
             stats: [
               {
-                compilation: {
-                  chunks: [
-                    new ChunkMock([
-                      {
-                        identifier: _.constant('"crypto"')
-                      },
-                      {
-                        identifier: _.constant('"uuid/v4"')
-                      },
-                      {
-                        identifier: _.constant('"mockery"')
-                      },
-                      {
-                        identifier: _.constant('"@scoped/vendor/module1"')
-                      },
-                      {
-                        identifier: _.constant('external "bluebird"')
-                      },
-                      {
-                        identifier: _.constant('external "request-promise"')
-                      }
-                    ])
-                  ],
-                  compiler: {
-                    outputPath: '/my/Service/Path/.webpack/service'
+                compilation: new WebpackCompilationMock([
+                  {
+                    identifier: _.constant('"crypto"')
+                  },
+                  {
+                    identifier: _.constant('"uuid/v4"')
+                  },
+                  {
+                    identifier: _.constant('"mockery"')
+                  },
+                  {
+                    identifier: _.constant('"@scoped/vendor/module1"')
+                  },
+                  {
+                    identifier: _.constant('external "bluebird"')
+                  },
+                  {
+                    identifier: _.constant('external "request-promise"')
                   }
-                }
+                ])
               }
             ]
           };
@@ -1291,33 +1248,26 @@ describe('packExternalModules', () => {
           const peerDepStats = {
             stats: [
               {
-                compilation: {
-                  chunks: [
-                    new ChunkMock([
-                      {
-                        identifier: _.constant('"crypto"')
-                      },
-                      {
-                        identifier: _.constant('"uuid/v4"')
-                      },
-                      {
-                        identifier: _.constant('"mockery"')
-                      },
-                      {
-                        identifier: _.constant('"@scoped/vendor/module1"')
-                      },
-                      {
-                        identifier: _.constant('external "bluebird"')
-                      },
-                      {
-                        identifier: _.constant('external "request-promise"')
-                      }
-                    ])
-                  ],
-                  compiler: {
-                    outputPath: '/my/Service/Path/.webpack/service'
+                compilation: new WebpackCompilationMock([
+                  {
+                    identifier: _.constant('"crypto"')
+                  },
+                  {
+                    identifier: _.constant('"uuid/v4"')
+                  },
+                  {
+                    identifier: _.constant('"mockery"')
+                  },
+                  {
+                    identifier: _.constant('"@scoped/vendor/module1"')
+                  },
+                  {
+                    identifier: _.constant('external "bluebird"')
+                  },
+                  {
+                    identifier: _.constant('external "request-promise"')
                   }
-                }
+                ])
               }
             ]
           };
@@ -1397,18 +1347,11 @@ describe('packExternalModules', () => {
         const transitiveDepStats = {
           stats: [
             {
-              compilation: {
-                chunks: [
-                  new ChunkMock([
-                    {
-                      identifier: _.constant('external "classnames"')
-                    }
-                  ])
-                ],
-                compiler: {
-                  outputPath: '/my/Service/Path/.webpack/service'
+              compilation: new WebpackCompilationMock([
+                {
+                  identifier: _.constant('external "classnames"')
                 }
-              }
+              ])
             }
           ]
         };
