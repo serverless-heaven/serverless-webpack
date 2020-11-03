@@ -90,11 +90,22 @@ class ServerlessWebpack {
     this.hooks = {
       'before:package:createDeploymentArtifacts': () =>
         BbPromise.bind(this)
-          .then(() => this.serverless.pluginManager.spawn('webpack:validate'))
-          .then(() => this.serverless.pluginManager.spawn('webpack:compile'))
-          .then(() => this.serverless.pluginManager.spawn('webpack:package')),
+          .then(() => {
+            if (_.get(this.serverless, 'service.package.artifact', false)) {
+              this.skipCompile = true;
+            }
+            return BbPromise.resolve();
+          })
+          .then(() =>
+            this.skipCompile ? BbPromise.resolve() : this.serverless.pluginManager.spawn('webpack:validate')
+          )
+          .then(() => (this.skipCompile ? BbPromise.resolve() : this.serverless.pluginManager.spawn('webpack:compile')))
+          .then(() =>
+            this.skipCompile ? BbPromise.resolve() : this.serverless.pluginManager.spawn('webpack:package')
+          ),
 
-      'after:package:createDeploymentArtifacts': () => BbPromise.bind(this).then(this.cleanup),
+      'after:package:createDeploymentArtifacts': () =>
+        this.skipCompile ? BbPromise.resolve() : BbPromise.bind(this).then(this.cleanup),
 
       'before:deploy:function:packageFunction': () =>
         BbPromise.bind(this)
