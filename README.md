@@ -361,9 +361,10 @@ Using yarn will switch the whole packaging pipeline to use yarn, so does it use 
 
 The yarn packager supports the following `packagerOptions`:
 
-| Option        | Type | Default | Description |
-|---------------|------|---------|-------------|
-| ignoreScripts | bool | true    | Do not execute package.json hook scripts on install |
+| Option           | Type | Default  | Description                                         |
+|------------------|------|----------|-----------------------------------------------------|
+| ignoreScripts    | bool | false    | Do not execute package.json hook scripts on install |
+| noFrozenLockfile | bool | false    | Do not require an up-to-date yarn.lock              |
 
 ##### Common packager options
 
