@@ -1,6 +1,7 @@
 'use strict';
 
 const BbPromise = require('bluebird');
+const path = require('path');
 const _ = require('lodash');
 
 const validate = require('./lib/validate');
@@ -24,6 +25,11 @@ class ServerlessWebpack {
   constructor(serverless, options) {
     this.serverless = serverless;
     this.options = options;
+
+    // From serverless Package plugin
+    this.servicePath = this.serverless.config.servicePath || '';
+    this.packagePath =
+      this.options.package || this.serverless.service.package.path || path.join(this.servicePath || '.', '.serverless');
 
     if (
       (_.has(this.serverless, 'service.custom.webpack') &&
