@@ -7,7 +7,7 @@
   "author": "Frank Schmid <fschmid740@googlemail.com>",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/serverless-heaven/serverless-webpack.git"
+    "url": "git+https://github.com/SensorUp/serverless-webpack.git"
   },
   "keywords": [
     "serverless",
