@@ -1,6 +1,7 @@
 'use strict';
 
 const BbPromise = require('bluebird');
+const path = require('path');
 const _ = require('lodash');
 
 const validate = require('./lib/validate');
@@ -24,6 +25,11 @@ class ServerlessWebpack {
   constructor(serverless, options) {
     this.serverless = serverless;
     this.options = options;
+
+    // From serverless Package plugin
+    this.servicePath = this.serverless.config.servicePath || '';
+    this.packagePath =
+      this.options.package || this.serverless.service.package.path || path.join(this.servicePath || '.', '.serverless');
 
     if (
       (_.has(this.serverless, 'service.custom.webpack') &&
@@ -90,11 +96,22 @@ class ServerlessWebpack {
     this.hooks = {
       'before:package:createDeploymentArtifacts': () =>
         BbPromise.bind(this)
-          .then(() => this.serverless.pluginManager.spawn('webpack:validate'))
-          .then(() => this.serverless.pluginManager.spawn('webpack:compile'))
-          .then(() => this.serverless.pluginManager.spawn('webpack:package')),
+          .then(() => {
+            if (_.get(this.serverless, 'service.package.artifact', false)) {
+              this.skipCompile = true;
+            }
+            return BbPromise.resolve();
+          })
+          .then(() =>
+            this.skipCompile ? BbPromise.resolve() : this.serverless.pluginManager.spawn('webpack:validate')
+          )
+          .then(() => (this.skipCompile ? BbPromise.resolve() : this.serverless.pluginManager.spawn('webpack:compile')))
+          .then(() =>
+            this.skipCompile ? BbPromise.resolve() : this.serverless.pluginManager.spawn('webpack:package')
+          ),
 
-      'after:package:createDeploymentArtifacts': () => BbPromise.bind(this).then(this.cleanup),
+      'after:package:createDeploymentArtifacts': () =>
+        this.skipCompile ? BbPromise.resolve() : BbPromise.bind(this).then(this.cleanup),
 
       'before:deploy:function:packageFunction': () =>
         BbPromise.bind(this)
