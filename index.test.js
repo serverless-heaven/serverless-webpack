@@ -20,8 +20,9 @@ describe('ServerlessWebpack', () => {
   let sandbox;
   let serverless;
   let ServerlessWebpack;
+  let moduleStub;
 
-  before(function() {
+  before(function () {
     // Mockery might take some time to clear the cache. So add 3 seconds to the default timeout.
     this.timeout(5000);
 
@@ -32,7 +33,7 @@ describe('ServerlessWebpack', () => {
     mockery.registerMock('webpack', {});
 
     ServerlessWebpack = require('./index');
-    sandbox.spy(Module, '_load');
+    moduleStub = sandbox.stub(Module, '_load');
   });
 
   beforeEach(() => {
@@ -58,15 +59,10 @@ describe('ServerlessWebpack', () => {
   it('should expose a lib object', () => {
     const lib = ServerlessWebpack.lib;
     expect(lib).to.be.an('object');
-    expect(lib)
-      .to.have.a.property('entries')
-      .that.is.an('object').that.is.empty;
-    expect(lib)
-      .to.have.a.property('webpack')
-      .that.is.an('object')
-      .that.deep.equals({
-        isLocal: false
-      });
+    expect(lib).to.have.a.property('entries').that.is.an('object').that.is.empty;
+    expect(lib).to.have.a.property('webpack').that.is.an('object').that.deep.equals({
+      isLocal: false
+    });
   });
 
   describe('with a TS webpack configuration', () => {
@@ -82,6 +78,25 @@ describe('ServerlessWebpack', () => {
       new ServerlessWebpack(serverless, {});
       expect(Module._load).to.have.been.calledOnce;
       expect(Module._load).to.have.been.calledWith('ts-node/register');
+    });
+
+    it('should throw an error if config use TS but ts-node was not added as dependency', () => {
+      moduleStub.throws();
+
+      _.set(serverless, 'service.custom.webpack.webpackConfig', 'webpack.config.ts');
+
+      const badDeps = function() {
+        new ServerlessWebpack(serverless, {});
+      };
+
+      expect(badDeps).to.throw(
+        'If you want to use TypeScript with serverless-webpack, please add "ts-node" as dependency.'
+      );
+
+      expect(Module._load).to.have.been.calledOnce;
+      expect(Module._load).to.have.been.calledWith('ts-node/register');
+
+      moduleStub.reset();
     });
   });
 

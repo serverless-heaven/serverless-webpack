@@ -32,7 +32,11 @@ class ServerlessWebpack {
       (_.has(this.serverless, 'service.custom.webpack.webpackConfig') &&
         _.endsWith(this.serverless.service.custom.webpack.webpackConfig, '.ts'))
     ) {
-      require('ts-node/register');
+      try {
+        require('ts-node/register');
+      } catch (e) {
+        throw new Error('If you want to use TypeScript with serverless-webpack, please add "ts-node" as dependency.');
+      }
     }
 
     _.assign(
