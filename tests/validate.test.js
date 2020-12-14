@@ -576,7 +576,7 @@ describe('validate', () => {
               }
             ],
             runtime: 'provided',
-            webpackAllowCustomRuntime: true
+            allowCustomRuntime: true
           },
           func3: {
             handler: 'module3.func2handler',
