@@ -545,6 +545,85 @@ describe('validate', () => {
         });
       });
 
+      it('should allow custom runtime', () => {
+        const testOutPath = 'test';
+        const testFunctionsConfig = {
+          func1: {
+            handler: 'module1.func1handler',
+            artifact: 'artifact-func1.zip',
+            events: [
+              {
+                http: {
+                  method: 'get',
+                  path: 'func1path'
+                }
+              }
+            ],
+            runtime: 'node10.x'
+          },
+          func2: {
+            handler: 'module2.func2handler',
+            artifact: 'artifact-func2.zip',
+            events: [
+              {
+                http: {
+                  method: 'POST',
+                  path: 'func2path'
+                }
+              },
+              {
+                nonhttp: 'non-http'
+              }
+            ],
+            runtime: 'provided',
+            allowCustomRuntime: true
+          },
+          func3: {
+            handler: 'module3.func2handler',
+            artifact: 'artifact-func3.zip',
+            events: [
+              {
+                http: {
+                  method: 'POST',
+                  path: 'func3path'
+                }
+              },
+              {
+                nonhttp: 'non-http'
+              }
+            ],
+            runtime: 'provided'
+          }
+        };
+
+        const testConfig = {
+          entry: 'test',
+          context: 'testcontext',
+          output: {
+            path: testOutPath
+          },
+          getFunction: func => {
+            return testFunctionsConfig[func];
+          }
+        };
+
+        _.set(module.serverless.service, 'custom.webpack.config', testConfig);
+        module.serverless.service.functions = testFunctionsConfig;
+        globSyncStub.callsFake(filename => [_.replace(filename, '*', 'js')]);
+        return expect(module.validate()).to.be.fulfilled.then(() => {
+          const lib = require('../lib/index');
+          const expectedLibEntries = {
+            module1: './module1.js',
+            module2: './module2.js'
+          };
+
+          expect(lib.entries).to.deep.equal(expectedLibEntries);
+          expect(globSyncStub).to.have.callCount(2);
+          expect(serverless.cli.log).to.not.have.been.called;
+          return null;
+        });
+      });
+
       describe('google provider', () => {
         beforeEach(() => {
           _.set(module.serverless, 'service.provider.name', 'google');
