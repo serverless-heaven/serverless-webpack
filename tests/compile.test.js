@@ -117,7 +117,7 @@ describe('compile', () => {
   });
 
   it('should work with concurrent compile', () => {
-    const testWebpackConfig = 'testconfig';
+    const testWebpackConfig = [ 'testconfig', 'testconfig2' ];
     const multiStats = {
       stats: [
         {
@@ -134,12 +134,13 @@ describe('compile', () => {
     };
     module.webpackConfig = testWebpackConfig;
     module.multiCompile = true;
-    module.configuration = { concurrency: 1 };
+    module.configuration = { concurrency: 2 };
     webpackMock.compilerMock.run.reset();
     webpackMock.compilerMock.run.yields(null, multiStats);
     return expect(module.compile()).to.be.fulfilled.then(() => {
-      expect(webpackMock).to.have.been.calledWith(testWebpackConfig);
-      expect(webpackMock.compilerMock.run).to.have.been.calledOnce;
+      expect(webpackMock).to.have.been.calledWith(testWebpackConfig[0]);
+      expect(webpackMock).to.have.been.calledWith(testWebpackConfig[1]);
+      expect(webpackMock.compilerMock.run).to.have.been.calledTwice;
       return null;
     });
   });
@@ -172,7 +173,7 @@ describe('compile', () => {
       })
       .then(() => {
         expect(webpackMock).to.have.been.calledWith(testWebpackConfig);
-        expect(mockStats.toString.args).to.eql([[testWebpackConfig.stats], [testWebpackConfig.stats]]);
+        expect(mockStats.toString.args).to.eql([ [testWebpackConfig.stats], [testWebpackConfig.stats] ]);
         return null;
       });
   });
