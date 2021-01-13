@@ -158,7 +158,6 @@ describe('packageModules', () => {
         fsMock._statMock.isDirectory.returns(false);
 
         module.compileStats = stats;
-
         return expect(module.packageModules()).to.be.fulfilled.then(() => BbPromise.all([]));
       });
 
