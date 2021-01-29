@@ -1,5 +1,11 @@
 # Change Log
 
+* 5.4.0
+  * Skip compile & packaging if --no-build is set [#560](https://github.com/serverless-heaven/serverless-webpack/pull/560)
+  * Serialized compile to address [#299](https://github.com/serverless-heaven/serverless-webpack/pull/299) [#517](https://github.com/serverless-heaven/serverless-webpack/pull/517)
+  * Option to exclude files using regular expression [#612](https://github.com/serverless-heaven/serverless-webpack/pull/612)
+  * Speed up cleanup process [#462](https://github.com/serverless-heaven/serverless-webpack/pull/462)
+  
 * 5.3.5
   * Improve runtime validation [#629](https://github.com/serverless-heaven/serverless-webpack/pull/629)
   * Move `ts-node` as optional dependency [#636](https://github.com/serverless-heaven/serverless-webpack/pull/636)
