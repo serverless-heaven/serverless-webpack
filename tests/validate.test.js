@@ -468,6 +468,18 @@ describe('validate', () => {
             }
           ],
           runtime: 'java8'
+        },
+        rustfunc: {
+          handler: 'my-rust-func',
+          runtime: 'rust',
+          events: [
+            {
+              http: {
+                method: 'POST',
+                path: 'rustfuncpath'
+              }
+            }
+          ]
         }
       };
 
@@ -960,7 +972,7 @@ describe('validate', () => {
   });
 
   describe('with skipped builds', () => {
-    it('should set `skipComile` to true if `options.build` is false', () => {
+    it('should set `skipCompile` to true if `options.build` is false', () => {
       const testConfig = {
         entry: 'test',
         output: {}
