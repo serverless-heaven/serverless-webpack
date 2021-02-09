@@ -302,6 +302,22 @@ custom:
 ```
 > Note that only relative path is supported at the moment.
 
+
+`peerDependencies` of all above external dependencies will also be packed into the Serverless
+artifact. By default, `node_modules` in the same directory as `package.json` (current working directory
+or specified by`packagePath`) will be used.
+
+However in some configuration (like monorepo), `node_modules` is in parent directory which is different from
+where `package.json` is. Set `nodeModulesRelativeDir` to specify the relative directory where `node_modules` is.
+
+```yaml
+# serverless.yml
+custom:
+  webpack:
+    includeModules:
+      nodeModulesRelativeDir: '../../' # relative path to current working directory.
+```
+
 #### Runtime dependencies
 
 If a runtime dependency is detected that is found in the `devDependencies` section and
