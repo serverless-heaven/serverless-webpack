@@ -65,7 +65,7 @@ describe('compile', () => {
   it('should compile with webpack from a context configuration', () => {
     const testWebpackConfig = 'testconfig';
     module.webpackConfig = testWebpackConfig;
-    module.configuration = { concurrency: Infinity };
+    module.configuration = { concurrency: 1 };
     return expect(module.compile()).to.be.fulfilled.then(() => {
       expect(webpackMock).to.have.been.calledWith(testWebpackConfig);
       expect(webpackMock.compilerMock.run).to.have.been.calledOnce;
@@ -82,7 +82,7 @@ describe('compile', () => {
 
   it('should fail if there are compilation errors', () => {
     module.webpackConfig = 'testconfig';
-    module.configuration = { concurrency: Infinity };
+    module.configuration = { concurrency: 1 };
     // We stub errors here. It will be reset again in afterEach()
     sandbox.stub(webpackMock.statsMock.compilation, 'errors').value(['error']);
     return expect(module.compile()).to.be.rejectedWith(/compilation error/);
@@ -105,8 +105,7 @@ describe('compile', () => {
       ]
     };
     module.webpackConfig = testWebpackConfig;
-    module.multiCompile = true;
-    module.configuration = { concurrency: Infinity };
+    module.configuration = { concurrency: 1 };
     webpackMock.compilerMock.run.reset();
     webpackMock.compilerMock.run.yields(null, multiStats);
     return expect(module.compile()).to.be.fulfilled.then(() => {
@@ -133,7 +132,6 @@ describe('compile', () => {
       ]
     };
     module.webpackConfig = testWebpackConfig;
-    module.multiCompile = true;
     module.configuration = { concurrency: 2 };
     webpackMock.compilerMock.run.reset();
     webpackMock.compilerMock.run.yields(null, multiStats);
@@ -161,7 +159,7 @@ describe('compile', () => {
     };
 
     module.webpackConfig = testWebpackConfig;
-    module.configuration = { concurrency: Infinity };
+    module.configuration = { concurrency: 1 };
     webpackMock.compilerMock.run.reset();
     webpackMock.compilerMock.run.yields(null, mockStats);
     return expect(module.compile())
