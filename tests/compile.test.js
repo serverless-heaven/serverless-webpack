@@ -44,10 +44,13 @@ describe('compile', () => {
       consoleLog: sandbox.stub()
     };
 
-    module = _.assign({
-      serverless,
-      options: {},
-    }, baseModule);
+    module = _.assign(
+      {
+        serverless,
+        options: {}
+      },
+      baseModule
+    );
   });
 
   afterEach(() => {
@@ -62,72 +65,82 @@ describe('compile', () => {
   it('should compile with webpack from a context configuration', () => {
     const testWebpackConfig = 'testconfig';
     module.webpackConfig = testWebpackConfig;
-    return expect(module.compile()).to.be.fulfilled
-    .then(() => {
-      expect(webpackMock).to.have.been.calledWith([testWebpackConfig]);
-      expect(webpackMock.compilerMock.run).to.have.been.calledOnce;
-      return null;
-    });
-  });
-
-  it('should fail if there are compilation errors', () => {
-    module.webpackConfig = 'testconfig';
-    // We stub errors here. It will be reset again in afterEach()
-    sandbox.stub(webpackMock.statsMock.compilation, 'errors').value(['error']);
-    return expect(module.compile()).to.be.rejectedWith(/compilation error/);
-  });
-
-  it('should work with multi compile', () => {
-    const testWebpackConfig = ['testconfig'];
-    const multiStats = {
-      stats: [{
-        compilation: {
-          errors: [],
-          compiler: {
-            outputPath: 'statsMock-outputPath',
-          },
-        },
-        toString: sandbox.stub().returns('testStats'),
-        hasErrors: _.constant(false)
-      }]
-    };
-    module.webpackConfig = testWebpackConfig;
-    module.multiCompile = true;
-    webpackMock.compilerMock.run.reset();
-    webpackMock.compilerMock.run.yields(null, multiStats);
-    return expect(module.compile()).to.be.fulfilled
-    .then(() => {
+    module.configuration = { concurrency: 1 };
+    return expect(module.compile()).to.be.fulfilled.then(() => {
       expect(webpackMock).to.have.been.calledWith(testWebpackConfig);
       expect(webpackMock.compilerMock.run).to.have.been.calledOnce;
       return null;
     });
   });
 
-  it('should work with serialized compile', () => {
-    const testWebpackConfig = ['testconfig'];
+  it('should fail if configuration is missing', () => {
+    const testWebpackConfig = 'testconfig';
+    module.webpackConfig = testWebpackConfig;
+    module.configuration = undefined;
+    return expect(module.compile()).to.be.rejectedWith('Missing plugin configuration');
+  });
+
+  it('should fail if there are compilation errors', () => {
+    module.webpackConfig = 'testconfig';
+    module.configuration = { concurrency: 1 };
+    // We stub errors here. It will be reset again in afterEach()
+    sandbox.stub(webpackMock.statsMock.compilation, 'errors').value(['error']);
+    return expect(module.compile()).to.be.rejectedWith(/compilation error/);
+  });
+
+  it('should work with multi compile', () => {
+    const testWebpackConfig = 'testconfig';
     const multiStats = {
-      stats: [{
-        compilation: {
-          errors: [],
-          compiler: {
-            outputPath: 'statsMock-outputPath',
+      stats: [
+        {
+          compilation: {
+            errors: [],
+            compiler: {
+              outputPath: 'statsMock-outputPath'
+            }
           },
-        },
-        toString: sandbox.stub().returns('testStats'),
-        hasErrors: _.constant(false)
-      }]
+          toString: sandbox.stub().returns('testStats'),
+          hasErrors: _.constant(false)
+        }
+      ]
     };
     module.webpackConfig = testWebpackConfig;
-    module.multiCompile = true;
-    module.serializedCompile = true;
+    module.configuration = { concurrency: 1 };
     webpackMock.compilerMock.run.reset();
     webpackMock.compilerMock.run.yields(null, multiStats);
-    return expect(module.compile()).to.be.fulfilled
-      .then(() => {
-        expect(webpackMock).to.have.been.calledWith(testWebpackConfig);
-        expect(webpackMock.compilerMock.run).to.have.been.calledOnce;
-        return null;
-      });
+    return expect(module.compile()).to.be.fulfilled.then(() => {
+      expect(webpackMock).to.have.been.calledWith(testWebpackConfig);
+      expect(webpackMock.compilerMock.run).to.have.been.calledOnce;
+      return null;
+    });
+  });
+
+  it('should work with concurrent compile', () => {
+    const testWebpackConfig = [ 'testconfig', 'testconfig2' ];
+    const multiStats = {
+      stats: [
+        {
+          compilation: {
+            errors: [],
+            compiler: {
+              outputPath: 'statsMock-outputPath'
+            }
+          },
+          toString: sandbox.stub().returns('testStats'),
+          hasErrors: _.constant(false)
+        }
+      ]
+    };
+    module.webpackConfig = testWebpackConfig;
+    module.configuration = { concurrency: 2 };
+    webpackMock.compilerMock.run.reset();
+    webpackMock.compilerMock.run.yields(null, multiStats);
+    return expect(module.compile()).to.be.fulfilled.then(() => {
+      expect(webpackMock).to.have.been.calledWith(testWebpackConfig[0]);
+      expect(webpackMock).to.have.been.calledWith(testWebpackConfig[1]);
+      expect(webpackMock.compilerMock.run).to.have.been.calledTwice;
+      return null;
+    });
   });
 
   it('should use correct stats option', () => {
@@ -146,19 +159,20 @@ describe('compile', () => {
     };
 
     module.webpackConfig = testWebpackConfig;
+    module.configuration = { concurrency: 1 };
     webpackMock.compilerMock.run.reset();
     webpackMock.compilerMock.run.yields(null, mockStats);
-    return (expect(module.compile()).to.be.fulfilled)
-    .then(() => {
-      expect(webpackMock).to.have.been.calledWith([testWebpackConfig]);
-      expect(mockStats.toString.firstCall.args).to.eql([testWebpackConfig.stats]);
-      module.webpackConfig = [testWebpackConfig];
-      return (expect(module.compile()).to.be.fulfilled);
-    })
-    .then(() => {
-      expect(webpackMock).to.have.been.calledWith([testWebpackConfig]);
-      expect(mockStats.toString.args).to.eql([ [testWebpackConfig.stats], [testWebpackConfig.stats] ]);
-      return null;
-    });
+    return expect(module.compile())
+      .to.be.fulfilled.then(() => {
+        expect(webpackMock).to.have.been.calledWith(testWebpackConfig);
+        expect(mockStats.toString.firstCall.args).to.eql([testWebpackConfig.stats]);
+        module.webpackConfig = [testWebpackConfig];
+        return expect(module.compile()).to.be.fulfilled;
+      })
+      .then(() => {
+        expect(webpackMock).to.have.been.calledWith(testWebpackConfig);
+        expect(mockStats.toString.args).to.eql([ [testWebpackConfig.stats], [testWebpackConfig.stats] ]);
+        return null;
+      });
   });
 });
