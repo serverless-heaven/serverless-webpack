@@ -158,7 +158,6 @@ describe('packageModules', () => {
         fsMock._statMock.isDirectory.returns(false);
 
         module.compileStats = stats;
-
         return expect(module.packageModules()).to.be.fulfilled.then(() => BbPromise.all([]));
       });
 
@@ -485,12 +484,8 @@ describe('packageModules', () => {
             expect(fsMock.copyFileSync).to.be.calledWith(expectedArtifactSource, expectedArtifactDestination),
 
             // Should set package artifact for each function to the single artifact
-            expect(func1)
-              .to.have.a.nested.property('package.artifact')
-              .that.equals(expectedArtifactDestination),
-            expect(func2)
-              .to.have.a.nested.property('package.artifact')
-              .that.equals(expectedArtifactDestination)
+            expect(func1).to.have.a.nested.property('package.artifact').that.equals(expectedArtifactDestination),
+            expect(func2).to.have.a.nested.property('package.artifact').that.equals(expectedArtifactDestination)
           ])
         );
       });
@@ -539,12 +534,8 @@ describe('packageModules', () => {
           getVersionStub.returns(version);
           return expect(module.copyExistingArtifacts()).to.be.fulfilled.then(() =>
             BbPromise.all([
-              expect(func1)
-                .to.have.a.nested.property('package.artifact')
-                .that.equals(expectedArtifactPath),
-              expect(func2)
-                .to.have.a.nested.property('package.artifact')
-                .that.equals(expectedArtifactPath)
+              expect(func1).to.have.a.nested.property('package.artifact').that.equals(expectedArtifactPath),
+              expect(func2).to.have.a.nested.property('package.artifact').that.equals(expectedArtifactPath)
             ])
           );
         }).then(() =>
@@ -552,12 +543,8 @@ describe('packageModules', () => {
             getVersionStub.returns(version);
             return expect(module.copyExistingArtifacts()).to.be.fulfilled.then(() =>
               BbPromise.all([
-                expect(func1)
-                  .to.have.a.nested.property('artifact')
-                  .that.equals(expectedArtifactPath),
-                expect(func2)
-                  .to.have.a.nested.property('artifact')
-                  .that.equals(expectedArtifactPath),
+                expect(func1).to.have.a.nested.property('artifact').that.equals(expectedArtifactPath),
+                expect(func2).to.have.a.nested.property('artifact').that.equals(expectedArtifactPath),
                 expect(func1).to.have.a.nested.property('package.disable').that.is.true,
                 expect(func2).to.have.a.nested.property('package.disable').that.is.true
               ])
@@ -610,9 +597,7 @@ describe('packageModules', () => {
           const expectedArtifactPath = path.join('.serverless', 'test-service.zip');
 
           return expect(module.copyExistingArtifacts()).to.be.fulfilled.then(() =>
-            expect(serverless.service)
-              .to.have.a.nested.property('package.artifact')
-              .that.equals(expectedArtifactPath)
+            expect(serverless.service).to.have.a.nested.property('package.artifact').that.equals(expectedArtifactPath)
           );
         });
       });
@@ -647,12 +632,8 @@ describe('packageModules', () => {
             expect(fsMock.copyFileSync).to.be.calledWith(path.join('.webpack', 'func2.zip'), expectedFunc2Destination),
 
             // Should set package artifact locations
-            expect(func1)
-              .to.have.a.nested.property('package.artifact')
-              .that.equals(expectedFunc1Destination),
-            expect(func2)
-              .to.have.a.nested.property('package.artifact')
-              .that.equals(expectedFunc2Destination)
+            expect(func1).to.have.a.nested.property('package.artifact').that.equals(expectedFunc1Destination),
+            expect(func2).to.have.a.nested.property('package.artifact').that.equals(expectedFunc2Destination)
           ])
         );
       });

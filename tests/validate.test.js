@@ -686,19 +686,6 @@ describe('validate', () => {
           _.unset(module.serverless, 'service.package.individually');
         });
 
-        it('should enable multiCompile', () => {
-          _.set(module.serverless.service, 'custom.webpack.config', testConfig);
-          module.serverless.service.functions = testFunctionsConfig;
-          globSyncStub.callsFake(filename => [_.replace(filename, '*', 'js')]);
-
-          expect(module.multiCompile).to.be.undefined;
-          return expect(module.validate()).to.be.fulfilled.then(() => {
-            expect(module.multiCompile).to.be.true;
-
-            return null;
-          });
-        });
-
         it('should fail if webpackConfig.entry is customised', () => {
           _.set(
             module.serverless.service,
