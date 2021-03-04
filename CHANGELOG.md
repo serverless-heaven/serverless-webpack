@@ -1,11 +1,18 @@
 # Change Log
 
 * 5.4.0
-  * Skip compile & packaging if --no-build is set [#560](https://github.com/serverless-heaven/serverless-webpack/pull/560)
+  * Skip compile & packaging if `--no-build` is set [#560](https://github.com/serverless-heaven/serverless-webpack/pull/560)
   * Serialized compile to address [#299](https://github.com/serverless-heaven/serverless-webpack/pull/299) [#517](https://github.com/serverless-heaven/serverless-webpack/pull/517)
+  * Add concurrency support for more than one thread [#681](https://github.com/serverless-heaven/serverless-webpack/pull/681)
   * Option to exclude files using regular expression [#612](https://github.com/serverless-heaven/serverless-webpack/pull/612)
   * Speed up cleanup process [#462](https://github.com/serverless-heaven/serverless-webpack/pull/462)
-  
+  * Allow custom runtime if Nodejs based [#675](https://github.com/serverless-heaven/serverless-webpack/pull/675)
+  * Convert packageModules to use bestzip instead of archiver [#596](https://github.com/serverless-heaven/serverless-webpack/pull/596)
+  * Fix external modules version for transitive dependencies [#541](https://github.com/serverless-heaven/serverless-webpack/pull/541) (see [#507](https://github.com/serverless-heaven/serverless-webpack/pull/507))
+  * Support noFrozenLockfile options [#687](https://github.com/serverless-heaven/serverless-webpack/pull/687)
+  * Don't package non-node functions (fix for [#644](https://github.com/serverless-heaven/serverless-webpack/issues/644)) [#663](https://github.com/serverless-heaven/serverless-webpack/pull/663)
+  * Testing with Node.js 14.x [#688](https://github.com/serverless-heaven/serverless-webpack/pull/688)
+
 * 5.3.5
   * Improve runtime validation [#629](https://github.com/serverless-heaven/serverless-webpack/pull/629)
   * Move `ts-node` as optional dependency [#636](https://github.com/serverless-heaven/serverless-webpack/pull/636)
