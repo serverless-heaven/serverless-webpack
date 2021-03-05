@@ -12,6 +12,7 @@
   * Support noFrozenLockfile options [#687](https://github.com/serverless-heaven/serverless-webpack/pull/687)
   * Don't package non-node functions (fix for [#644](https://github.com/serverless-heaven/serverless-webpack/issues/644)) [#663](https://github.com/serverless-heaven/serverless-webpack/pull/663)
   * Testing with Node.js 14.x [#688](https://github.com/serverless-heaven/serverless-webpack/pull/688)
+  * Replace `babel-eslint` by `@babel/eslint-parser` [#713](https://github.com/serverless-heaven/serverless-webpack/pull/713)
 
 * 5.3.5
   * Improve runtime validation [#629](https://github.com/serverless-heaven/serverless-webpack/pull/629)
@@ -24,7 +25,7 @@
   * Bump lodash from 4.17.4 to 4.17.19 in /examples/multiple-statically-entries [#599](https://github.com/serverless-heaven/serverless-webpack/pull/599)
   * Bump lodash from 4.17.4 to 4.17.19 in /examples/include-external-npm-packages [#600](https://github.com/serverless-heaven/serverless-webpack/pull/600)
   * Bump lodash from 4.17.4 to 4.17.19 in /examples/babel-multiple-statically-entries [#601](https://github.com/serverless-heaven/serverless-webpack/pull/601)
-  * Bump lodash from 4.17.4 to 4.17.19 in /examples/babel [#603] (https://github.com/serverless-heaven/serverless-webpack/pull/603)
+  * Bump lodash from 4.17.4 to 4.17.19 in /examples/babel [#603](https://github.com/serverless-heaven/serverless-webpack/pull/603)
   * Ignore more files from NPM [#609](https://github.com/serverless-heaven/serverless-webpack/pull/609)
   * Update all examples [#626](https://github.com/serverless-heaven/serverless-webpack/pull/626)
 
