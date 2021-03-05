@@ -10,12 +10,10 @@ extends:
   - plugin:promise/recommended
   - plugin:import/errors
   - plugin:import/warnings
-parser: babel-eslint
+parser: "@babel/eslint-parser"
 parserOptions:
+  requireConfigFile: false
   sourceType: module
-  ecmaFeatures:
-    classes: true
-    experimentalObjectRestSpread: true
 plugins:
   - promise
   - lodash
