@@ -554,7 +554,7 @@ Will run each webpack build one at a time which helps reduce memory usage and in
 ### Support for Docker Images as Custom Runtimes
 AWS Lambda and `serverless` started supporting the use of Docker images as custom runtimes in 2021. See the [serverless documentation](https://www.serverless.com/blog/container-support-for-lambda) for details on how to configure a `serverless.yml` to use these features.
 
-** NOTE: You must provide an override for the Image `CMD` property in your function definitions.**
+**NOTE: You must provide an override for the Image `CMD` property in your function definitions.**
 See [Dockerfile documentation](https://docs.docker.com/engine/reference/builder/#cmd) for more information about the native Docker `CMD` property.
 
 In the following example `entrypoint` is inherited from the shared Docker image, while `command` is provided as an override for each function:
