@@ -605,6 +605,24 @@ describe('validate', () => {
               }
             ],
             runtime: 'provided'
+          },
+          func4: {
+            artifact: 'artifact-func4.zip',
+            events: [
+              {
+                http: {
+                  method: 'POST',
+                  path: 'func4path'
+                }
+              },
+              {
+                nonhttp: 'non-http'
+              }
+            ],
+            image: {
+              name: 'custom-image',
+              command: ['module4.func1handler']
+            }
           }
         };
 
@@ -626,11 +644,12 @@ describe('validate', () => {
           const lib = require('../lib/index');
           const expectedLibEntries = {
             module1: './module1.js',
-            module2: './module2.js'
+            module2: './module2.js',
+            module4: './module4.js'
           };
 
           expect(lib.entries).to.deep.equal(expectedLibEntries);
-          expect(globSyncStub).to.have.callCount(2);
+          expect(globSyncStub).to.have.callCount(3);
           expect(serverless.cli.log).to.not.have.been.called;
           return null;
         });
