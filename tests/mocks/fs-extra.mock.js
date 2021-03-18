@@ -5,12 +5,10 @@
  */
 
 module.exports.create = sandbox => {
-  const fsExtraMock = {
+  return {
     copy: sandbox.stub().yields(),
     pathExists: sandbox.stub().yields(),
     pathExistsSync: sandbox.stub().returns(false),
     removeSync: sandbox.stub()
   };
-
-  return fsExtraMock;
 };

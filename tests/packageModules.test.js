@@ -73,7 +73,9 @@ describe('packageModules', () => {
     module = _.assign(
       {
         serverless,
-        options: {},
+        options: {
+          verbose: true,
+        },
         webpackOutputPath: '.webpack',
         configuration: new Configuration()
       },
@@ -92,7 +94,7 @@ describe('packageModules', () => {
       module.compileStats = { stats: [] };
       return expect(module.packageModules()).to.be.fulfilled.then(() =>
         BbPromise.all([
-          expect(bestzipMock).to.not.have.been.called,
+          expect(bestzipMock.bestzip).to.not.have.been.called,
           expect(writeFileDirStub).to.not.have.been.called,
           expect(fsMock.createWriteStream).to.not.have.been.called,
           expect(globMock.sync).to.not.have.been.called
@@ -104,7 +106,7 @@ describe('packageModules', () => {
       module.skipCompile = true;
       return expect(module.packageModules()).to.be.fulfilled.then(() =>
         BbPromise.all([
-          expect(bestzipMock).to.not.have.been.called,
+          expect(bestzipMock.bestzip).to.not.have.been.called,
           expect(writeFileDirStub).to.not.have.been.called,
           expect(fsMock.createWriteStream).to.not.have.been.called,
           expect(globMock.sync).to.not.have.been.called
