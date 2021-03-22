@@ -480,6 +480,20 @@ describe('validate', () => {
               }
             }
           ]
+        },
+        dockerfunc: {
+          image: {
+            name: 'some-image-uri',
+            command: ['com.serverless.Handler']
+          },
+          events: [
+            {
+              http: {
+                method: 'POST',
+                path: 'mydockerfuncpath'
+              }
+            }
+          ]
         }
       };
 
@@ -517,6 +531,7 @@ describe('validate', () => {
         return expect(module.validate()).to.be.fulfilled.then(() => {
           const lib = require('../lib/index');
           const expectedLibEntries = {
+            'com.serverless': './com.serverless.js',
             module1: './module1.js',
             module2: './module2.js',
             'handlers/func3/module2': './handlers/func3/module2.js',
@@ -524,7 +539,7 @@ describe('validate', () => {
           };
 
           expect(lib.entries).to.deep.equal(expectedLibEntries);
-          expect(globSyncStub).to.have.callCount(4);
+          expect(globSyncStub).to.have.callCount(5);
           expect(serverless.cli.log).to.not.have.been.called;
           return null;
         });
@@ -772,6 +787,15 @@ describe('validate', () => {
                   key: 'handlers/module2/func3/module2',
                   value: './handlers/module2/func3/module2.js'
                 }
+              },
+              {
+                handlerFile: 'com.serverless',
+                funcName: 'dockerfunc',
+                func: testFunctionsConfig.dockerfunc,
+                entry: {
+                  key: 'com.serverless',
+                  value: './com.serverless.js'
+                }
               }
             ]);
             return null;
@@ -783,11 +807,12 @@ describe('validate', () => {
           module.serverless.service.functions = testFunctionsConfig;
           globSyncStub.callsFake(filename => [_.replace(filename, '*', 'js')]);
           return expect(module.validate()).to.be.fulfilled.then(() => {
-            expect(module.webpackConfig).to.have.lengthOf(4);
+            expect(module.webpackConfig).to.have.lengthOf(5);
             expect(module.webpackConfig[0].output.path).to.equal(path.join('output', 'func1'));
             expect(module.webpackConfig[1].output.path).to.equal(path.join('output', 'func2'));
             expect(module.webpackConfig[2].output.path).to.equal(path.join('output', 'func3'));
             expect(module.webpackConfig[3].output.path).to.equal(path.join('output', 'func4'));
+            expect(module.webpackConfig[4].output.path).to.equal(path.join('output', 'dockerfunc'));
 
             return null;
           });
@@ -808,19 +833,22 @@ describe('validate', () => {
           module.serverless.service.functions = testFunctionsConfig;
           globSyncStub.callsFake(filename => [_.replace(filename, '*', 'js')]);
           return expect(module.validate()).to.be.fulfilled.then(() => {
-            expect(module.webpackConfig).to.have.lengthOf(4);
+            expect(module.webpackConfig).to.have.lengthOf(5);
             expect(module.webpackConfig[0].devtool).to.equal('source-map');
             expect(module.webpackConfig[1].devtool).to.equal('source-map');
             expect(module.webpackConfig[2].devtool).to.equal('source-map');
             expect(module.webpackConfig[3].devtool).to.equal('source-map');
+            expect(module.webpackConfig[4].devtool).to.equal('source-map');
             expect(module.webpackConfig[0].context).to.equal('some context');
             expect(module.webpackConfig[1].context).to.equal('some context');
             expect(module.webpackConfig[2].context).to.equal('some context');
             expect(module.webpackConfig[3].context).to.equal('some context');
+            expect(module.webpackConfig[4].context).to.equal('some context');
             expect(module.webpackConfig[0].output.libraryTarget).to.equal('commonjs');
             expect(module.webpackConfig[1].output.libraryTarget).to.equal('commonjs');
             expect(module.webpackConfig[2].output.libraryTarget).to.equal('commonjs');
             expect(module.webpackConfig[3].output.libraryTarget).to.equal('commonjs');
+            expect(module.webpackConfig[4].output.libraryTarget).to.equal('commonjs');
             return null;
           });
         });
