@@ -75,7 +75,7 @@
     "prettier": "^2.2.1",
     "prettier-eslint-cli": "^5.0.1",
     "serverless": "^1.83.0",
-    "sinon": "^9.2.4",
+    "sinon": "^10.0.0",
     "sinon-chai": "^3.5.0"
   },
   "peerDependencies": {
