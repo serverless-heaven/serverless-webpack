@@ -7,7 +7,7 @@ updates:
       time: "02:00"
       timezone: Europe/Paris
     open-pull-requests-limit: 10
-    version_requirement_updates: increase_versions
+    versioning-strategy: increase
     ignore:
       - dependency-name: husky
         versions:
