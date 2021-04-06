@@ -80,6 +80,15 @@ describe('ServerlessWebpack', () => {
       expect(Module._load).to.have.been.calledWith('ts-node/register');
     });
 
+    it('should not register ts-node if it has already been registered', () => {
+      _.set(serverless, 'service.custom.webpack.webpackConfig', 'webpack.config.ts');
+      process[Symbol.for('ts-node.register.instance')] = 'foo';
+      new ServerlessWebpack(serverless, {});
+      delete process[Symbol.for('ts-node.register.instance')];
+      expect(Module._load).to.not.have.been.called;
+      expect(Module._load).to.not.have.been.calledWith('ts-node/register');
+    });
+
     it('should throw an error if config use TS but ts-node was not added as dependency', () => {
       moduleStub.throws();
 
