@@ -271,6 +271,30 @@ describe('validate', () => {
         });
     });
 
+    it('should interop default when webpack config is exported as an ES6 module', () => {
+      const testConfig = 'testconfig';
+      const testServicePath = 'testpath';
+      const requiredPath = path.join(testServicePath, testConfig);
+      module.serverless.config.servicePath = testServicePath;
+      module.serverless.service.custom.webpack = testConfig;
+      serverless.utils.fileExistsSync = sinon.stub().returns(true);
+      const loadedConfig = {
+        default: {
+          entry: 'testentry'
+        }
+      };
+      mockery.registerMock(requiredPath, loadedConfig);
+      return expect(module.validate())
+        .to.fulfilled.then(() => {
+          expect(serverless.utils.fileExistsSync).to.have.been.calledWith(requiredPath);
+          expect(module.webpackConfig).to.eql(loadedConfig.default);
+          return null;
+        })
+        .finally(() => {
+          mockery.deregisterMock(requiredPath);
+        });
+    });
+
     it('should catch errors while loading a async webpack config from file if `custom.webpack` is a string', () => {
       const testConfig = 'testconfig';
       const testServicePath = 'testpath';
