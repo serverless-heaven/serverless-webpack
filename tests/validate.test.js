@@ -916,7 +916,7 @@ describe('validate', () => {
 
           expect(globSyncStub).to.have.been.calledOnceWith('module1.*', {
             ignore: '**/*.ts',
-            cwd: null,
+            cwd: undefined,
             nodir: true
           });
           expect(serverless.cli.log).not.to.have.been.called;
