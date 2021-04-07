@@ -145,7 +145,6 @@ describe('packageModules', () => {
           events: []
         };
         // Serverless behavior
-        sandbox.stub(serverless.config, 'servicePath').value('/my/Service/Path');
         getVersionStub.returns('1.18.0');
         getServiceObjectStub.returns({
           name: 'test-service'
@@ -203,7 +202,6 @@ describe('packageModules', () => {
             handler: 'handler2',
             events: []
           };
-          sandbox.stub(serverless.config, 'servicePath').value('/my/Service/Path');
           getVersionStub.returns('1.18.0');
           getServiceObjectStub.returns({
             name: 'test-service'
@@ -246,7 +244,6 @@ describe('packageModules', () => {
           events: []
         };
         // Serverless behavior
-        sandbox.stub(serverless.config, 'servicePath').value('/my/Service/Path');
         getServiceObjectStub.returns({
           name: 'test-service'
         });
@@ -295,7 +292,6 @@ describe('packageModules', () => {
           events: []
         };
         // Serverless behavior
-        sandbox.stub(serverless.config, 'servicePath').value('/my/Service/Path');
         getVersionStub.returns('1.18.0');
         getServiceObjectStub.returns({
           name: 'test-service'
@@ -343,7 +339,6 @@ describe('packageModules', () => {
           events: []
         };
         // Serverless behavior
-        sandbox.stub(serverless.config, 'servicePath').value('/my/Service/Path');
         getVersionStub.returns('1.18.0');
         getServiceObjectStub.returns({
           name: 'test-service'
@@ -413,7 +408,6 @@ describe('packageModules', () => {
 
       it('should package', () => {
         // Serverless behavior
-        sandbox.stub(serverless.config, 'servicePath').value('/my/Service/Path');
         getVersionStub.returns('1.18.0');
         getServiceObjectStub.returns({
           name: 'test-service'
@@ -516,7 +510,6 @@ describe('packageModules', () => {
           events: []
         };
         // Serverless behavior
-        sandbox.stub(serverless.config, 'servicePath').value('/my/Service/Path');
         getServiceObjectStub.returns({
           name: 'test-service'
         });
@@ -583,7 +576,6 @@ describe('packageModules', () => {
             handler: 'handler2',
             events: []
           };
-          sandbox.stub(serverless.config, 'servicePath').value('/my/Service/Path');
           getVersionStub.returns('1.18.0');
           getServiceObjectStub.returns({
             name: 'test-service'
