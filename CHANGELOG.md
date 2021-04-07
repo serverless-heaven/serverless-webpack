@@ -1,5 +1,20 @@
 # Change Log
 
+* 5.4.1
+  * Display the zip method used ([#735][] @j0k3r)
+  * Dependabot should now updates package.json too ([#742][] @j0k3r)
+  * Fix configuration check for `keepOutputDirectory` in cleanup ([#748][] @daryl-c)
+  * Prevent ts-node being registered twice ([#766][] @apancutt)
+  * Fix external modules with webpack 5 ([#746][] @janicduplessis)
+  * Allow custom webpack config files to export as an ES6 module (interop default) ([#767][] @apancutt)
+
+[#735]: https://github.com/serverless-heaven/serverless-webpack/pull/735
+[#742]: https://github.com/serverless-heaven/serverless-webpack/pull/742
+[#748]: https://github.com/serverless-heaven/serverless-webpack/pull/748
+[#766]: https://github.com/serverless-heaven/serverless-webpack/pull/766
+[#746]: https://github.com/serverless-heaven/serverless-webpack/pull/746
+[#767]: https://github.com/serverless-heaven/serverless-webpack/pull/767
+
 * 5.4.0
   * Skip compile & packaging if `--no-build` is set [#560](https://github.com/serverless-heaven/serverless-webpack/pull/560)
   * Serialized compile to address [#299](https://github.com/serverless-heaven/serverless-webpack/pull/299) [#517](https://github.com/serverless-heaven/serverless-webpack/pull/517)
