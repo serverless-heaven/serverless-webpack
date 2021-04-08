@@ -74,7 +74,7 @@ describe('packageModules', () => {
       {
         serverless,
         options: {
-          verbose: true,
+          verbose: true
         },
         webpackOutputPath: '.webpack',
         configuration: new Configuration()

@@ -914,11 +914,21 @@ describe('validate', () => {
 
           expect(lib.entries).to.deep.equal(expectedLibEntries);
 
-          expect(globSyncStub).to.have.been.calledOnceWith('module1.*', {
-            ignore: '**/*.ts',
-            cwd: undefined,
-            nodir: true
-          });
+          // handle different stub in case of serverless version
+          if (serverless.version.match(/^1/)) {
+            expect(globSyncStub).to.have.been.calledOnceWith('module1.*', {
+              ignore: '**/*.ts',
+              cwd: null,
+              nodir: true
+            });
+          } else {
+            expect(globSyncStub).to.have.been.calledOnceWith('module1.*', {
+              ignore: '**/*.ts',
+              cwd: undefined,
+              nodir: true
+            });
+          }
+
           expect(serverless.cli.log).not.to.have.been.called;
           return null;
         });
