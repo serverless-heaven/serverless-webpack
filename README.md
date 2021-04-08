@@ -7,7 +7,7 @@
 [![Coverage Status][ico-coverage]][link-coverage]
 [![Contributors][ico-contributors]][link-contributors]
 
-A Serverless v1.x plugin to build your lambda functions with [Webpack][link-webpack].
+A Serverless v1.x & v2.x plugin to build your lambda functions with [Webpack][link-webpack].
 
 This plugin is for you if you want to use the latest Javascript version with [Babel][link-babel];
 use custom [resource loaders][link-webpack-loaders], optimize your packaged functions individually
