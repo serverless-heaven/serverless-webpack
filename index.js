@@ -63,7 +63,8 @@ class ServerlessWebpack {
         options: {
           out: {
             usage: 'Path to output directory',
-            shortcut: 'o'
+            shortcut: 'o',
+            type: 'string'
           }
         },
         commands: {
