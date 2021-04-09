@@ -312,7 +312,7 @@ describe('packageModules', () => {
       it('should reject if no files are found because all files are excluded using regex', () => {
         module.configuration = new Configuration({
           webpack: {
-            excludeRegex: /.*/
+            excludeRegex: '.*'
           }
         });
 
