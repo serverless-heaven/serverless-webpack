@@ -463,7 +463,7 @@ regex you want to exclude).
 # serverless.yml
 custom:
   webpack:
-    excludeRegex: /\.ts|test|\.map/
+    excludeRegex: \.ts|test|\.map
 ```
 
 #### Keep output directory after packaging
