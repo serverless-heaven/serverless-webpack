@@ -679,6 +679,22 @@ describe('packageModules', () => {
           ])
         );
       });
+
+      it('copies only the artifact for function specified in options', () => {
+        _.set(module, 'options.function', 'func1');
+        const expectedFunc1Destination = path.join('.serverless', 'func1.zip');
+
+        return expect(module.copyExistingArtifacts()).to.be.fulfilled.then(() =>
+          BbPromise.all([
+            // Should copy an artifact per function into .serverless
+            expect(fsMock.copyFileSync).callCount(1),
+            expect(fsMock.copyFileSync).to.be.calledWith(path.join('.webpack', 'func1.zip'), expectedFunc1Destination),
+
+            // Should set package artifact locations
+            expect(func1).to.have.a.nested.property('package.artifact').that.equals(expectedFunc1Destination)
+          ])
+        );
+      });
     });
   });
 });
