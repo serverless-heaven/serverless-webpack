@@ -53,7 +53,7 @@
     "bluebird": "^3.7.2",
     "fs-extra": "^9.1.0",
     "glob": "^7.1.6",
-    "is-builtin-module": "^3.0.0",
+    "is-builtin-module": "^3.1.0",
     "lodash": "^4.17.21",
     "semver": "^7.3.5"
   },
