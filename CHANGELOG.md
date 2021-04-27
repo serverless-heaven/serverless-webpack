@@ -1,5 +1,20 @@
 # Change Log
 
+* 5.4.2
+  * Regression Fix: Empty lines while stats: 'errors-only' ([#773][] @Enase)
+  * Add type to CLI options ([#774][] @j0k3r)
+  * Add Serverless v2 compatibility ([#775][] @nponeccop)
+  * Support local errors with NPM 7 workspaces ([#782][] @mikejpeters)
+  * Fix `excludeRegex` option and allow dotfiles to be packaged ([#780][] @l1b3r)
+  * Correctly handle packaging for function during `deploy -f` ([#794][] @pgrzesik)
+
+[#773]: https://github.com/serverless-heaven/serverless-webpack/pull/773
+[#774]: https://github.com/serverless-heaven/serverless-webpack/pull/774
+[#775]: https://github.com/serverless-heaven/serverless-webpack/pull/775
+[#782]: https://github.com/serverless-heaven/serverless-webpack/pull/782
+[#780]: https://github.com/serverless-heaven/serverless-webpack/pull/780
+[#794]: https://github.com/serverless-heaven/serverless-webpack/pull/794
+
 * 5.4.1
   * Display the zip method used ([#735][] @j0k3r)
   * Dependabot should now updates package.json too ([#742][] @j0k3r)
