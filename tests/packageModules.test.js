@@ -682,6 +682,8 @@ describe('packageModules', () => {
 
       it('copies only the artifact for function specified in options', () => {
         _.set(module, 'options.function', 'func1');
+        // when set to options.function is set, validate.js will only have that function as an entry point
+        _.set(module, 'entryFunctions', _.pickBy(entryFunctions, [ 'funcName', 'func1' ]));
         const expectedFunc1Destination = path.join('.serverless', 'func1.zip');
 
         return expect(module.copyExistingArtifacts()).to.be.fulfilled.then(() =>
