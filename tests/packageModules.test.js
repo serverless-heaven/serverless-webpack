@@ -477,16 +477,21 @@ describe('packageModules', () => {
   });
 
   describe('copyExistingArtifacts()', () => {
-    const allFunctions = [ 'func1', 'func2' ];
+    const allFunctions = [ 'func1', 'func2', 'funcPython' ];
     const func1 = {
       handler: 'src/handler1',
       events: []
     };
     const func2 = {
       handler: 'src/handler2',
-      events: []
+      events: [],
+      runtime: 'node'
     };
-
+    const funcPython = {
+      handler: 'src/handlerPython',
+      events: [],
+      runtime: 'python'
+    };
     const entryFunctions = [
       {
         handlerFile: 'src/handler1.js',
@@ -497,6 +502,11 @@ describe('packageModules', () => {
         handlerFile: 'src/handler2.js',
         funcName: 'func2',
         func: func2
+      },
+      {
+        handlerFile: 'src/handlerPython.js',
+        funcName: 'funcPython',
+        func: funcPython
       }
     ];
 
@@ -515,6 +525,7 @@ describe('packageModules', () => {
         getAllFunctionsStub.returns(allFunctions);
         getFunctionStub.withArgs('func1').returns(func1);
         getFunctionStub.withArgs('func2').returns(func2);
+        getFunctionStub.withArgs('funcPython').returns(funcPython);
       });
 
       it('copies the artifact', () => {
@@ -660,9 +671,10 @@ describe('packageModules', () => {
         getAllFunctionsStub.returns(allFunctions);
         getFunctionStub.withArgs('func1').returns(func1);
         getFunctionStub.withArgs('func2').returns(func2);
+        getFunctionStub.withArgs('funcPython').returns(funcPython);
       });
 
-      it('copies each artifact', () => {
+      it('copies each node artifact', () => {
         const expectedFunc1Destination = path.join('.serverless', 'func1.zip');
         const expectedFunc2Destination = path.join('.serverless', 'func2.zip');
 
