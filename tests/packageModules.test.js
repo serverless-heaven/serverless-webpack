@@ -312,7 +312,7 @@ describe('packageModules', () => {
       it('should reject if no files are found because all files are excluded using regex', () => {
         module.configuration = new Configuration({
           webpack: {
-            excludeRegex: /.*/
+            excludeRegex: '.*'
           }
         });
 
@@ -354,6 +354,54 @@ describe('packageModules', () => {
 
         module.compileStats = stats;
         return expect(module.packageModules()).to.be.rejectedWith('Packaging: No files found');
+      });
+
+      it('should reject only .md files without verbose log', () => {
+        module.options.verbose = false;
+        module.configuration = new Configuration({
+          webpack: {
+            excludeRegex: '.md$'
+          }
+        });
+
+        // Test data
+        const stats = {
+          stats: [
+            {
+              compilation: {
+                compiler: {
+                  outputPath: '/my/Service/Path/.webpack/service'
+                }
+              }
+            }
+          ]
+        };
+        const files = [ 'README.md', 'src/handler1.js', 'src/handler1.js.map', 'src/handler2.js', 'src/handler2.js.map' ];
+        const allFunctions = [ 'func1', 'func2' ];
+        const func1 = {
+          handler: 'src/handler1',
+          events: []
+        };
+        const func2 = {
+          handler: 'src/handler2',
+          events: []
+        };
+        // Serverless behavior
+        getVersionStub.returns('1.18.0');
+        getServiceObjectStub.returns({
+          name: 'test-service'
+        });
+        getAllFunctionsStub.returns(allFunctions);
+        getFunctionStub.withArgs('func1').returns(func1);
+        getFunctionStub.withArgs('func2').returns(func2);
+        // Mock behavior
+        globMock.sync.returns(files);
+        fsMock._streamMock.on.withArgs('open').yields();
+        fsMock._streamMock.on.withArgs('close').yields();
+        fsMock._statMock.isDirectory.returns(false);
+
+        module.compileStats = stats;
+        return expect(module.packageModules()).to.be.fulfilled;
       });
     });
 
@@ -628,6 +676,22 @@ describe('packageModules', () => {
             // Should set package artifact locations
             expect(func1).to.have.a.nested.property('package.artifact').that.equals(expectedFunc1Destination),
             expect(func2).to.have.a.nested.property('package.artifact').that.equals(expectedFunc2Destination)
+          ])
+        );
+      });
+
+      it('copies only the artifact for function specified in options', () => {
+        _.set(module, 'options.function', 'func1');
+        const expectedFunc1Destination = path.join('.serverless', 'func1.zip');
+
+        return expect(module.copyExistingArtifacts()).to.be.fulfilled.then(() =>
+          BbPromise.all([
+            // Should copy an artifact per function into .serverless
+            expect(fsMock.copyFileSync).callCount(1),
+            expect(fsMock.copyFileSync).to.be.calledWith(path.join('.webpack', 'func1.zip'), expectedFunc1Destination),
+
+            // Should set package artifact locations
+            expect(func1).to.have.a.nested.property('package.artifact').that.equals(expectedFunc1Destination)
           ])
         );
       });
