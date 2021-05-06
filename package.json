@@ -1,6 +1,6 @@
 {
   "name": "serverless-webpack",
-  "version": "5.4.1",
+  "version": "5.4.2",
   "description": "Serverless plugin to bundle your javascript with Webpack",
   "main": "index.js",
   "types": "index.d.ts",
@@ -53,20 +53,20 @@
     "bluebird": "^3.7.2",
     "fs-extra": "^9.1.0",
     "glob": "^7.1.6",
-    "is-builtin-module": "^3.0.0",
+    "is-builtin-module": "^3.1.0",
     "lodash": "^4.17.21",
     "semver": "^7.3.5"
   },
   "devDependencies": {
-    "@babel/core": "^7.13.10",
+    "@babel/core": "^7.14.0",
     "@babel/eslint-parser": "^7.13.10",
     "chai": "^4.3.4",
     "chai-as-promised": "^7.1.1",
     "coveralls": "^3.1.0",
-    "eslint": "^7.22.0",
+    "eslint": "^7.25.0",
     "eslint-plugin-import": "^2.22.1",
     "eslint-plugin-lodash": "^7.2.0",
-    "eslint-plugin-promise": "^4.3.1",
+    "eslint-plugin-promise": "^5.1.0",
     "husky": "^4.3.8",
     "lint-staged": "^10.5.4",
     "mocha": "^8.3.2",
@@ -74,8 +74,8 @@
     "nyc": "^15.1.0",
     "prettier": "^2.2.1",
     "prettier-eslint-cli": "^5.0.1",
-    "serverless": "^1.83.3",
-    "sinon": "^10.0.0",
+    "serverless": "^2.39.2",
+    "sinon": "^10.0.1",
     "sinon-chai": "^3.6.0"
   },
   "peerDependencies": {

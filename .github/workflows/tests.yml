@@ -29,7 +29,7 @@ jobs:
           fetch-depth: 2
 
       - name: "Install Node.js"
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v2
         with:
           node-version: "${{ matrix.node }}"
 
@@ -39,12 +39,9 @@ jobs:
       - name: "Run tests"
         run: "npm run test"
 
-      - name: "Run tests"
-        run: "npm run test"
-
   coverage:
     name: "Upload coverage"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     needs:
       - "mocha"
 
@@ -55,7 +52,7 @@ jobs:
           fetch-depth: 2
 
       - name: "Install Node.js"
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v2
         with:
           node-version: "12"
 
@@ -69,3 +66,34 @@ jobs:
         uses: coverallsapp/github-action@master
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
+
+  serverless-v1:
+    runs-on: ${{ matrix.os }}
+    name: Node.js ${{ matrix.node }} on ${{ matrix.os }} with Serverless v1
+
+    strategy:
+      matrix:
+        os:
+          - ubuntu-20.04
+        node:
+          - "14"
+
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 2
+
+      - name: "Install Node.js"
+        uses: actions/setup-node@v2
+        with:
+          node-version: "${{ matrix.node }}"
+
+      - name: "Install Serverless v1"
+        run: npm install serverless@"<2.0.0"
+
+      - name: "Install dependencies"
+        run: npm ci
+
+      - name: "Run tests"
+        run: "npm run test"
