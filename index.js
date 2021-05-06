@@ -26,11 +26,12 @@ class ServerlessWebpack {
     this.options = options;
 
     if (
-      (_.has(this.serverless, 'service.custom.webpack') &&
+      ((_.has(this.serverless, 'service.custom.webpack') &&
         _.isString(this.serverless.service.custom.webpack) &&
         _.endsWith(this.serverless.service.custom.webpack, '.ts')) ||
-      (_.has(this.serverless, 'service.custom.webpack.webpackConfig') &&
-        _.endsWith(this.serverless.service.custom.webpack.webpackConfig, '.ts'))
+        (_.has(this.serverless, 'service.custom.webpack.webpackConfig') &&
+          _.endsWith(this.serverless.service.custom.webpack.webpackConfig, '.ts'))) &&
+      !process[Symbol.for('ts-node.register.instance')]
     ) {
       try {
         require('ts-node/register');
@@ -61,7 +62,8 @@ class ServerlessWebpack {
         options: {
           out: {
             usage: 'Path to output directory',
-            shortcut: 'o'
+            shortcut: 'o',
+            type: 'string'
           }
         },
         commands: {
@@ -161,17 +163,25 @@ class ServerlessWebpack {
         BbPromise.bind(this)
           .tap(() => {
             lib.webpack.isLocal = true;
+            // --no-build override
+            if (this.options.build === false) {
+              this.skipCompile = true;
+            }
           })
           .then(this.prepareOfflineInvoke)
-          .then(this.wpwatch),
+          .then(() => (this.skipCompile ? BbPromise.resolve() : this.wpwatch())),
 
       'before:offline:start:init': () =>
         BbPromise.bind(this)
           .tap(() => {
             lib.webpack.isLocal = true;
+            // --no-build override
+            if (this.options.build === false) {
+              this.skipCompile = true;
+            }
           })
           .then(this.prepareOfflineInvoke)
-          .then(this.wpwatch),
+          .then(() => (this.skipCompile ? BbPromise.resolve() : this.wpwatch())),
 
       'before:step-functions-offline:start': () =>
         BbPromise.bind(this)

@@ -80,12 +80,21 @@ describe('ServerlessWebpack', () => {
       expect(Module._load).to.have.been.calledWith('ts-node/register');
     });
 
+    it('should not register ts-node if it has already been registered', () => {
+      _.set(serverless, 'service.custom.webpack.webpackConfig', 'webpack.config.ts');
+      process[Symbol.for('ts-node.register.instance')] = 'foo';
+      new ServerlessWebpack(serverless, {});
+      delete process[Symbol.for('ts-node.register.instance')];
+      expect(Module._load).to.not.have.been.called;
+      expect(Module._load).to.not.have.been.calledWith('ts-node/register');
+    });
+
     it('should throw an error if config use TS but ts-node was not added as dependency', () => {
       moduleStub.throws();
 
       _.set(serverless, 'service.custom.webpack.webpackConfig', 'webpack.config.ts');
 
-      const badDeps = function() {
+      const badDeps = function () {
         new ServerlessWebpack(serverless, {});
       };
 
@@ -253,6 +262,7 @@ describe('ServerlessWebpack', () => {
             });
 
             it('should skip compile if requested', () => {
+              slsw.options.build = false;
               slsw.skipCompile = true;
               return expect(slsw.hooks['before:invoke:local:invoke']()).to.be.fulfilled.then(() => {
                 expect(slsw.serverless.pluginManager.spawn).to.have.been.calledOnce;
@@ -392,10 +402,22 @@ describe('ServerlessWebpack', () => {
           name: 'before:offline:start',
           test: () => {
             it('should prepare offline', () => {
+              slsw.skipCompile = false;
+              slsw.options.build = true;
               return expect(slsw.hooks['before:offline:start']()).to.be.fulfilled.then(() => {
                 expect(ServerlessWebpack.lib.webpack.isLocal).to.be.true;
                 expect(slsw.prepareOfflineInvoke).to.have.been.calledOnce;
                 expect(slsw.wpwatch).to.have.been.calledOnce;
+                return null;
+              });
+            });
+            it('should skip compiling when requested', () => {
+              slsw.skipCompile = true;
+              slsw.options.build = false;
+              return expect(slsw.hooks['before:offline:start']()).to.be.fulfilled.then(() => {
+                expect(ServerlessWebpack.lib.webpack.isLocal).to.be.true;
+                expect(slsw.prepareOfflineInvoke).to.have.been.calledOnce;
+                expect(slsw.wpwatch).to.not.have.been.called;
                 return null;
               });
             });
@@ -405,10 +427,22 @@ describe('ServerlessWebpack', () => {
           name: 'before:offline:start:init',
           test: () => {
             it('should prepare offline', () => {
+              slsw.skipCompile = false;
+              slsw.options.build = true;
               return expect(slsw.hooks['before:offline:start:init']()).to.be.fulfilled.then(() => {
                 expect(ServerlessWebpack.lib.webpack.isLocal).to.be.true;
                 expect(slsw.prepareOfflineInvoke).to.have.been.calledOnce;
                 expect(slsw.wpwatch).to.have.been.calledOnce;
+                return null;
+              });
+            });
+            it('should skip compiling when requested', () => {
+              slsw.skipCompile = false;
+              slsw.options.build = false;
+              return expect(slsw.hooks['before:offline:start:init']()).to.be.fulfilled.then(() => {
+                expect(ServerlessWebpack.lib.webpack.isLocal).to.be.true;
+                expect(slsw.prepareOfflineInvoke).to.have.been.calledOnce;
+                expect(slsw.wpwatch).to.not.have.been.called;
                 return null;
               });
             });

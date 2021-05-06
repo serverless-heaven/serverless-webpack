@@ -1,5 +1,35 @@
 # Change Log
 
+* 5.4.2
+  * Regression Fix: Empty lines while stats: 'errors-only' ([#773][] @Enase)
+  * Add type to CLI options ([#774][] @j0k3r)
+  * Add Serverless v2 compatibility ([#775][] @nponeccop)
+  * Support local errors with NPM 7 workspaces ([#782][] @mikejpeters)
+  * Fix `excludeRegex` option and allow dotfiles to be packaged ([#780][] @l1b3r)
+  * Correctly handle packaging for function during `deploy -f` ([#794][] @pgrzesik)
+
+[#773]: https://github.com/serverless-heaven/serverless-webpack/pull/773
+[#774]: https://github.com/serverless-heaven/serverless-webpack/pull/774
+[#775]: https://github.com/serverless-heaven/serverless-webpack/pull/775
+[#782]: https://github.com/serverless-heaven/serverless-webpack/pull/782
+[#780]: https://github.com/serverless-heaven/serverless-webpack/pull/780
+[#794]: https://github.com/serverless-heaven/serverless-webpack/pull/794
+
+* 5.4.1
+  * Display the zip method used ([#735][] @j0k3r)
+  * Dependabot should now updates package.json too ([#742][] @j0k3r)
+  * Fix configuration check for `keepOutputDirectory` in cleanup ([#748][] @daryl-c)
+  * Prevent ts-node being registered twice ([#766][] @apancutt)
+  * Fix external modules with webpack 5 ([#746][] @janicduplessis)
+  * Allow custom webpack config files to export as an ES6 module (interop default) ([#767][] @apancutt)
+
+[#735]: https://github.com/serverless-heaven/serverless-webpack/pull/735
+[#742]: https://github.com/serverless-heaven/serverless-webpack/pull/742
+[#748]: https://github.com/serverless-heaven/serverless-webpack/pull/748
+[#766]: https://github.com/serverless-heaven/serverless-webpack/pull/766
+[#746]: https://github.com/serverless-heaven/serverless-webpack/pull/746
+[#767]: https://github.com/serverless-heaven/serverless-webpack/pull/767
+
 * 5.4.0
   * Skip compile & packaging if `--no-build` is set [#560](https://github.com/serverless-heaven/serverless-webpack/pull/560)
   * Serialized compile to address [#299](https://github.com/serverless-heaven/serverless-webpack/pull/299) [#517](https://github.com/serverless-heaven/serverless-webpack/pull/517)
@@ -12,6 +42,7 @@
   * Support noFrozenLockfile options [#687](https://github.com/serverless-heaven/serverless-webpack/pull/687)
   * Don't package non-node functions (fix for [#644](https://github.com/serverless-heaven/serverless-webpack/issues/644)) [#663](https://github.com/serverless-heaven/serverless-webpack/pull/663)
   * Testing with Node.js 14.x [#688](https://github.com/serverless-heaven/serverless-webpack/pull/688)
+  * Replace `babel-eslint` by `@babel/eslint-parser` [#713](https://github.com/serverless-heaven/serverless-webpack/pull/713)
 
 * 5.3.5
   * Improve runtime validation [#629](https://github.com/serverless-heaven/serverless-webpack/pull/629)
@@ -24,7 +55,7 @@
   * Bump lodash from 4.17.4 to 4.17.19 in /examples/multiple-statically-entries [#599](https://github.com/serverless-heaven/serverless-webpack/pull/599)
   * Bump lodash from 4.17.4 to 4.17.19 in /examples/include-external-npm-packages [#600](https://github.com/serverless-heaven/serverless-webpack/pull/600)
   * Bump lodash from 4.17.4 to 4.17.19 in /examples/babel-multiple-statically-entries [#601](https://github.com/serverless-heaven/serverless-webpack/pull/601)
-  * Bump lodash from 4.17.4 to 4.17.19 in /examples/babel [#603] (https://github.com/serverless-heaven/serverless-webpack/pull/603)
+  * Bump lodash from 4.17.4 to 4.17.19 in /examples/babel [#603](https://github.com/serverless-heaven/serverless-webpack/pull/603)
   * Ignore more files from NPM [#609](https://github.com/serverless-heaven/serverless-webpack/pull/609)
   * Update all examples [#626](https://github.com/serverless-heaven/serverless-webpack/pull/626)
 

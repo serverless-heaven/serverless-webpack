@@ -7,7 +7,7 @@
 [![Coverage Status][ico-coverage]][link-coverage]
 [![Contributors][ico-contributors]][link-contributors]
 
-A Serverless v1.x plugin to build your lambda functions with [Webpack][link-webpack].
+A Serverless v1.x & v2.x plugin to build your lambda functions with [Webpack][link-webpack].
 
 This plugin is for you if you want to use the latest Javascript version with [Babel][link-babel];
 use custom [resource loaders][link-webpack-loaders], optimize your packaged functions individually
@@ -302,6 +302,22 @@ custom:
 ```
 > Note that only relative path is supported at the moment.
 
+
+`peerDependencies` of all above external dependencies will also be packed into the Serverless
+artifact. By default, `node_modules` in the same directory as `package.json` (current working directory
+or specified by`packagePath`) will be used.
+
+However in some configuration (like monorepo), `node_modules` is in parent directory which is different from
+where `package.json` is. Set `nodeModulesRelativeDir` to specify the relative directory where `node_modules` is.
+
+```yaml
+# serverless.yml
+custom:
+  webpack:
+    includeModules:
+      nodeModulesRelativeDir: '../../' # relative path to current working directory.
+```
+
 #### Runtime dependencies
 
 If a runtime dependency is detected that is found in the `devDependencies` section and
@@ -463,7 +479,7 @@ regex you want to exclude).
 # serverless.yml
 custom:
   webpack:
-    excludeRegex: /\.ts|test|\.map/
+    excludeRegex: \.ts|test|\.map
 ```
 
 #### Keep output directory after packaging
@@ -680,6 +696,8 @@ If you have your sources located on a file system that does not offer events,
 e.g. a mounted volume in a Docker container, you can enable polling with the
 `--webpack-use-polling=<time in ms>` option. If you omit the value, it defaults
 to 3000 ms.
+
+If you don't want the plugin to build when using `serverless-offline`, select the `--no-build` option.
 
 #### Custom paths
 

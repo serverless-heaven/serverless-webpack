@@ -6,15 +6,14 @@ const StatsMock = () => ({
   compilation: {
     errors: [],
     compiler: {
-      outputPath: 'statsMock-outputPath',
-    },
+      outputPath: 'statsMock-outputPath'
+    }
   },
   toString: sinon.stub().returns('testStats'),
   hasErrors() {
     return Boolean(this.compilation.errors.length);
-  },
+  }
 });
-
 
 const CompilerMock = (sandbox, statsMock) => ({
   run: sandbox.stub().yields(null, statsMock),
@@ -23,7 +22,7 @@ const CompilerMock = (sandbox, statsMock) => ({
     beforeCompile: {
       tapPromise: sandbox.stub()
     }
-  },
+  }
 });
 
 const webpackMock = sandbox => {

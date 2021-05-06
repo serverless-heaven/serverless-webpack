@@ -6,6 +6,7 @@ const chai = require('chai');
 const sinon = require('sinon');
 const mockery = require('mockery');
 const Serverless = require('serverless');
+const Configuration = require('../lib/Configuration');
 
 chai.use(require('chai-as-promised'));
 chai.use(require('sinon-chai'));
@@ -58,7 +59,8 @@ describe('cleanup', () => {
         options: {
           verbose: true
         },
-        webpackOutputPath: 'my/Output/Path'
+        webpackOutputPath: 'my/Output/Path',
+        configuration: new Configuration()
       },
       baseModule
     );
@@ -88,16 +90,7 @@ describe('cleanup', () => {
     dirExistsSyncStub.returns(true);
     fseMock.remove.resolves(true);
 
-    module = _.assign(
-      {
-        serverless,
-        options: {
-          verbose: false
-        },
-        webpackOutputPath: 'my/Output/Path'
-      },
-      baseModule
-    );
+    module = _.assign({}, module, { options: { verbose: false } });
 
     return expect(module.cleanup()).to.be.fulfilled.then(() => {
       expect(dirExistsSyncStub).to.have.been.calledOnce;
@@ -136,6 +129,20 @@ describe('cleanup', () => {
     const configuredModule = _.assign({}, module, {
       keepOutputDirectory: true
     });
+    return expect(configuredModule.cleanup()).to.be.fulfilled.then(() => {
+      expect(dirExistsSyncStub).to.not.have.been.calledOnce;
+      expect(fseMock.remove).to.not.have.been.called;
+      return null;
+    });
+  });
+
+  it('should keep output dir if keepOutputDir = true in configuration', () => {
+    dirExistsSyncStub.returns(true);
+
+    const configuredModule = _.assign({}, module, {
+      configuration: new Configuration({ webpack: { keepOutputDirectory: true } })
+    });
+
     return expect(configuredModule.cleanup()).to.be.fulfilled.then(() => {
       expect(dirExistsSyncStub).to.not.have.been.calledOnce;
       expect(fseMock.remove).to.not.have.been.called;
