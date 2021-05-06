@@ -94,7 +94,7 @@ describe('packageModules', () => {
       module.compileStats = { stats: [] };
       return expect(module.packageModules()).to.be.fulfilled.then(() =>
         BbPromise.all([
-          expect(bestzipMock.bestzip).to.not.have.been.called,
+          expect(bestzipMock.nativeZip).to.not.have.been.called,
           expect(writeFileDirStub).to.not.have.been.called,
           expect(fsMock.createWriteStream).to.not.have.been.called,
           expect(globMock.sync).to.not.have.been.called
@@ -106,7 +106,7 @@ describe('packageModules', () => {
       module.skipCompile = true;
       return expect(module.packageModules()).to.be.fulfilled.then(() =>
         BbPromise.all([
-          expect(bestzipMock.bestzip).to.not.have.been.called,
+          expect(bestzipMock.nativeZip).to.not.have.been.called,
           expect(writeFileDirStub).to.not.have.been.called,
           expect(fsMock.createWriteStream).to.not.have.been.called,
           expect(globMock.sync).to.not.have.been.called

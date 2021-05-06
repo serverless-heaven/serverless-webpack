@@ -15,7 +15,8 @@ module.exports.create = sandbox => {
   hasNativeZip.returns(false);
 
   return {
-    bestzip: sinon.stub().resolves(BestZipMock(sandbox)),
+    nativeZip: sinon.stub().resolves(BestZipMock(sandbox)),
+    nodeZip: sinon.stub().resolves(BestZipMock(sandbox)),
     hasNativeZip
   };
 };
