@@ -12,3 +12,11 @@ updates:
       - dependency-name: husky
         versions:
           - ">= 5.0.0"
+      # require node >= 12
+      - dependency-name: lint-staged
+        versions:
+          - ">= 11.0.0"
+      # require node >= 12
+      - dependency-name: fs-extra
+        versions:
+          - ">= 10.0.0"

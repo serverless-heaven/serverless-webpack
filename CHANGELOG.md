@@ -1,5 +1,18 @@
 # Change Log
 
+* 5.5.0
+  * Add ability to specify the node_modules relative dir ([#689][] @ypxing)
+  * Fix the spawn E2BIG error when zipping ([#813][] @j0k3r)
+  * Extends the --no-build option to serverless offline start ([#770][] @nponeccop)
+  * Add Serverless Container Support ([#723][] @rogersgt)
+  * Add support for Yarn network-concurrency option ([#550][] @cfroese )
+
+[#689]: https://github.com/serverless-heaven/serverless-webpack/pull/689
+[#813]: https://github.com/serverless-heaven/serverless-webpack/pull/813
+[#770]: https://github.com/serverless-heaven/serverless-webpack/pull/770
+[#723]: https://github.com/serverless-heaven/serverless-webpack/pull/723
+[#550]: https://github.com/serverless-heaven/serverless-webpack/pull/550
+
 * 5.4.2
   * Regression Fix: Empty lines while stats: 'errors-only' ([#773][] @Enase)
   * Add type to CLI options ([#774][] @j0k3r)
