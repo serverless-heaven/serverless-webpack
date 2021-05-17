@@ -90,6 +90,9 @@ class ServerlessWebpack {
     };
 
     this.hooks = {
+      initialize: () => {
+        this.options = this.serverless.processedInput.options;
+      },
       'before:package:createDeploymentArtifacts': () =>
         BbPromise.bind(this)
           .then(() => this.serverless.pluginManager.spawn('webpack:validate'))

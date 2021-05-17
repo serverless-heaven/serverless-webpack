@@ -134,10 +134,18 @@ describe('ServerlessWebpack', () => {
   );
 
   describe('hooks', () => {
+    const functionName = 'myFunction';
+    const rawOptions = {
+      f: functionName
+    };
+    const processedOptions = {
+      function: functionName
+    };
     let slsw;
 
     before(() => {
-      slsw = new ServerlessWebpack(serverless, {});
+      slsw = new ServerlessWebpack(serverless, rawOptions);
+      serverless.processedInput.options = processedOptions;
       sandbox.stub(slsw, 'cleanup').returns(BbPromise.resolve());
       sandbox.stub(slsw, 'watch').returns(BbPromise.resolve());
       sandbox.stub(slsw, 'wpwatch').returns(BbPromise.resolve());
@@ -459,6 +467,15 @@ describe('ServerlessWebpack', () => {
                 expect(slsw.serverless.pluginManager.spawn).to.have.been.calledWithExactly('webpack:compile');
                 return null;
               });
+            });
+          }
+        },
+        {
+          name: 'initialize',
+          test: () => {
+            it('should override the raw options with the processed ones', () => {
+              slsw.hooks.initialize();
+              expect(slsw.options).to.equal(processedOptions);
             });
           }
         }
