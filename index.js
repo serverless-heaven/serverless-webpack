@@ -90,6 +90,12 @@ class ServerlessWebpack {
     };
 
     this.hooks = {
+      initialize: () => {
+        // serverless.processedInput does not exist in serverless@<2.0.0. This ensure the retrocompatibility with serverless v1
+        if (this.serverless.processedInput && this.serverless.processedInput.options) {
+          this.options = this.serverless.processedInput.options;
+        }
+      },
       'before:package:createDeploymentArtifacts': () =>
         BbPromise.bind(this)
           .then(() => this.serverless.pluginManager.spawn('webpack:validate'))
