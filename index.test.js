@@ -145,7 +145,9 @@ describe('ServerlessWebpack', () => {
 
     before(() => {
       slsw = new ServerlessWebpack(serverless, rawOptions);
-      serverless.processedInput.options = processedOptions;
+      if(serverless.processedInput) { // serverless.processedInput does not exist in serverless@<2.0.0
+        serverless.processedInput.options = processedOptions;
+      }
       sandbox.stub(slsw, 'cleanup').returns(BbPromise.resolve());
       sandbox.stub(slsw, 'watch').returns(BbPromise.resolve());
       sandbox.stub(slsw, 'wpwatch').returns(BbPromise.resolve());
@@ -475,7 +477,13 @@ describe('ServerlessWebpack', () => {
           test: () => {
             it('should override the raw options with the processed ones', () => {
               slsw.hooks.initialize();
-              expect(slsw.options).to.equal(processedOptions);
+              if(serverless.processedInput) {
+                expect(slsw.options).to.equal(processedOptions);
+              } else {
+                // serverless.processedInput does not exist in serverless@<2.0.0
+                // The options should not be changed
+                expect(slsw.options).to.equal(rawOptions);
+              }
             });
           }
         }
