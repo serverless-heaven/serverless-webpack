@@ -7,7 +7,8 @@ const StatsMock = () => ({
     errors: [],
     compiler: {
       outputPath: 'statsMock-outputPath'
-    }
+    },
+    modules: []
   },
   toString: sinon.stub().returns('testStats'),
   hasErrors() {

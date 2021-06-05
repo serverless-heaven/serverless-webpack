@@ -97,7 +97,8 @@ describe('compile', () => {
             errors: [],
             compiler: {
               outputPath: 'statsMock-outputPath'
-            }
+            },
+            modules: []
           },
           toString: sandbox.stub().returns('testStats'),
           hasErrors: _.constant(false)
@@ -124,7 +125,8 @@ describe('compile', () => {
             errors: [],
             compiler: {
               outputPath: 'statsMock-outputPath'
-            }
+            },
+            modules: []
           },
           toString: sandbox.stub().returns('testStats'),
           hasErrors: _.constant(false)
@@ -152,7 +154,8 @@ describe('compile', () => {
         errors: [],
         compiler: {
           outputPath: 'statsMock-outputPath'
-        }
+        },
+        modules: []
       },
       toString: sandbox.stub().returns('testStats'),
       hasErrors: _.constant(false)
@@ -174,5 +177,94 @@ describe('compile', () => {
         expect(mockStats.toString.args).to.eql([ [testWebpackConfig.stats], [testWebpackConfig.stats] ]);
         return null;
       });
+  });
+
+  it('should set stats outputPath', () => {
+    const testWebpackConfig = 'testconfig';
+    const multiStats = {
+      stats: [
+        {
+          compilation: {
+            errors: [],
+            compiler: {
+              outputPath: 'compileStats-outputPath'
+            },
+            modules: []
+          },
+          toString: sandbox.stub().returns('testStats'),
+          hasErrors: _.constant(false)
+        }
+      ]
+    };
+    module.webpackConfig = testWebpackConfig;
+    module.configuration = { concurrency: 1 };
+    webpackMock.compilerMock.run.reset();
+    webpackMock.compilerMock.run.yields(null, multiStats);
+    return expect(module.compile()).to.be.fulfilled.then(() => {
+      expect(module.compileStats.stats[0].outputPath).to.equal('compileStats-outputPath');
+      return null;
+    });
+  });
+
+  it('should set stats externals', () => {
+    const testWebpackConfig = 'testconfig';
+    const multiStats = {
+      stats: [
+        {
+          compilation: {
+            errors: [],
+            compiler: {
+              outputPath: 'compileStats-outputPath'
+            },
+            modules: [
+              {
+                identifier: _.constant('"crypto"')
+              },
+              {
+                identifier: _.constant('"uuid/v4"')
+              },
+              {
+                identifier: _.constant('"mockery"')
+              },
+              {
+                identifier: _.constant('"@scoped/vendor/module1"')
+              },
+              {
+                identifier: _.constant('external "@scoped/vendor/module2"')
+              },
+              {
+                identifier: _.constant('external "uuid/v4"')
+              },
+              {
+                identifier: _.constant('external "localmodule"')
+              },
+              {
+                identifier: _.constant('external "bluebird"')
+              },
+              {
+                identifier: _.constant('external "aws-sdk"')
+              }
+            ]
+          },
+          toString: sandbox.stub().returns('testStats'),
+          hasErrors: _.constant(false)
+        }
+      ]
+    };
+    module.webpackConfig = testWebpackConfig;
+    module.configuration = { concurrency: 1 };
+    webpackMock.compilerMock.run.reset();
+    webpackMock.compilerMock.run.yields(null, multiStats);
+    return expect(module.compile()).to.be.fulfilled.then(() => {
+      console.log(JSON.stringify(module.compileStats.stats[0].externalModules));
+      expect(module.compileStats.stats[0].externalModules).to.eql([
+        { external: '@scoped/vendor', origin: undefined },
+        { external: 'uuid', origin: undefined },
+        { external: 'localmodule', origin: undefined },
+        { external: 'bluebird', origin: undefined },
+        { external: 'aws-sdk', origin: undefined }
+      ]);
+      return null;
+    });
   });
 });
