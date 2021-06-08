@@ -20,21 +20,16 @@ chai.use(require('sinon-chai'));
 
 const expect = chai.expect;
 
-class WebpackModuleGraphMock {
-  getIssuer(module) {
-    return module.issuer;
-  }
-}
-
-class WebpackCompilationMock {
-  constructor(modules) {
-    this.moduleGraph = new WebpackModuleGraphMock();
-    this.modules = modules;
-    this.compiler = {
-      outputPath: '/my/Service/Path/.webpack/service'
-    };
-  }
-}
+const createStatsMock = modules => ({
+  stats: [
+    {
+      outputPath: '/my/Service/Path/.webpack/service',
+      externalModules: _.map(modules, m => ({
+        external: m
+      }))
+    }
+  ]
+});
 
 const packagerMockFactory = {
   create(sandbox) {
@@ -135,157 +130,23 @@ describe('packExternalModules', () => {
 
   describe('packExternalModules()', () => {
     // Test data
-    const stats = {
-      stats: [
-        {
-          compilation: new WebpackCompilationMock([
-            {
-              identifier: _.constant('"crypto"')
-            },
-            {
-              identifier: _.constant('"uuid/v4"')
-            },
-            {
-              identifier: _.constant('"mockery"')
-            },
-            {
-              identifier: _.constant('"@scoped/vendor/module1"')
-            },
-            {
-              identifier: _.constant('external "@scoped/vendor/module2"')
-            },
-            {
-              identifier: _.constant('external "uuid/v4"')
-            },
-            {
-              identifier: _.constant('external "bluebird"')
-            }
-          ])
-        }
-      ]
-    };
+    const stats = createStatsMock([ '@scoped/vendor', 'uuid', 'bluebird' ]);
     const noExtStats = {
       stats: [
         {
-          compilation: new WebpackCompilationMock([
-            {
-              identifier: _.constant('"crypto"')
-            },
-            {
-              identifier: _.constant('"uuid/v4"')
-            },
-            {
-              identifier: _.constant('"mockery"')
-            },
-            {
-              identifier: _.constant('"@scoped/vendor/module1"')
-            }
-          ])
+          externalModules: []
         }
       ]
     };
-    const statsWithFileRef = {
-      stats: [
-        {
-          compilation: new WebpackCompilationMock([
-            {
-              identifier: _.constant('"crypto"')
-            },
-            {
-              identifier: _.constant('"uuid/v4"')
-            },
-            {
-              identifier: _.constant('"mockery"')
-            },
-            {
-              identifier: _.constant('"@scoped/vendor/module1"')
-            },
-            {
-              identifier: _.constant('external "@scoped/vendor/module2"')
-            },
-            {
-              identifier: _.constant('external "uuid/v4"')
-            },
-            {
-              identifier: _.constant('external "localmodule"')
-            },
-            {
-              identifier: _.constant('external "bluebird"')
-            }
-          ])
-        }
-      ]
-    };
-    const statsWithDevDependency = {
-      stats: [
-        {
-          compilation: new WebpackCompilationMock([
-            {
-              identifier: _.constant('"crypto"')
-            },
-            {
-              identifier: _.constant('"uuid/v4"')
-            },
-            {
-              identifier: _.constant('external "eslint"')
-            },
-            {
-              identifier: _.constant('"mockery"')
-            },
-            {
-              identifier: _.constant('"@scoped/vendor/module1"')
-            },
-            {
-              identifier: _.constant('external "@scoped/vendor/module2"')
-            },
-            {
-              identifier: _.constant('external "uuid/v4"')
-            },
-            {
-              identifier: _.constant('external "localmodule"')
-            },
-            {
-              identifier: _.constant('external "bluebird"')
-            }
-          ])
-        }
-      ]
-    };
-    const statsWithIgnoredDevDependency = {
-      stats: [
-        {
-          compilation: new WebpackCompilationMock([
-            {
-              identifier: _.constant('"crypto"')
-            },
-            {
-              identifier: _.constant('"uuid/v4"')
-            },
-            {
-              identifier: _.constant('"mockery"')
-            },
-            {
-              identifier: _.constant('"@scoped/vendor/module1"')
-            },
-            {
-              identifier: _.constant('external "@scoped/vendor/module2"')
-            },
-            {
-              identifier: _.constant('external "uuid/v4"')
-            },
-            {
-              identifier: _.constant('external "localmodule"')
-            },
-            {
-              identifier: _.constant('external "bluebird"')
-            },
-            {
-              identifier: _.constant('external "aws-sdk"')
-            }
-          ])
-        }
-      ]
-    };
+    const statsWithFileRef = createStatsMock([ '@scoped/vendor', 'uuid', 'localmodule', 'bluebird' ]);
+    const statsWithDevDependency = createStatsMock([ 'eslint', '@scoped/vendor', 'uuid', 'localmodule', 'bluebird' ]);
+    const statsWithIgnoredDevDependency = createStatsMock([
+      '@scoped/vendor',
+      'uuid',
+      'localmodule',
+      'bluebird',
+      'aws-sdk'
+    ]);
 
     it('should do nothing if webpackIncludeModules is not set', () => {
       module.configuration = new Configuration();
@@ -1146,32 +1007,7 @@ describe('packExternalModules', () => {
           };
 
           const dependencyGraph = require('./data/npm-ls-peerdeps.json');
-          const peerDepStats = {
-            stats: [
-              {
-                compilation: new WebpackCompilationMock([
-                  {
-                    identifier: _.constant('"crypto"')
-                  },
-                  {
-                    identifier: _.constant('"uuid/v4"')
-                  },
-                  {
-                    identifier: _.constant('"mockery"')
-                  },
-                  {
-                    identifier: _.constant('"@scoped/vendor/module1"')
-                  },
-                  {
-                    identifier: _.constant('external "bluebird"')
-                  },
-                  {
-                    identifier: _.constant('external "request-promise"')
-                  }
-                ])
-              }
-            ]
-          };
+          const peerDepStats = createStatsMock([ 'bluebird', 'request-promise' ]);
 
           module.webpackOutputPath = 'outputPath';
           fsExtraMock.pathExists.yields(null, false);
@@ -1228,32 +1064,7 @@ describe('packExternalModules', () => {
         };
 
         const dependencyGraph = require('./data/npm-ls-peerdeps.json');
-        const peerDepStats = {
-          stats: [
-            {
-              compilation: new WebpackCompilationMock([
-                {
-                  identifier: _.constant('"crypto"')
-                },
-                {
-                  identifier: _.constant('"uuid/v4"')
-                },
-                {
-                  identifier: _.constant('"mockery"')
-                },
-                {
-                  identifier: _.constant('"@scoped/vendor/module1"')
-                },
-                {
-                  identifier: _.constant('external "bluebird"')
-                },
-                {
-                  identifier: _.constant('external "request-promise"')
-                }
-              ])
-            }
-          ]
-        };
+        const peerDepStats = createStatsMock([ 'bluebird', 'request-promise' ]);
 
         describe('without nodeModulesRelativeDir', () => {
           before(() => {
@@ -1402,17 +1213,7 @@ describe('packExternalModules', () => {
           }
         };
 
-        const transitiveDepStats = {
-          stats: [
-            {
-              compilation: new WebpackCompilationMock([
-                {
-                  identifier: _.constant('external "classnames"')
-                }
-              ])
-            }
-          ]
-        };
+        const transitiveDepStats = createStatsMock(['classnames']);
 
         module.webpackOutputPath = 'outputPath';
         fsExtraMock.pathExists.yields(null, false);
