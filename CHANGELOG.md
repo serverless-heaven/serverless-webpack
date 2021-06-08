@@ -1,11 +1,22 @@
 # Change Log
 
+* 5.5.1
+  * chore: use processedOptions ([#834][] @CorentinDoue)
+  * Reduce memory usage by releasing webpack stats objects after compile ([#858][] @janicduplessis)
+  * (fix) allow boolean or number values in slsw.lib.options ([#857][] @coyoteecd)
+  * Fix packaging for non-node functions ([#876][] @FatalTouch)
+
+[#834]: https://github.com/serverless-heaven/serverless-webpack/pull/834
+[#858]: https://github.com/serverless-heaven/serverless-webpack/pull/858
+[#876]: https://github.com/serverless-heaven/serverless-webpack/pull/876
+[#857]: https://github.com/serverless-heaven/serverless-webpack/pull/857
+
 * 5.5.0
   * Add ability to specify the node_modules relative dir ([#689][] @ypxing)
   * Fix the spawn E2BIG error when zipping ([#813][] @j0k3r)
   * Extends the --no-build option to serverless offline start ([#770][] @nponeccop)
   * Add Serverless Container Support ([#723][] @rogersgt)
-  * Add support for Yarn network-concurrency option ([#550][] @cfroese )
+  * Add support for Yarn network-concurrency option ([#550][] @cfroese)
 
 [#689]: https://github.com/serverless-heaven/serverless-webpack/pull/689
 [#813]: https://github.com/serverless-heaven/serverless-webpack/pull/813
