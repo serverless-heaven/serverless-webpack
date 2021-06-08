@@ -20,3 +20,7 @@ updates:
       - dependency-name: fs-extra
         versions:
           - ">= 10.0.0"
+      # require node > 10
+      - dependency-name: mocha
+        versions:
+          - ">= 9.0.0"
