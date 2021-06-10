@@ -596,7 +596,7 @@ describe('validate', () => {
         });
       });
 
-      it('should allow custom runtime', () => {
+      it('should ignore non-node runtimes', () => {
         const testOutPath = 'test';
         const testFunctionsConfig = {
           func1: {
@@ -683,12 +683,11 @@ describe('validate', () => {
           const lib = require('../lib/index');
           const expectedLibEntries = {
             module1: './module1.js',
-            module2: './module2.js',
             module4: './module4.js'
           };
 
           expect(lib.entries).to.deep.equal(expectedLibEntries);
-          expect(globSyncStub).to.have.callCount(3);
+          expect(globSyncStub).to.have.callCount(2);
           expect(serverless.cli.log).to.not.have.been.called;
           return null;
         });
