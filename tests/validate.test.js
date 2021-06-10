@@ -693,6 +693,48 @@ describe('validate', () => {
         });
       });
 
+      it('should throw error if container image is not well defined', () => {
+        const testOutPath = 'test';
+        const testFunctionsConfig = {
+          func1: {
+            artifact: 'artifact-func1.zip',
+            events: [
+              {
+                http: {
+                  method: 'POST',
+                  path: 'func1path'
+                }
+              },
+              {
+                nonhttp: 'non-http'
+              }
+            ],
+            image: {
+              name: 'custom-image',
+              command: []
+            }
+          }
+        };
+
+        const testConfig = {
+          entry: 'test',
+          context: 'testcontext',
+          output: {
+            path: testOutPath
+          },
+          getFunction: func => {
+            return testFunctionsConfig[func];
+          }
+        };
+
+        _.set(module.serverless.service, 'custom.webpack.config', testConfig);
+        module.serverless.service.functions = testFunctionsConfig;
+        globSyncStub.callsFake(filename => [_.replace(filename, '*', 'js')]);
+        expect(() => {
+          module.validate();
+        }).to.throw(/Either function.handler or function.image must be defined/);
+      });
+
       describe('google provider', () => {
         beforeEach(() => {
           _.set(module.serverless, 'service.provider.name', 'google');

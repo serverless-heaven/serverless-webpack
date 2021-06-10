@@ -256,7 +256,6 @@ describe('compile', () => {
     webpackMock.compilerMock.run.reset();
     webpackMock.compilerMock.run.yields(null, multiStats);
     return expect(module.compile()).to.be.fulfilled.then(() => {
-      console.log(JSON.stringify(module.compileStats.stats[0].externalModules));
       expect(module.compileStats.stats[0].externalModules).to.eql([
         { external: '@scoped/vendor', origin: undefined },
         { external: 'uuid', origin: undefined },
