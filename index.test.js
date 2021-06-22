@@ -422,8 +422,14 @@ describe('ServerlessWebpack', () => {
                 return null;
               });
             });
+            it('should skip plugin when requested', () => {
+              slsw.options.disableWebpack = true;
+              // It does not return a promise
+              return expect(slsw.hooks['before:offline:start']()).to.be.undefined;
+            });
             it('should skip compiling when requested', () => {
               slsw.skipCompile = true;
+              slsw.options.disableWebpack = false;
               slsw.options.build = false;
               return expect(slsw.hooks['before:offline:start']()).to.be.fulfilled.then(() => {
                 expect(ServerlessWebpack.lib.webpack.isLocal).to.be.true;
