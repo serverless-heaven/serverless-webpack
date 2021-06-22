@@ -707,6 +707,11 @@ If you don't want the plugin to build when using `serverless-offline`, select th
 If you do not use the default path and override it in your Webpack configuration,
 you have use the `--location` option.
 
+#### Ignoring plugin
+
+You can always opt-out and ignore the plugin when running Serverless Offline.
+You can use the `--disableWebpack` option.
+
 #### serverless-dynamodb-local
 
 Configure your service the same as mentioned above, but additionally add the `serverless-dynamodb-local`
