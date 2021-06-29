@@ -596,31 +596,6 @@ describe('validate', () => {
         });
       });
 
-      it('should ignore the requested function if `options.function` is defined and the function is not a node one', () => {
-        const testOutPath = 'test';
-        const testFunction = 'func5';
-        const testConfig = {
-          entry: 'test',
-          context: 'testcontext',
-          output: {
-            path: testOutPath
-          }
-        };
-        _.set(module.serverless.service, 'custom.webpack.config', testConfig);
-        module.serverless.service.functions = testFunctionsConfig;
-        module.options.function = testFunction;
-        globSyncStub.callsFake(filename => [_.replace(filename, '*', 'js')]);
-        return expect(module.validate()).to.be.fulfilled.then(() => {
-          const lib = require('../lib/index');
-          const expectedLibEntries = {};
-
-          expect(lib.entries).to.deep.equal(expectedLibEntries);
-          expect(globSyncStub).to.not.have.been.called;
-          expect(serverless.cli.log).to.not.have.been.called;
-          return null;
-        });
-      });
-
       it('should ignore non-node runtimes', () => {
         const testOutPath = 'test';
         const testFunctionsConfig = {
