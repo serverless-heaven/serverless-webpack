@@ -62,7 +62,7 @@
     "@babel/eslint-parser": "^7.14.7",
     "chai": "^4.3.4",
     "chai-as-promised": "^7.1.1",
-    "coveralls": "^3.1.0",
+    "coveralls": "^3.1.1",
     "eslint": "^7.29.0",
     "eslint-plugin-import": "^2.23.4",
     "eslint-plugin-lodash": "^7.2.0",
