@@ -62,7 +62,7 @@
     "@babel/eslint-parser": "^7.14.7",
     "chai": "^4.3.4",
     "chai-as-promised": "^7.1.1",
-    "coveralls": "^3.1.0",
+    "coveralls": "^3.1.1",
     "eslint": "^7.29.0",
     "eslint-plugin-import": "^2.23.4",
     "eslint-plugin-lodash": "^7.2.0",
@@ -74,7 +74,7 @@
     "nyc": "^15.1.0",
     "prettier": "^2.3.2",
     "prettier-eslint-cli": "^5.0.1",
-    "serverless": "^2.48.1",
+    "serverless": "^2.49.0",
     "sinon": "^11.1.1",
     "sinon-chai": "^3.7.0"
   },
