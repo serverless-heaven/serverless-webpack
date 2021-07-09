@@ -507,8 +507,23 @@ describe('validate', () => {
         },
         dockerfunc: {
           image: {
-            name: 'some-image-uri',
+            name: 'some-docker-image',
             command: ['com.serverless.Handler']
+          },
+          events: [
+            {
+              http: {
+                method: 'POST',
+                path: 'mydockerfuncpath'
+              }
+            }
+          ]
+        },
+        dockerfuncuri: {
+          image: {
+            name: 'some-image-with-uri',
+            uri: 'http://hub.dock.er/image',
+            command: ['method.lambda']
           },
           events: [
             {
