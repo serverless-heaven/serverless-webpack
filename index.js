@@ -165,8 +165,13 @@ class ServerlessWebpack {
 
       'webpack:package:copyExistingArtifacts': () => BbPromise.bind(this).then(this.copyExistingArtifacts),
 
-      'before:offline:start': () =>
-        BbPromise.bind(this)
+      'before:offline:start': () => {
+        if (this.options.disableWebpack) {
+          this.serverless.cli.log('Ignoring Webpack because `--disableWebpack` was specified');
+          return;
+        }
+
+        return BbPromise.bind(this)
           .tap(() => {
             lib.webpack.isLocal = true;
             // --no-build override
@@ -175,7 +180,8 @@ class ServerlessWebpack {
             }
           })
           .then(this.prepareOfflineInvoke)
-          .then(() => (this.skipCompile ? BbPromise.resolve() : this.wpwatch())),
+          .then(() => (this.skipCompile ? BbPromise.resolve() : this.wpwatch()));
+      },
 
       'before:offline:start:init': () =>
         BbPromise.bind(this)
