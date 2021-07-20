@@ -63,6 +63,7 @@ custom:
     includeModules: false # Node modules configuration for packaging
     packager: 'npm' # Packager that will be used to package your external modules
     excludeFiles: src/**/*.test.js # Provide a glob for files to ignore
+    tryNativeZip: false # Use native zip functionality if available - this will break serverless' change detection algorithm.
 ```
 
 ### Webpack configuration file
@@ -502,6 +503,22 @@ custom:
 This can be useful, in case you want to upload the source maps to your Error
 reporting system, or just have it available for some post processing.
 
+#### Try native zip functionality
+
+Native zip is much faster than node zip, however the "bestzip" library used lacks
+adequate configuration options, resulting in a new artifact each time `serverless package` is
+run. If you have your own change detection algorithm, or are otherwise not concerned
+about no-op deployments, you can set tryNativeZip to true. This will use native
+zip if your system supports it, and you are not using the `excludeRegex` configuration.
+
+```yaml
+# serverless.yml
+custom:
+  webpack:
+    tryNativeZip: true
+```
+
+
 #### Nodejs custom runtime
 
 If you are using a nodejs custom runtime you can add the property `allowCustomRuntime: true`.
@@ -515,7 +532,6 @@ exampleFunction:
 
 ⚠️ **Note: this will only work if your custom runtime and function are written in JavaScript.
 Make sure you know what you are doing when this option is set to `true`**
-
 #### Examples
 
 You can find an example setups in the [`examples`][link-examples] folder.
