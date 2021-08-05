@@ -49,12 +49,16 @@
     "report-dir": "./coverage"
   },
   "dependencies": {
+    "@serverless/utils": "^5.2.0",
     "bestzip": "^2.2.0",
     "bluebird": "^3.7.2",
     "fs-extra": "^9.1.0",
     "glob": "^7.1.7",
     "is-builtin-module": "^3.1.0",
     "lodash": "^4.17.21",
+    "interpret": "^2.2.0",
+    "jest-worker": "^27.0.2",
+    "rechoir": "^0.7.0",
     "semver": "^7.3.5"
   },
   "devDependencies": {

@@ -1,8 +1,12 @@
 declare module 'serverless-webpack' {
-  import serverless from 'serverless';
-
-  const lib: {
-    serverless: serverless;
+  export const lib: {
+    serverless: {
+      serverlessDirPath: string;
+      version: string;
+      config: {
+        servicePath: string;
+      };
+    };
     webpack: {
       isLocal: boolean;
     };

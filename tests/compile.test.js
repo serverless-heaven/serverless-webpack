@@ -7,15 +7,27 @@ const sinon = require('sinon');
 const mockery = require('mockery');
 const Serverless = require('serverless');
 const makeWebpackMock = require('./webpack.mock');
+const makeJestWorkerMock = require('./mocks/jest-worker.mock');
 
 chai.use(require('chai-as-promised'));
 chai.use(require('sinon-chai'));
 
 const expect = chai.expect;
 
+const webpackConfigFilePath = './webpack.config.js';
+
+const testWebpackConfig = {
+  output: { path: '/home/hello' },
+  entry: undefined,
+  context: undefined,
+  node: undefined,
+  target: undefined
+};
+
 describe('compile', () => {
   let sandbox;
   let webpackMock;
+  let jestWorkerMock;
   let baseModule;
   let serverless;
   let module;
@@ -25,9 +37,12 @@ describe('compile', () => {
     sandbox.usingPromise(BbPromise);
 
     webpackMock = makeWebpackMock(sandbox);
+    jestWorkerMock = makeJestWorkerMock(sandbox);
 
     mockery.enable({ warnOnUnregistered: false });
     mockery.registerMock('webpack', webpackMock);
+    mockery.registerMock('jest-worker', jestWorkerMock);
+    mockery.registerMock(webpackConfigFilePath, {});
     baseModule = require('../lib/compile');
     Object.freeze(baseModule);
   });
@@ -47,7 +62,8 @@ describe('compile', () => {
     module = _.assign(
       {
         serverless,
-        options: {}
+        options: {},
+        webpackConfigFilePath
       },
       baseModule
     );
@@ -63,7 +79,6 @@ describe('compile', () => {
   });
 
   it('should compile with webpack from a context configuration', () => {
-    const testWebpackConfig = 'testconfig';
     module.webpackConfig = testWebpackConfig;
     module.configuration = { concurrency: 1 };
     return expect(module.compile()).to.be.fulfilled.then(() => {
@@ -74,14 +89,13 @@ describe('compile', () => {
   });
 
   it('should fail if configuration is missing', () => {
-    const testWebpackConfig = 'testconfig';
     module.webpackConfig = testWebpackConfig;
     module.configuration = undefined;
     return expect(module.compile()).to.be.rejectedWith('Missing plugin configuration');
   });
 
   it('should fail if there are compilation errors', () => {
-    module.webpackConfig = 'testconfig';
+    module.webpackConfig = testWebpackConfig;
     module.configuration = { concurrency: 1 };
     // We stub errors here. It will be reset again in afterEach()
     sandbox.stub(webpackMock.statsMock.compilation, 'errors').value(['error']);
@@ -89,7 +103,6 @@ describe('compile', () => {
   });
 
   it('should work with multi compile', () => {
-    const testWebpackConfig = 'testconfig';
     const multiStats = {
       stats: [
         {
@@ -117,7 +130,26 @@ describe('compile', () => {
   });
 
   it('should work with concurrent compile', () => {
-    const testWebpackConfig = [ 'testconfig', 'testconfig2' ];
+    const testWebpackMultiConfig = [
+      {
+        output: {
+          path: '/home/hello'
+        },
+        entry: undefined,
+        context: undefined,
+        node: undefined,
+        target: undefined
+      },
+      {
+        output: {
+          path: '/home/hello2'
+        },
+        entry: undefined,
+        context: undefined,
+        node: undefined,
+        target: undefined
+      }
+    ];
     const multiStats = {
       stats: [
         {
@@ -133,21 +165,28 @@ describe('compile', () => {
         }
       ]
     };
-    module.webpackConfig = testWebpackConfig;
+    module.webpackConfig = testWebpackMultiConfig;
     module.configuration = { concurrency: 2 };
     webpackMock.compilerMock.run.reset();
     webpackMock.compilerMock.run.yields(null, multiStats);
     return expect(module.compile()).to.be.fulfilled.then(() => {
-      expect(webpackMock).to.have.been.calledWith(testWebpackConfig[0]);
-      expect(webpackMock).to.have.been.calledWith(testWebpackConfig[1]);
+      expect(webpackMock).to.have.been.calledWith(testWebpackMultiConfig[0]);
+      expect(webpackMock).to.have.been.calledWith(testWebpackMultiConfig[1]);
       expect(webpackMock.compilerMock.run).to.have.been.calledTwice;
       return null;
     });
   });
 
   it('should use correct stats option', () => {
-    const testWebpackConfig = {
-      stats: 'minimal'
+    const testWebpackStatsConfig = {
+      stats: 'minimal',
+      output: {
+        path: '/home/hello'
+      },
+      entry: undefined,
+      context: undefined,
+      node: undefined,
+      target: undefined
     };
     const mockStats = {
       compilation: {
@@ -161,26 +200,27 @@ describe('compile', () => {
       hasErrors: _.constant(false)
     };
 
-    module.webpackConfig = testWebpackConfig;
+    module.webpackConfig = testWebpackStatsConfig;
     module.configuration = { concurrency: 1 };
     webpackMock.compilerMock.run.reset();
     webpackMock.compilerMock.run.yields(null, mockStats);
+    mockery.registerMock(webpackConfigFilePath, testWebpackStatsConfig);
     return expect(module.compile())
       .to.be.fulfilled.then(() => {
-        expect(webpackMock).to.have.been.calledWith(testWebpackConfig);
-        expect(mockStats.toString.firstCall.args).to.eql([testWebpackConfig.stats]);
-        module.webpackConfig = [testWebpackConfig];
+        expect(webpackMock).to.have.been.calledWith(testWebpackStatsConfig);
+        expect(mockStats.toString.firstCall.args).to.eql([testWebpackStatsConfig.stats]);
+        module.webpackConfig = [testWebpackStatsConfig];
         return expect(module.compile()).to.be.fulfilled;
       })
       .then(() => {
-        expect(webpackMock).to.have.been.calledWith(testWebpackConfig);
-        expect(mockStats.toString.args).to.eql([ [testWebpackConfig.stats], [testWebpackConfig.stats] ]);
+        expect(webpackMock).to.have.been.calledWith(testWebpackStatsConfig);
+        expect(mockStats.toString.args).to.eql([ [testWebpackStatsConfig.stats], [testWebpackStatsConfig.stats] ]);
+        mockery.registerMock(webpackConfigFilePath, {});
         return null;
       });
   });
 
   it('should set stats outputPath', () => {
-    const testWebpackConfig = 'testconfig';
     const multiStats = {
       stats: [
         {
@@ -207,7 +247,6 @@ describe('compile', () => {
   });
 
   it('should set stats externals', () => {
-    const testWebpackConfig = 'testconfig';
     const multiStats = {
       stats: [
         {
