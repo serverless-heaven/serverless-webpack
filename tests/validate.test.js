@@ -708,6 +708,51 @@ describe('validate', () => {
         });
       });
 
+      it('should skip image defined with URI', () => {
+        const testOutPath = 'test';
+        const testFunctionsConfig = {
+          dockerfuncwithuri: {
+            image: {
+              name: 'some-image-with-uri',
+              uri: 'http://hub.dock.er/image',
+              command: ['method.lambda']
+            },
+            events: [
+              {
+                http: {
+                  method: 'POST',
+                  path: 'mydockerfuncpath'
+                }
+              }
+            ]
+          }
+        };
+
+        const testConfig = {
+          entry: 'test',
+          context: 'testcontext',
+          output: {
+            path: testOutPath
+          },
+          getFunction: func => {
+            return testFunctionsConfig[func];
+          }
+        };
+
+        _.set(module.serverless.service, 'custom.webpack.config', testConfig);
+        module.serverless.service.functions = testFunctionsConfig;
+        globSyncStub.callsFake(filename => [_.replace(filename, '*', 'js')]);
+        return expect(module.validate()).to.be.fulfilled.then(() => {
+          const lib = require('../lib/index');
+          const expectedLibEntries = {};
+
+          expect(lib.entries).to.deep.equal(expectedLibEntries);
+          expect(globSyncStub).to.have.callCount(0);
+          expect(serverless.cli.log).to.not.have.been.called;
+          return null;
+        });
+      });
+
       it('should throw error if container image is not well defined', () => {
         const testOutPath = 'test';
         const testFunctionsConfig = {
