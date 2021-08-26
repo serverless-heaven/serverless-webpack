@@ -1,5 +1,14 @@
 # Change Log
 
+* 5.5.2
+  * Register `serverless` as peer dependency ([#900][] @medikoo)
+  * Do not run webpack on a single non-node function ([#879][] @j0k3r)
+  * Skip container function with `uri` defined ([#877][] @j0k3r)
+
+[#900]: https://github.com/serverless-heaven/serverless-webpack/pull/900
+[#879]: https://github.com/serverless-heaven/serverless-webpack/pull/879
+[#877]: https://github.com/serverless-heaven/serverless-webpack/pull/877
+
 * 5.5.1
   * chore: use processedOptions ([#834][] @CorentinDoue)
   * Reduce memory usage by releasing webpack stats objects after compile ([#858][] @janicduplessis)
