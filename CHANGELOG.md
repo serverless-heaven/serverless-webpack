@@ -1,5 +1,10 @@
 # Change Log
 
+* 5.5.3
+  * Fallback on using service provider runtime when using `sls deploy function` ([#944][] @mostthingsweb)
+
+[#944]: https://github.com/serverless-heaven/serverless-webpack/pull/944
+
 * 5.5.2
   * Register `serverless` as peer dependency ([#900][] @medikoo)
   * Do not run webpack on a single non-node function ([#879][] @j0k3r)
