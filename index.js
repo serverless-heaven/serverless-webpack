@@ -106,7 +106,7 @@ class ServerlessWebpack {
       'after:package:createDeploymentArtifacts': () => BbPromise.bind(this).then(this.cleanup),
 
       'before:deploy:function:packageFunction': () => {
-        const runtime = this.serverless.service.getFunction(this.options.function).runtime;
+        const runtime = this.serverless.service.getFunction(this.options.function).runtime || this.serverless.service.provider.runtime || 'nodejs';
 
         if (isNodeRuntime(runtime)) {
           return BbPromise.bind(this)
