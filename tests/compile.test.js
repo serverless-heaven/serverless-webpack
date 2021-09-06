@@ -217,33 +217,21 @@ describe('compile', () => {
               outputPath: 'compileStats-outputPath'
             },
             modules: [
-              {
-                identifier: _.constant('"crypto"')
-              },
-              {
-                identifier: _.constant('"uuid/v4"')
-              },
-              {
-                identifier: _.constant('"mockery"')
-              },
-              {
-                identifier: _.constant('"@scoped/vendor/module1"')
-              },
-              {
-                identifier: _.constant('external "@scoped/vendor/module2"')
-              },
-              {
-                identifier: _.constant('external "uuid/v4"')
-              },
-              {
-                identifier: _.constant('external "localmodule"')
-              },
-              {
-                identifier: _.constant('external "bluebird"')
-              },
-              {
-                identifier: _.constant('external "aws-sdk"')
-              }
+              { identifier: _.constant('"crypto"') },
+              { identifier: _.constant('"uuid/v4"') },
+              { identifier: _.constant('"mockery"') },
+              { identifier: _.constant('"@scoped/vendor/module1"') },
+              { identifier: _.constant('external "@scoped/vendor/module2"') },
+              { identifier: _.constant('external "uuid/v4"') },
+              { identifier: _.constant('external "localmodule"') },
+              { identifier: _.constant('external "bluebird"') },
+              { identifier: _.constant('external "aws-sdk"') },
+              { identifier: _.constant('external node-commonjs "lodash"') },
+              { identifier: _.constant('external commonjs-module "globby"') },
+              { identifier: _.constant('external this "glob"') },
+              { identifier: _.constant('external module "semver"') },
+              { identifier: _.constant('external assign "whatever"') },
+              { identifier: _.constant('external umd2 "hiyou"') }
             ]
           },
           toString: sandbox.stub().returns('testStats'),
@@ -261,9 +249,41 @@ describe('compile', () => {
         { external: 'uuid', origin: undefined },
         { external: 'localmodule', origin: undefined },
         { external: 'bluebird', origin: undefined },
-        { external: 'aws-sdk', origin: undefined }
+        { external: 'aws-sdk', origin: undefined },
+        { external: 'lodash', origin: undefined },
+        { external: 'globby', origin: undefined },
+        { external: 'glob', origin: undefined },
+        { external: 'semver', origin: undefined },
+        { external: 'whatever', origin: undefined },
+        { external: 'hiyou', origin: undefined }
       ]);
       return null;
     });
+  });
+
+  it('should fail to set stats externals', () => {
+    const testWebpackConfig = 'testconfig';
+    const multiStats = {
+      stats: [
+        {
+          compilation: {
+            errors: [],
+            compiler: {
+              outputPath: 'compileStats-outputPath'
+            },
+            modules: [{ identifier: _.constant('external node-commonjs "aws-sdk".') }]
+          },
+          toString: sandbox.stub().returns('testStats'),
+          hasErrors: _.constant(false)
+        }
+      ]
+    };
+    module.webpackConfig = testWebpackConfig;
+    module.configuration = { concurrency: 1 };
+    webpackMock.compilerMock.run.reset();
+    webpackMock.compilerMock.run.yields(null, multiStats);
+    return expect(module.compile()).to.be.rejectedWith(
+      'Unable to extract module name from Webpack identifier: external node-commonjs "aws-sdk".'
+    );
   });
 });
