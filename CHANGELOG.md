@@ -1,5 +1,10 @@
 # Change Log
 
+* 5.5.4
+  * Fix the way to detect external module from Webpack ([#953][] @j0k3r)
+
+[#944]: https://github.com/serverless-heaven/serverless-webpack/pull/953
+
 * 5.5.3
   * Fallback on using service provider runtime when using `sls deploy function` ([#944][] @mostthingsweb)
 
