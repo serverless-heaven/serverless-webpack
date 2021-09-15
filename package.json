@@ -74,7 +74,7 @@
     "nyc": "^15.1.0",
     "prettier": "^2.4.0",
     "prettier-eslint-cli": "^5.0.1",
-    "serverless": "^2.58.0",
+    "serverless": "^2.59.0",
     "sinon": "^11.1.2",
     "sinon-chai": "^3.7.0"
   },
