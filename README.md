@@ -592,6 +592,15 @@ functions:
         - app.handler2
 ```
 
+If you want to use a remote docker image but still need the webpack process before doing so, you can specify it as indicated below:
+
+```yaml
+# serverless.yml
+functions:
+  myFunction1:
+    image: public.ecr.aws/lambda/nodejs:latest
+```
+
 ## Usage
 
 ### Automatic bundling
