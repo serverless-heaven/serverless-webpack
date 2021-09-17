@@ -592,13 +592,16 @@ functions:
         - app.handler2
 ```
 
-If you want to use a remote docker image but still need the webpack process before doing so, you can specify it as indicated below:
+If you want to use a remote docker image but still need the webpack process before doing so, you can specify it as indicated below. 
+This will include this handler into webpack build but still uses the user defined image as the source image. This case is specially
+usefull for processes that build their images on the go with the webpack built source and deploy to an ECR repository for example.
 
 ```yaml
 # serverless.yml
 functions:
   myFunction1:
     image: public.ecr.aws/lambda/nodejs:latest
+    handler: index.js
 ```
 
 ## Usage

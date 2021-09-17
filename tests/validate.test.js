@@ -840,6 +840,53 @@ describe('validate', () => {
         });
       });
 
+      it('should not build handler of custom remote image', () => {
+        const testOutPath = 'test';
+        const testFunctionsConfig = {
+          func1: {
+            events: [
+              {
+                http: {
+                  method: 'POST',
+                  path: 'func1path'
+                }
+              },
+              {
+                nonhttp: 'non-http'
+              }
+            ],
+            image: 'XXXX.dkr.ecr.ca-central-1.amazonaws.com/myproject/customNode:latest',
+            handler: 'module3.func2handler',
+          }
+        };
+
+        const testConfig = {
+          entry: 'test',
+          context: 'testcontext',
+          output: {
+            path: testOutPath
+          },
+          getFunction: func => {
+            return testFunctionsConfig[func];
+          }
+        };
+
+        _.set(module.serverless.service, 'custom.webpack.config', testConfig);
+        module.serverless.service.functions = testFunctionsConfig;
+        globSyncStub.callsFake(filename => [_.replace(filename, '*', 'js')]);
+        return expect(module.validate()).to.be.fulfilled.then(() => {
+          const lib = require('../lib/index');
+          const expectedLibEntries = {
+            module3: './module3.js',
+          };
+
+          expect(lib.entries).to.deep.equal(expectedLibEntries);
+          expect(globSyncStub).to.have.callCount(1);
+          expect(serverless.cli.log).to.not.have.been.called;
+          return null;
+        });
+      });
+
       describe('google provider', () => {
         beforeEach(() => {
           _.set(module.serverless, 'service.provider.name', 'google');
