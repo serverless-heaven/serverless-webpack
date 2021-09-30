@@ -90,7 +90,7 @@ jobs:
           node-version: '${{ matrix.node }}'
 
       - name: 'Install Serverless v1'
-        run: npm install serverless@1"
+        run: npm install serverless@1
 
       - name: 'Install dependencies'
         run: npm ci
