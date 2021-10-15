@@ -848,7 +848,7 @@ me to take it over and continue working on the project. That helped to revive it
 
 ## Release Notes
 
-See [CHANGELOG.md](./CHANGELOG.md)
+See [the releases section](https://github.com/serverless-heaven/serverless-webpack/releases)
 
 [ico-serverless]: http://public.serverless.com/badges/v3.svg
 [ico-license]: https://img.shields.io/github/license/serverless-heaven/serverless-webpack.svg
