@@ -14,6 +14,7 @@ const prepareOfflineInvoke = require('./lib/prepareOfflineInvoke');
 const prepareStepOfflineInvoke = require('./lib/prepareStepOfflineInvoke');
 const packExternalModules = require('./lib/packExternalModules');
 const packageModules = require('./lib/packageModules');
+const { isNodeRuntime } = require('./lib/utils');
 const lib = require('./lib');
 
 class ServerlessWebpack {
@@ -104,11 +105,19 @@ class ServerlessWebpack {
 
       'after:package:createDeploymentArtifacts': () => BbPromise.bind(this).then(this.cleanup),
 
-      'before:deploy:function:packageFunction': () =>
-        BbPromise.bind(this)
-          .then(() => this.serverless.pluginManager.spawn('webpack:validate'))
-          .then(() => this.serverless.pluginManager.spawn('webpack:compile'))
-          .then(() => this.serverless.pluginManager.spawn('webpack:package')),
+      'before:deploy:function:packageFunction': () => {
+        const runtime =
+          this.serverless.service.getFunction(this.options.function).runtime ||
+          this.serverless.service.provider.runtime ||
+          'nodejs';
+
+        if (isNodeRuntime(runtime)) {
+          return BbPromise.bind(this)
+            .then(() => this.serverless.pluginManager.spawn('webpack:validate'))
+            .then(() => this.serverless.pluginManager.spawn('webpack:compile'))
+            .then(() => this.serverless.pluginManager.spawn('webpack:package'));
+        }
+      },
 
       'before:invoke:local:invoke': () =>
         BbPromise.bind(this)
