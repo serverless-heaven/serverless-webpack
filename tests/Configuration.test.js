@@ -21,8 +21,7 @@ describe('Configuration', () => {
         packagerOptions: {},
         keepOutputDirectory: false,
         config: null,
-        concurrency: os.cpus().length,
-        tryNativeZip: false
+        concurrency: os.cpus().length
       };
     });
 
@@ -72,8 +71,7 @@ describe('Configuration', () => {
         packagerOptions: {},
         keepOutputDirectory: false,
         config: null,
-        concurrency: os.cpus().length,
-        tryNativeZip: false
+        concurrency: os.cpus().length
       });
     });
   });
@@ -94,8 +92,7 @@ describe('Configuration', () => {
         packagerOptions: {},
         keepOutputDirectory: false,
         config: null,
-        concurrency: os.cpus().length,
-        tryNativeZip: false
+        concurrency: os.cpus().length
       });
     });
 
@@ -115,8 +112,7 @@ describe('Configuration', () => {
         packagerOptions: {},
         keepOutputDirectory: false,
         config: null,
-        concurrency: os.cpus().length,
-        tryNativeZip: false
+        concurrency: os.cpus().length
       });
     });
 
