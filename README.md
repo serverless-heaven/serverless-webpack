@@ -63,7 +63,6 @@ custom:
     includeModules: false # Node modules configuration for packaging
     packager: 'npm' # Packager that will be used to package your external modules
     excludeFiles: src/**/*.test.js # Provide a glob for files to ignore
-    tryNativeZip: false # Use native zip functionality if available - this will break serverless' change detection algorithm.
 ```
 
 ### Webpack configuration file
