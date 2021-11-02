@@ -203,8 +203,8 @@ describe('packExternalModules', () => {
         section1: originalPackageJSON.section1,
         dependencies: {
           '@scoped/vendor': '1.0.0',
-          uuid: '^5.4.1',
-          bluebird: '^3.4.0'
+          bluebird: '^3.4.0',
+          uuid: '^5.4.1'
         }
       };
       const expectedPackageJSON = {
@@ -215,8 +215,8 @@ describe('packExternalModules', () => {
         scripts: {},
         dependencies: {
           '@scoped/vendor': '1.0.0',
-          uuid: '^5.4.1',
-          bluebird: '^3.4.0'
+          bluebird: '^3.4.0',
+          uuid: '^5.4.1'
         },
         section1: originalPackageJSON.section1
       };
@@ -257,8 +257,8 @@ describe('packExternalModules', () => {
         scripts: {},
         dependencies: {
           '@scoped/vendor': '1.0.0',
-          uuid: '^5.4.1',
-          bluebird: '^3.4.0'
+          bluebird: '^3.4.0',
+          uuid: '^5.4.1'
         }
       };
       const expectedPackageJSON = {
@@ -269,8 +269,8 @@ describe('packExternalModules', () => {
         scripts: {},
         dependencies: {
           '@scoped/vendor': '1.0.0',
-          uuid: '^5.4.1',
-          bluebird: '^3.4.0'
+          bluebird: '^3.4.0',
+          uuid: '^5.4.1'
         }
       };
 
@@ -309,9 +309,9 @@ describe('packExternalModules', () => {
         scripts: {},
         dependencies: {
           '@scoped/vendor': '1.0.0',
-          uuid: '^5.4.1',
+          bluebird: '^3.4.0',
           localmodule: 'file:../../locals/../../mymodule',
-          bluebird: '^3.4.0'
+          uuid: '^5.4.1'
         }
       };
       const expectedPackageJSON = {
@@ -322,9 +322,9 @@ describe('packExternalModules', () => {
         scripts: {},
         dependencies: {
           '@scoped/vendor': '1.0.0',
-          uuid: '^5.4.1',
+          bluebird: '^3.4.0',
           localmodule: expectedLocalModule,
-          bluebird: '^3.4.0'
+          uuid: '^5.4.1'
         }
       };
 
@@ -335,14 +335,14 @@ describe('packExternalModules', () => {
         private: true,
         dependencies: {
           '@scoped/vendor': '1.0.0',
-          uuid: {
-            version: '^5.4.1'
-          },
           bluebird: {
             version: '^3.4.0'
           },
           localmodule: {
             version: 'file:../../mymodule'
+          },
+          uuid: {
+            version: '^5.4.1'
           }
         }
       };
@@ -405,8 +405,8 @@ describe('packExternalModules', () => {
         scripts: {},
         dependencies: {
           '@scoped/vendor': '1.0.0',
-          uuid: '^5.4.1',
-          bluebird: '^3.4.0'
+          bluebird: '^3.4.0',
+          uuid: '^5.4.1'
         }
       };
       const expectedPackageJSON = {
@@ -417,8 +417,8 @@ describe('packExternalModules', () => {
         scripts: {},
         dependencies: {
           '@scoped/vendor': '1.0.0',
-          uuid: '^5.4.1',
-          bluebird: '^3.4.0'
+          bluebird: '^3.4.0',
+          uuid: '^5.4.1'
         }
       };
 
@@ -543,9 +543,9 @@ describe('packExternalModules', () => {
         scripts: {},
         dependencies: {
           '@scoped/vendor': '1.0.0',
-          uuid: '^5.4.1',
           bluebird: '^3.4.0',
-          pg: '^4.3.5'
+          pg: '^4.3.5',
+          uuid: '^5.4.1'
         }
       };
       const expectedPackageJSON = {
@@ -556,9 +556,9 @@ describe('packExternalModules', () => {
         scripts: {},
         dependencies: {
           '@scoped/vendor': '1.0.0',
-          uuid: '^5.4.1',
           bluebird: '^3.4.0',
-          pg: '^4.3.5'
+          pg: '^4.3.5',
+          uuid: '^5.4.1'
         }
       };
       module.configuration = new Configuration({
@@ -602,9 +602,9 @@ describe('packExternalModules', () => {
         scripts: {},
         dependencies: {
           '@scoped/vendor': '1.0.0',
-          uuid: '^5.4.1',
           bluebird: '^3.4.0',
-          'not-in-prod-deps': ''
+          'not-in-prod-deps': '',
+          uuid: '^5.4.1'
         }
       };
       const expectedPackageJSON = {
@@ -615,9 +615,9 @@ describe('packExternalModules', () => {
         scripts: {},
         dependencies: {
           '@scoped/vendor': '1.0.0',
-          uuid: '^5.4.1',
           bluebird: '^3.4.0',
-          'not-in-prod-deps': ''
+          'not-in-prod-deps': '',
+          uuid: '^5.4.1'
         }
       };
       module.configuration = new Configuration({
@@ -802,8 +802,8 @@ describe('packExternalModules', () => {
         scripts: {},
         dependencies: {
           '@scoped/vendor': '1.0.0',
-          uuid: '^5.4.1',
-          bluebird: '^3.4.0'
+          bluebird: '^3.4.0',
+          uuid: '^5.4.1'
         }
       };
       const expectedPackageJSON = {
@@ -814,8 +814,8 @@ describe('packExternalModules', () => {
         scripts: {},
         dependencies: {
           '@scoped/vendor': '1.0.0',
-          uuid: '^5.4.1',
-          bluebird: '^3.4.0'
+          bluebird: '^3.4.0',
+          uuid: '^5.4.1'
         }
       };
 
@@ -857,8 +857,8 @@ describe('packExternalModules', () => {
         scripts: {},
         dependencies: {
           '@scoped/vendor': '1.0.0',
-          uuid: '^5.4.1',
-          bluebird: '^3.4.0'
+          bluebird: '^3.4.0',
+          uuid: '^5.4.1'
         }
       };
       const expectedPackageJSON = {
@@ -869,8 +869,8 @@ describe('packExternalModules', () => {
         scripts: {},
         dependencies: {
           '@scoped/vendor': '1.0.0',
-          uuid: '^5.4.1',
-          bluebird: '^3.4.0'
+          bluebird: '^3.4.0',
+          uuid: '^5.4.1'
         }
       };
 
@@ -910,8 +910,8 @@ describe('packExternalModules', () => {
         scripts: {},
         dependencies: {
           '@scoped/vendor': '1.0.0',
-          uuid: '^5.4.1',
-          bluebird: '^3.4.0'
+          bluebird: '^3.4.0',
+          uuid: '^5.4.1'
         }
       };
       const expectedPackageJSON = {
@@ -922,8 +922,8 @@ describe('packExternalModules', () => {
         scripts: {},
         dependencies: {
           '@scoped/vendor': '1.0.0',
-          uuid: '^5.4.1',
-          bluebird: '^3.4.0'
+          bluebird: '^3.4.0',
+          uuid: '^5.4.1'
         }
       };
 

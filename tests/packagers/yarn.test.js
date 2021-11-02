@@ -69,7 +69,7 @@ describe('yarn', () => {
         '{"type":"activityTick","data":{"id":0,"name":"minimist@^0.0.8"}}\n' +
         '{"type":"activityTick","data":{"id":0,"name":"@sls/webpack@^1.0.0"}}\n' +
         '{"type":"tree","data":{"type":"list","trees":[' +
-        '"depth":0},{"name":"bluebird@3.5.1","children":[],"hint":null,"color":' +
+        '{"name":"bluebird@3.5.1","children":[],"hint":null,"color":' +
         '"bold","depth":0},{"name":"fs-extra@4.0.3","children":[],"hint":null,' +
         '"color":"bold","depth":0},{"name":"mkdirp@0.5.1","children":[{"name":' +
         '"minimist@0.0.8","children":[],"hint":null,"color":"bold","depth":0}],' +
