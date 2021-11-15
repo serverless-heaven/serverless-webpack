@@ -44,6 +44,7 @@ describe('ServerlessWebpack', () => {
     };
 
     sandbox.stub(serverless.pluginManager, 'spawn').returns(BbPromise.resolve());
+    sandbox.stub(serverless.service, 'getFunction').returns({ runtime: 'nodejs12.x' });
   });
 
   afterEach(() => {
@@ -222,6 +223,8 @@ describe('ServerlessWebpack', () => {
           name: 'before:deploy:function:packageFunction',
           test: () => {
             it('should spawn validate, compile and package', () => {
+              slsw.options.function = functionName;
+
               return expect(slsw.hooks['before:deploy:function:packageFunction']()).to.be.fulfilled.then(() => {
                 expect(slsw.serverless.pluginManager.spawn).to.have.been.calledThrice;
                 expect(slsw.serverless.pluginManager.spawn.firstCall).to.have.been.calledWithExactly(

@@ -507,8 +507,23 @@ describe('validate', () => {
         },
         dockerfunc: {
           image: {
-            name: 'some-image-uri',
+            name: 'some-docker-image',
             command: ['com.serverless.Handler']
+          },
+          events: [
+            {
+              http: {
+                method: 'POST',
+                path: 'mydockerfuncpath'
+              }
+            }
+          ]
+        },
+        dockerfuncuri: {
+          image: {
+            name: 'some-image-with-uri',
+            uri: 'http://hub.dock.er/image',
+            command: ['method.lambda']
           },
           events: [
             {
@@ -693,6 +708,51 @@ describe('validate', () => {
         });
       });
 
+      it('should skip image defined with URI', () => {
+        const testOutPath = 'test';
+        const testFunctionsConfig = {
+          dockerfuncwithuri: {
+            image: {
+              name: 'some-image-with-uri',
+              uri: 'http://hub.dock.er/image',
+              command: ['method.lambda']
+            },
+            events: [
+              {
+                http: {
+                  method: 'POST',
+                  path: 'mydockerfuncpath'
+                }
+              }
+            ]
+          }
+        };
+
+        const testConfig = {
+          entry: 'test',
+          context: 'testcontext',
+          output: {
+            path: testOutPath
+          },
+          getFunction: func => {
+            return testFunctionsConfig[func];
+          }
+        };
+
+        _.set(module.serverless.service, 'custom.webpack.config', testConfig);
+        module.serverless.service.functions = testFunctionsConfig;
+        globSyncStub.callsFake(filename => [_.replace(filename, '*', 'js')]);
+        return expect(module.validate()).to.be.fulfilled.then(() => {
+          const lib = require('../lib/index');
+          const expectedLibEntries = {};
+
+          expect(lib.entries).to.deep.equal(expectedLibEntries);
+          expect(globSyncStub).to.have.callCount(0);
+          expect(serverless.cli.log).to.not.have.been.called;
+          return null;
+        });
+      });
+
       it('should throw error if container image is not well defined', () => {
         const testOutPath = 'test';
         const testFunctionsConfig = {
@@ -733,6 +793,51 @@ describe('validate', () => {
         expect(() => {
           module.validate();
         }).to.throw(/Either function.handler or function.image must be defined/);
+      });
+
+      it('should not throw error if container image is a simple string', () => {
+        const testOutPath = 'test';
+        const testFunctionsConfig = {
+          func1: {
+            artifact: 'artifact-func1.zip',
+            events: [
+              {
+                http: {
+                  method: 'POST',
+                  path: 'func1path'
+                }
+              },
+              {
+                nonhttp: 'non-http'
+              }
+            ],
+            image: 'XXXX.dkr.ecr.ca-central-1.amazonaws.com/myproject/customNode:latest'
+          }
+        };
+
+        const testConfig = {
+          entry: 'test',
+          context: 'testcontext',
+          output: {
+            path: testOutPath
+          },
+          getFunction: func => {
+            return testFunctionsConfig[func];
+          }
+        };
+
+        _.set(module.serverless.service, 'custom.webpack.config', testConfig);
+        module.serverless.service.functions = testFunctionsConfig;
+        globSyncStub.callsFake(filename => [_.replace(filename, '*', 'js')]);
+        return expect(module.validate()).to.be.fulfilled.then(() => {
+          const lib = require('../lib/index');
+          const expectedLibEntries = {};
+
+          expect(lib.entries).to.deep.equal(expectedLibEntries);
+          expect(globSyncStub).to.have.callCount(0);
+          expect(serverless.cli.log).to.not.have.been.called;
+          return null;
+        });
       });
 
       describe('google provider', () => {
