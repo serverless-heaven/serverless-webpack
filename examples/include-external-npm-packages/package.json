@@ -9,7 +9,7 @@
   "author": "Tony Yuen <colsy2@gmail.com>",
   "license": "MIT",
   "devDependencies": {
-    "aws-sdk": "^2.724.0",
+    "aws-sdk": "^2.814.0",
     "serverless-offline": "^6.5.0",
     "serverless-webpack": "file:../..",
     "webpack": "^4.44.1",
