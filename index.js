@@ -178,10 +178,6 @@ class ServerlessWebpack {
         BbPromise.bind(this)
           .tap(() => {
             lib.webpack.isLocal = true;
-            // --no-build override
-            if (this.options.build === false) {
-              this.skipCompile = true;
-            }
           })
           .then(this.prepareOfflineInvoke)
           .then(() => (this.skipCompile ? BbPromise.resolve() : this.wpwatch())),
@@ -190,10 +186,6 @@ class ServerlessWebpack {
         BbPromise.bind(this)
           .tap(() => {
             lib.webpack.isLocal = true;
-            // --no-build override
-            if (this.options.build === false) {
-              this.skipCompile = true;
-            }
           })
           .then(this.prepareOfflineInvoke)
           .then(() => (this.skipCompile ? BbPromise.resolve() : this.wpwatch())),

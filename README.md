@@ -304,7 +304,6 @@ custom:
 
 > Note that only relative path is supported at the moment.
 
-
 `peerDependencies` of all above external dependencies will also be packed into the Serverless
 artifact. By default, `node_modules` in the same directory as `package.json` (current working directory
 or specified by`packagePath`) will be used.
@@ -576,12 +575,14 @@ custom:
 Will run each webpack build one at a time which helps reduce memory usage and in some cases impoves overall build performance.
 
 ### Support for Docker Images as Custom Runtimes
+
 AWS Lambda and `serverless` started supporting the use of Docker images as custom runtimes in 2021. See the [serverless documentation](https://www.serverless.com/blog/container-support-for-lambda) for details on how to configure a `serverless.yml` to use these features.
 
 **NOTE: You must provide an override for the Image `CMD` property in your function definitions.**
 See [Dockerfile documentation](https://docs.docker.com/engine/reference/builder/#cmd) for more information about the native Docker `CMD` property.
 
 In the following example `entrypoint` is inherited from the shared Docker image, while `command` is provided as an override for each function:
+
 ```yaml
 # serverless.yml
 functions:
@@ -633,17 +634,16 @@ All options that are supported by invoke local can be used as usual:
 
 > :exclamation: The old `webpack invoke` command has been disabled.
 
-#### Run a function with an existing compiled output (--no-build)
+#### Run a function with an existing compiled output
 
 On CI systems it is likely that you'll run multiple integration tests with `invoke local`
 sequentially. To improve this, you can do one compile and run multiple invokes on the
 compiled output - it is not necessary to compile again before each and every invoke.
 
-```bash
-$ serverless webpack
-$ serverless invoke local --function <function-name-1> --no-build
-$ serverless invoke local --function <function-name-2> --no-build
-...
+```yaml
+custom:
+  webpack:
+    noBuild: true
 ```
 
 ### Run a function locally on source changes
