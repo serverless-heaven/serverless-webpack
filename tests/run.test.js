@@ -76,7 +76,7 @@ describe('run', () => {
       const watch = module.watch.bind(module);
       webpackMock.compilerMock.watch = sandbox.stub().yields(new Error('Failed'));
 
-      expect(() => watch()).to.throw('Failed');
+      expect(watch()).to.eventually.be.rejectedWith('Failed');
     });
 
     it('should not spawn invoke local on first run', () => {
