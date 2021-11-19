@@ -451,7 +451,7 @@ describe('ServerlessWebpack', () => {
               });
             });
             it('should skip compiling when requested', () => {
-              slsw.skipCompile = false;
+              slsw.skipCompile = true;
               slsw.options.build = false;
               return expect(slsw.hooks['before:offline:start:init']()).to.be.fulfilled.then(() => {
                 expect(ServerlessWebpack.lib.webpack.isLocal).to.be.true;
