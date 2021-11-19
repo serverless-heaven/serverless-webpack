@@ -74,6 +74,10 @@ describe('compile', () => {
   });
 
   it('should fail if configuration is missing', () => {
+    return expect(module.compile()).to.be.rejectedWith('Unable to find Webpack configuration');
+  });
+
+  it('should fail if plugin configuration is missing', () => {
     const testWebpackConfig = 'testconfig';
     module.webpackConfig = testWebpackConfig;
     module.configuration = undefined;
