@@ -79,7 +79,7 @@
     "sinon-chai": "^3.7.0"
   },
   "peerDependencies": {
-    "serverless": "1 || 2",
+    "serverless": "1 || 2 || 3",
     "webpack": ">= 3.0.0 < 6"
   },
   "optionalDependencies": {
