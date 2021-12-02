@@ -1,0 +1,19 @@
+{
+  "name": "dummy-project",
+  "version": "1.0.0",
+  "description": "",
+  "main": "handler.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "universalify": "2.0.0"
+  },
+  "devDependencies": {
+    "serverless-webpack": "^5.6.0",
+    "webpack-node-externals": "^3.0.0"
+  }
+}
