@@ -47,6 +47,7 @@
     "report-dir": "./coverage"
   },
   "dependencies": {
+    "archiver": "^5.3.0",
     "bluebird": "^3.7.2",
     "fs-extra": "^9.1.0",
     "glob": "^7.2.0",
@@ -57,7 +58,6 @@
   "devDependencies": {
     "@babel/core": "^7.17.8",
     "@babel/eslint-parser": "^7.17.0",
-    "archiver": "^5.3.0",
     "chai": "^4.3.6",
     "chai-as-promised": "^7.1.1",
     "coveralls": "^3.1.1",

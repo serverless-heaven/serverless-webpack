@@ -506,7 +506,6 @@ custom:
 This can be useful, in case you want to upload the source maps to your Error
 reporting system, or just have it available for some post processing.
 
-
 #### Nodejs custom runtime
 
 If you are using a nodejs custom runtime you can add the property `allowCustomRuntime: true`.
@@ -520,6 +519,7 @@ exampleFunction:
 
 ⚠️ **Note: this will only work if your custom runtime and function are written in JavaScript.
 Make sure you know what you are doing when this option is set to `true`**
+
 #### Examples
 
 You can find an example setups in the [`examples`][link-examples] folder.

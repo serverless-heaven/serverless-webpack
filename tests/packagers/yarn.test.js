@@ -63,13 +63,15 @@ describe('yarn', () => {
     it('should transform yarn trees to npm dependencies', () => {
       const testYarnResult =
         '{"type":"activityStart","data":{"id":0}}\n' +
+        '{"type":"activityTick","data":{"id":0,"name":"bestzip@^2.1.5"}}\n' +
         '{"type":"activityTick","data":{"id":0,"name":"bluebird@^3.5.1"}}\n' +
         '{"type":"activityTick","data":{"id":0,"name":"fs-extra@^4.0.3"}}\n' +
         '{"type":"activityTick","data":{"id":0,"name":"mkdirp@^0.5.1"}}\n' +
         '{"type":"activityTick","data":{"id":0,"name":"minimist@^0.0.8"}}\n' +
         '{"type":"activityTick","data":{"id":0,"name":"@sls/webpack@^1.0.0"}}\n' +
         '{"type":"tree","data":{"type":"list","trees":[' +
-        '{"name":"bluebird@3.5.1","children":[],"hint":null,"color":' +
+        '{"name":"bestzip@2.1.5","children":[],"hint":null,"color":"bold",' +
+        '"depth":0},{"name":"bluebird@3.5.1","children":[],"hint":null,"color":' +
         '"bold","depth":0},{"name":"fs-extra@4.0.3","children":[],"hint":null,' +
         '"color":"bold","depth":0},{"name":"mkdirp@0.5.1","children":[{"name":' +
         '"minimist@0.0.8","children":[],"hint":null,"color":"bold","depth":0}],' +
@@ -78,6 +80,10 @@ describe('yarn', () => {
       const expectedResult = {
         problems: [],
         dependencies: {
+          bestzip: {
+            version: '2.1.5',
+            dependencies: {}
+          },
           bluebird: {
             version: '3.5.1',
             dependencies: {}

@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "bestzip": "^2.1.5",
     "bluebird": "^3.4.0",
     "fs-extra": "^0.26.7",
     "glob": "^7.1.2",
