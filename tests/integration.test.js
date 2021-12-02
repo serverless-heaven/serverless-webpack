@@ -34,6 +34,7 @@ describe('Integration test - Packaging', function () {
 
   after(() => {
     if (serviceDir) {
+      fse.emptyDirSync(serviceDir);
       fse.rmdirSync(serviceDir, { recursive: true });
     }
   });
@@ -43,7 +44,7 @@ describe('Integration test - Packaging', function () {
     fse.rmdirSync(`${serviceDir}/.serverless`, { recursive: true });
   });
 
-  it('packages the default aws template with an npm dep correctly in the zip', async () => {
+  it('packages with a npm dep correctly in the zip', async () => {
     await spawn(serverlessExec, ['package'], { cwd: serviceDir });
 
     const zipfiles = await listZipFiles(path.join(serviceDir, `.serverless/${serviceConfig.service}.zip`));
@@ -54,13 +55,13 @@ describe('Integration test - Packaging', function () {
     const nonNodeModulesFiles = zipfiles.filter(f => !f.startsWith('node_modules'));
 
     expect(Array.from(nodeModules)).to.deep.equal(['universalify']);
-    expect(nonNodeModulesFiles).to.deep.equal([ 'handler.js', 'package-lock.json', 'package.json' ]);
+    expect(nonNodeModulesFiles).to.deep.equal([ 'handler.js', 'package-lock.json', 'package.json', 'webpack.config.js' ]);
 
     const files = fs.readdirSync(serviceDir);
     expect(files).not.to.include('.webpack');
   });
 
-  it('packages the default aws template with an npm dep correctly in the zip and keep .webpack folder', async () => {
+  it('packages with a npm dep correctly in the zip and keep .webpack folder', async () => {
     updateConfig({
       custom: {
         webpack: {
@@ -79,7 +80,7 @@ describe('Integration test - Packaging', function () {
     const nonNodeModulesFiles = zipfiles.filter(f => !f.startsWith('node_modules'));
 
     expect(Array.from(nodeModules)).to.deep.equal(['universalify']);
-    expect(nonNodeModulesFiles).to.deep.equal([ 'handler.js', 'package-lock.json', 'package.json' ]);
+    expect(nonNodeModulesFiles).to.deep.equal([ 'handler.js', 'package-lock.json', 'package.json', 'webpack.config.js' ]);
 
     const files = fs.readdirSync(serviceDir);
     expect(files).to.include('.webpack');
