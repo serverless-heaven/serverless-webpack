@@ -7,70 +7,81 @@ const fs = require('fs');
 const fse = require('fs-extra');
 const spawn = require('child-process-ext/spawn');
 const JSZip = require('jszip');
-const yaml = require('js-yaml');
 
 const serverlessExec = path.join(__dirname, '../node_modules/.bin/serverless');
+const fixturesDir = path.resolve(__dirname, 'fixtures')
+const fixturesEngine = require('@serverless/test/setup-fixtures-engine')(fixturesDir);
 
 function listZipFiles(filename) {
   return new JSZip().loadAsync(fs.readFileSync(filename)).then(zip => Object.keys(zip.files));
 }
 
 describe('Integration test - Packaging', function () {
-  this.timeout(5 * 60 * 1000);
-  let cwd;
-  let defaultServerlessConfig;
+  this.timeout(1000 * 60 * 10); // Involves time-taking npm install
+
+  // let runServerless;
+  let serviceDir
+  let updateConfig;
+  let serviceConfig;
 
   before(async () => {
-    cwd = fs.mkdtempSync(path.join(os.tmpdir(), 'tmpdirs-serverless-webpack-'));
-
-    await fse.copy(path.join(__dirname, 'dummy-project'), cwd);
-    await spawn('npm', ['i'], { cwd });
-
-    defaultServerlessConfig = yaml.load(fs.readFileSync(path.join(__dirname, 'dummy-project/serverless.yml'), 'utf8'));
+    ({
+      servicePath: serviceDir,
+      updateConfig,
+      serviceConfig,
+    } = await fixturesEngine.setup('dummy-project'));
   });
 
   after(() => {
-    if (cwd) {
-      fs.rmdirSync(cwd, { recursive: true });
+    if (serviceDir) {
+      fse.rmdirSync(serviceDir, { recursive: true });
     }
   });
 
-  it('packages the default aws template with an npm dep correctly in the zip', async () => {
-    await spawn(serverlessExec, ['package'], { cwd });
+  afterEach(() => {
+    updateConfig({ plugins: null })
+    fse.rmdirSync(`${serviceDir}/.serverless`, { recursive: true });
+  });
 
-    const zipfiles = await listZipFiles(path.join(cwd, '.serverless/aws-nodejs.zip'));
+  it('packages the default aws template with an npm dep correctly in the zip', async () => {
+    await spawn(serverlessExec, ['package'], { cwd: serviceDir });
+
+    const zipfiles = await listZipFiles(path.join(serviceDir, `.serverless/${serviceConfig.service}.zip`));
     const nodeModules = new Set(zipfiles.filter(f => f.startsWith('node_modules')).map(f => f.split(path.sep)[1]));
     nodeModules.delete('');
+    nodeModules.delete('.bin');
     nodeModules.delete('.package-lock.json');
     const nonNodeModulesFiles = zipfiles.filter(f => !f.startsWith('node_modules'));
 
     expect(Array.from(nodeModules)).to.deep.equal(['universalify']);
     expect(nonNodeModulesFiles).to.deep.equal([ 'handler.js', 'package-lock.json', 'package.json' ]);
 
-    const files = fs.readdirSync(cwd);
+    const files = fs.readdirSync(serviceDir);
     expect(files).not.to.include('.webpack');
   });
 
   it('packages the default aws template with an npm dep correctly in the zip and keep .webpack folder', async () => {
-    const serverlessConfig = {
-      ...defaultServerlessConfig
-    };
-    serverlessConfig.custom.webpack.keepOutputDirectory = true;
+    updateConfig({
+      custom: {
+        webpack: {
+          keepOutputDirectory: true,
+        },
+      },
+    })
 
-    fs.writeFileSync(path.join(cwd, 'serverless.yml'), yaml.dump(serverlessConfig));
+    await spawn(serverlessExec, ['package'], { cwd: serviceDir });
 
-    await spawn(serverlessExec, ['package'], { cwd });
-
-    const zipfiles = await listZipFiles(path.join(cwd, '.serverless/aws-nodejs.zip'));
+    const zipfiles = await listZipFiles(path.join(serviceDir, `.serverless/${serviceConfig.service}.zip`));
     const nodeModules = new Set(zipfiles.filter(f => f.startsWith('node_modules')).map(f => f.split(path.sep)[1]));
     nodeModules.delete('');
+    nodeModules.delete('.bin');
     nodeModules.delete('.package-lock.json');
     const nonNodeModulesFiles = zipfiles.filter(f => !f.startsWith('node_modules'));
 
     expect(Array.from(nodeModules)).to.deep.equal(['universalify']);
     expect(nonNodeModulesFiles).to.deep.equal([ 'handler.js', 'package-lock.json', 'package.json' ]);
 
-    const files = fs.readdirSync(cwd);
+    const files = fs.readdirSync(serviceDir);
     expect(files).to.include('.webpack');
   });
 });
