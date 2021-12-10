@@ -137,6 +137,15 @@ describe('validate', () => {
     return module.validate().then(() => expect(module.webpackConfig.context).to.equal(testServicePath));
   });
 
+  it('should fail when `includeModules` and `packagerOptions.noInstall` are set', () => {
+    const testConfig = {
+      includeModules: true,
+      packagerOptions: { noInstall: true }
+    };
+    _.set(module.serverless.service, 'custom.webpack.config', testConfig);
+    expect(() => module.validate()).throws();
+  });
+
   describe('default target', () => {
     it('should set a default `webpackConfig.target` if not present', () => {
       const testConfig = {
