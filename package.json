@@ -64,7 +64,7 @@
     "chai-as-promised": "^7.1.1",
     "coveralls": "^3.1.1",
     "eslint": "^8.6.0",
-    "eslint-plugin-import": "^2.25.3",
+    "eslint-plugin-import": "^2.25.4",
     "eslint-plugin-lodash": "^7.3.0",
     "eslint-plugin-promise": "^6.0.0",
     "husky": "^4.3.8",
