@@ -98,6 +98,68 @@ describe('compile', () => {
       });
   });
 
+  it('should work with individual compile and webpack filesystem cache', () => {
+    const testWebpackConfig = {
+      cache: {
+        type: 'filesystem'
+      },
+      // Below entry is inserted during validate() which happens before compile()
+      // Thus the assumed value
+      entry: {
+        'function-name/handler': './function-name/handler.js'
+      }
+    };
+    const multiStats = {
+      stats: [
+        {
+          compilation: {
+            errors: [],
+            compiler: {
+              outputPath: 'statsMock-outputPath'
+            },
+            modules: []
+          },
+          toString: sandbox.stub().returns('testStats'),
+          hasErrors: _.constant(false)
+        }
+      ]
+    };
+    module.webpackConfig = testWebpackConfig;
+    module.configuration = { concurrency: 1 };
+    module.serverless.service.package = {
+      individually: true
+    };
+    module.entryFunctions = [
+      {
+        handlerFile: 'function-name/handler',
+        funcName: 'function-name',
+        func: {
+          handler: 'function-name/handler.handler',
+          name: 'service-stage-function-name'
+        },
+        entry: {
+          key: 'function-name/handler',
+          value: './function-name/handler.js'
+        }
+      }
+    ];
+    webpackMock.compilerMock.run.reset();
+    webpackMock.compilerMock.run.yields(null, multiStats);
+    return expect(module.compile()).to.be.fulfilled.then(() => {
+      expect(webpackMock).to.have.been.calledWith({
+        cache: {
+          type: 'filesystem',
+          name: 'service-stage-function-name'
+        },
+        entry: {
+          'function-name/handler': './function-name/handler.js'
+        }
+      });
+      expect(webpackMock.compilerMock.run).to.have.been.calledOnce;
+      return null;
+    });
+  });
+
   it('should work with concurrent compile', () => {
     const testWebpackConfig = ['testconfig', 'testconfig2'];
     const multiStats = {
@@ -127,6 +189,101 @@ describe('compile', () => {
         expect(webpackMock.compilerMock.run).toHaveBeenCalledTimes(2);
         return null;
       });
+  });
+
+  it('should concurrently work with individual compile and webpack filesystem cache', () => {
+    const testWebpackConfig = [
+      {
+        cache: {
+          type: 'filesystem'
+        },
+        // Below entry is inserted during validate() which happens before compile()
+        // Thus the assumed value
+        entry: {
+          'function-name-1/handler': './function-name-1/handler.js'
+        }
+      },
+      {
+        cache: {
+          type: 'filesystem'
+        },
+        // Below entry is inserted during validate() which happens before compile()
+        // Thus the assumed value
+        entry: {
+          'function-name-2/handler': './function-name-2/handler.js'
+        }
+      }
+    ];
+    const multiStats = {
+      stats: [
+        {
+          compilation: {
+            errors: [],
+            compiler: {
+              outputPath: 'statsMock-outputPath'
+            },
+            modules: []
+          },
+          toString: sandbox.stub().returns('testStats'),
+          hasErrors: _.constant(false)
+        }
+      ]
+    };
+    module.webpackConfig = testWebpackConfig;
+    module.configuration = { concurrency: 2 };
+    module.serverless.service.package = {
+      individually: true
+    };
+    module.entryFunctions = [
+      {
+        handlerFile: 'function-name-1/handler',
+        funcName: 'function-name-1',
+        func: {
+          handler: 'function-name-1/handler.handler',
+          name: 'service-stage-function-name-1'
+        },
+        entry: {
+          key: 'function-name-1/handler',
+          value: './function-name-1/handler.js'
+        }
+      },
+      {
+        handlerFile: 'function-name-2/handler',
+        funcName: 'function-name-2',
+        func: {
+          handler: 'function-name-2/handler.handler',
+          name: 'service-stage-function-name-2'
+        },
+        entry: {
+          key: 'function-name-2/handler',
+          value: './function-name-2/handler.js'
+        }
+      }
+    ];
+    webpackMock.compilerMock.run.reset();
+    webpackMock.compilerMock.run.yields(null, multiStats);
+    return expect(module.compile()).to.be.fulfilled.then(() => {
+      expect(webpackMock).to.have.been.calledWith({
+        cache: {
+          type: 'filesystem',
+          name: 'service-stage-function-name-1'
+        },
+        entry: {
+          'function-name-1/handler': './function-name-1/handler.js'
+        }
+      });
+      expect(webpackMock).to.have.been.calledWith({
+        cache: {
+          type: 'filesystem',
+          name: 'service-stage-function-name-2'
+        },
+        entry: {
+          'function-name-2/handler': './function-name-2/handler.js'
+        }
+      });
+      expect(webpackMock.compilerMock.run).to.have.been.calledTwice;
+      return null;
+    });
   });
 
   it('should use correct stats option', () => {
