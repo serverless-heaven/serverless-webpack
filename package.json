@@ -58,7 +58,7 @@
   "devDependencies": {
     "@babel/core": "^7.17.0",
     "@babel/eslint-parser": "^7.17.0",
-    "@serverless/test": "^8.5.0",
+    "@serverless/test": "^8.8.0",
     "chai": "^4.3.6",
     "chai-as-promised": "^7.1.1",
     "child-process-ext": "^2.1.1",

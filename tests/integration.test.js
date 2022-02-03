@@ -1,7 +1,6 @@
 'use strict';
 
 const path = require('path');
-const os = require('os');
 const { expect } = require('chai');
 const fs = require('fs');
 const fse = require('fs-extra');
@@ -9,7 +8,7 @@ const spawn = require('child-process-ext/spawn');
 const JSZip = require('jszip');
 
 const serverlessExec = path.join(__dirname, '../node_modules/.bin/serverless');
-const fixturesDir = path.resolve(__dirname, 'fixtures')
+const fixturesDir = path.resolve(__dirname, 'fixtures');
 const fixturesEngine = require('@serverless/test/setup-fixtures-engine')(fixturesDir);
 
 function listZipFiles(filename) {
@@ -20,16 +19,12 @@ describe('Integration test - Packaging', function () {
   this.timeout(1000 * 60 * 10); // Involves time-taking npm install
 
   // let runServerless;
-  let serviceDir
+  let serviceDir;
   let updateConfig;
   let serviceConfig;
 
   before(async () => {
-    ({
-      servicePath: serviceDir,
-      updateConfig,
-      serviceConfig,
-    } = await fixturesEngine.setup('dummy-project'));
+    ({ servicePath: serviceDir, updateConfig, serviceConfig } = await fixturesEngine.setup('dummy-project'));
   });
 
   after(() => {
@@ -40,7 +35,7 @@ describe('Integration test - Packaging', function () {
   });
 
   afterEach(() => {
-    updateConfig({ plugins: null })
+    updateConfig({ plugins: null });
     fse.rmdirSync(`${serviceDir}/.serverless`, { recursive: true });
   });
 
@@ -55,7 +50,7 @@ describe('Integration test - Packaging', function () {
     const nonNodeModulesFiles = zipfiles.filter(f => !f.startsWith('node_modules'));
 
     expect(Array.from(nodeModules)).to.deep.equal(['universalify']);
-    expect(nonNodeModulesFiles).to.deep.equal([ 'handler.js', 'package-lock.json', 'package.json', 'webpack.config.js' ]);
+    expect(nonNodeModulesFiles).to.deep.equal(['handler.js', 'package-lock.json', 'package.json', 'webpack.config.js']);
 
     const files = fs.readdirSync(serviceDir);
     expect(files).not.to.include('.webpack');
@@ -65,10 +60,10 @@ describe('Integration test - Packaging', function () {
     updateConfig({
       custom: {
         webpack: {
-          keepOutputDirectory: true,
-        },
-      },
-    })
+          keepOutputDirectory: true
+        }
+      }
+    });
 
     await spawn(serverlessExec, ['package'], { cwd: serviceDir });
 
@@ -80,7 +75,7 @@ describe('Integration test - Packaging', function () {
     const nonNodeModulesFiles = zipfiles.filter(f => !f.startsWith('node_modules'));
 
     expect(Array.from(nodeModules)).to.deep.equal(['universalify']);
-    expect(nonNodeModulesFiles).to.deep.equal([ 'handler.js', 'package-lock.json', 'package.json', 'webpack.config.js' ]);
+    expect(nonNodeModulesFiles).to.deep.equal(['handler.js', 'package-lock.json', 'package.json', 'webpack.config.js']);
 
     const files = fs.readdirSync(serviceDir);
     expect(files).to.include('.webpack');
