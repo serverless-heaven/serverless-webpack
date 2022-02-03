@@ -30,10 +30,10 @@ describe('packagers factory', () => {
       hello: 'I am Yarn'
     };
     mockery.enable({ useCleanCache: true });
-    mockery.registerAllowables([ './index', 'lodash' ]);
+    mockery.registerAllowables(['../../lib/packagers/index', 'util', 'lodash']);
     mockery.registerMock('./npm', npmMock);
     mockery.registerMock('./yarn', yarnMock);
-    baseModule = require('./index');
+    baseModule = require('../../lib/packagers/index');
     Object.freeze(baseModule);
   });
 
@@ -43,7 +43,7 @@ describe('packagers factory', () => {
   });
 
   beforeEach(() => {
-    serverless = new Serverless();
+    serverless = new Serverless({ commands: ['print'], options: {}, serviceDir: null });
     serverless.cli = {
       log: sandbox.stub(),
       consoleLog: sandbox.stub()

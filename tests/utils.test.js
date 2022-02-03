@@ -7,7 +7,7 @@ const _ = require('lodash');
 const chai = require('chai');
 const sinon = require('sinon');
 const childProcess = require('child_process');
-const Utils = require('./utils');
+const Utils = require('../lib/utils');
 
 chai.use(require('chai-as-promised'));
 chai.use(require('sinon-chai'));
@@ -121,7 +121,7 @@ describe('Utils', () => {
 
   describe('splitLines', () => {
     it('should split on new line characters', () => {
-      expect(Utils.splitLines('a\r\nb\nc')).to.deep.equal([ 'a', 'b', 'c' ]);
+      expect(Utils.splitLines('a\r\nb\nc')).to.deep.equal(['a', 'b', 'c']);
     });
   });
 });

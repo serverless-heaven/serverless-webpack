@@ -45,7 +45,7 @@ describe('cleanup', () => {
   });
 
   beforeEach(() => {
-    serverless = new Serverless();
+    serverless = new Serverless({ commands: ['print'], options: {}, serviceDir: null });
     serverless.cli = {
       log: sandbox.stub(),
       error: sandbox.stub(),

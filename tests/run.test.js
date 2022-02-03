@@ -43,7 +43,7 @@ describe('run', () => {
   });
 
   beforeEach(() => {
-    serverless = new Serverless();
+    serverless = new Serverless({ commands: ['print'], options: {}, serviceDir: null });
     serverless.cli = {
       log: sandbox.stub(),
       consoleLog: sandbox.stub()

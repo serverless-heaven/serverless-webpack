@@ -7,7 +7,7 @@ const _ = require('lodash');
 const BbPromise = require('bluebird');
 const chai = require('chai');
 const sinon = require('sinon');
-const Utils = require('../utils');
+const Utils = require('../../lib/utils');
 
 chai.use(require('chai-as-promised'));
 chai.use(require('sinon-chai'));
@@ -23,7 +23,7 @@ describe('npm', () => {
     sandbox.usingPromise(BbPromise.Promise);
 
     sandbox.stub(Utils, 'spawnProcess');
-    npmModule = require('./npm');
+    npmModule = require('../../lib/packagers/npm');
   });
 
   after(() => {
@@ -87,13 +87,13 @@ describe('npm', () => {
   describe('runScripts', () => {
     it('should use npm run for the given scripts', () => {
       Utils.spawnProcess.returns(BbPromise.resolve({ stdout: 'success', stderr: '' }));
-      return expect(npmModule.runScripts('myPath', [ 's1', 's2' ])).to.be.fulfilled.then(result => {
+      return expect(npmModule.runScripts('myPath', ['s1', 's2'])).to.be.fulfilled.then(result => {
         expect(result).to.be.undefined;
         expect(Utils.spawnProcess).to.have.been.calledTwice;
-        expect(Utils.spawnProcess.firstCall).to.have.been.calledWithExactly(sinon.match(/^npm/), [ 'run', 's1' ], {
+        expect(Utils.spawnProcess.firstCall).to.have.been.calledWithExactly(sinon.match(/^npm/), ['run', 's1'], {
           cwd: 'myPath'
         });
-        expect(Utils.spawnProcess.secondCall).to.have.been.calledWithExactly(sinon.match(/^npm/), [ 'run', 's2' ], {
+        expect(Utils.spawnProcess.secondCall).to.have.been.calledWithExactly(sinon.match(/^npm/), ['run', 's2'], {
           cwd: 'myPath'
         });
         return null;
@@ -107,12 +107,12 @@ describe('npm', () => {
       return expect(npmModule.getProdDependencies('myPath', 10)).to.be.fulfilled.then(result => {
         expect(result).to.be.an('object').that.is.empty;
         expect(Utils.spawnProcess).to.have.been.calledOnce,
-        expect(Utils.spawnProcess.firstCall).to.have.been.calledWith(sinon.match(/^npm/), [
-          'ls',
-          '-prod',
-          '-json',
-          '-depth=10'
-        ]);
+          expect(Utils.spawnProcess.firstCall).to.have.been.calledWith(sinon.match(/^npm/), [
+            'ls',
+            '-prod',
+            '-json',
+            '-depth=10'
+          ]);
         return null;
       });
     });
@@ -122,12 +122,12 @@ describe('npm', () => {
       return expect(npmModule.getProdDependencies('myPath')).to.be.fulfilled.then(result => {
         expect(result).to.be.an('object').that.is.empty;
         expect(Utils.spawnProcess).to.have.been.calledOnce,
-        expect(Utils.spawnProcess.firstCall).to.have.been.calledWith(sinon.match(/^npm/), [
-          'ls',
-          '-prod',
-          '-json',
-          '-depth=1'
-        ]);
+          expect(Utils.spawnProcess.firstCall).to.have.been.calledWith(sinon.match(/^npm/), [
+            'ls',
+            '-prod',
+            '-json',
+            '-depth=1'
+          ]);
         return null;
       });
     });

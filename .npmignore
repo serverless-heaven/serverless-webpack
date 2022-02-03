@@ -13,4 +13,3 @@ yarn-error.log
 .eslintrc.yml
 .huskyrc
 .lintstagedrc.yml
-prettier.config.js

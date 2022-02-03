@@ -21,12 +21,12 @@ describe('prepareOfflineInvoke', () => {
     sandbox = sinon.createSandbox();
     sandbox.usingPromise(BbPromise.Promise);
 
-    baseModule = require('./prepareOfflineInvoke');
+    baseModule = require('../lib/prepareOfflineInvoke');
     Object.freeze(baseModule);
   });
 
   beforeEach(() => {
-    serverless = new Serverless();
+    serverless = new Serverless({ commands: ['print'], options: {}, serviceDir: null });
     serverless.cli = {
       log: sandbox.stub()
     };

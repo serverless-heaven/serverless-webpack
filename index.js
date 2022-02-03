@@ -84,7 +84,7 @@ class ServerlessWebpack {
           },
           package: {
             type: 'entrypoint',
-            lifecycleEvents: [ 'packExternalModules', 'packageModules', 'copyExistingArtifacts' ]
+            lifecycleEvents: ['packExternalModules', 'packageModules', 'copyExistingArtifacts']
           }
         }
       }

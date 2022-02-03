@@ -32,12 +32,12 @@ describe('ServerlessWebpack', () => {
     mockery.registerMock('ts-node/register', {});
     mockery.registerMock('webpack', {});
 
-    ServerlessWebpack = require('./index');
+    ServerlessWebpack = require('../index');
     moduleStub = sandbox.stub(Module, '_load');
   });
 
   beforeEach(() => {
-    serverless = new Serverless();
+    serverless = new Serverless({ commands: ['print'], options: {}, serviceDir: null });
     serverless.cli = {
       log: sandbox.stub(),
       consoleLog: sandbox.stub()
