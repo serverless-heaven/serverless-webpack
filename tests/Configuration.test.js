@@ -5,7 +5,7 @@
 
 const os = require('os');
 const chai = require('chai');
-const Configuration = require('./Configuration');
+const Configuration = require('../lib/Configuration');
 
 const expect = chai.expect;
 

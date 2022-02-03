@@ -53,7 +53,7 @@ describe('yarn', () => {
         expect(Utils.spawnProcess).to.have.been.calledOnce;
         expect(Utils.spawnProcess.firstCall).to.have.been.calledWith(
           sinon.match(/^yarn/),
-          [ 'list', '--depth=1', '--json', '--production' ],
+          ['list', '--depth=1', '--json', '--production'],
           { cwd: 'myPath' }
         );
         return null;
@@ -218,7 +218,7 @@ describe('yarn', () => {
         expect(Utils.spawnProcess).to.have.been.calledOnce;
         expect(Utils.spawnProcess).to.have.been.calledWithExactly(
           sinon.match(/^yarn/),
-          [ 'install', '--non-interactive', '--frozen-lockfile' ],
+          ['install', '--non-interactive', '--frozen-lockfile'],
           {
             cwd: 'myPath'
           }
@@ -234,7 +234,7 @@ describe('yarn', () => {
         expect(Utils.spawnProcess).to.have.been.calledOnce;
         expect(Utils.spawnProcess).to.have.been.calledWithExactly(
           sinon.match(/^yarn/),
-          [ 'install', '--non-interactive', '--frozen-lockfile', '--ignore-scripts' ],
+          ['install', '--non-interactive', '--frozen-lockfile', '--ignore-scripts'],
           {
             cwd: 'myPath'
           }
@@ -250,7 +250,7 @@ describe('yarn', () => {
         expect(Utils.spawnProcess).to.have.been.calledOnce;
         expect(Utils.spawnProcess).to.have.been.calledWithExactly(
           sinon.match(/^yarn/),
-          [ 'install', '--non-interactive' ],
+          ['install', '--non-interactive'],
           {
             cwd: 'myPath'
           }
@@ -266,7 +266,7 @@ describe('yarn', () => {
         expect(Utils.spawnProcess).to.have.been.calledOnce;
         expect(Utils.spawnProcess).to.have.been.calledWithExactly(
           sinon.match(/^yarn/),
-          [ 'install', '--non-interactive', '--frozen-lockfile', '--network-concurrency 1' ],
+          ['install', '--non-interactive', '--frozen-lockfile', '--network-concurrency 1'],
           {
             cwd: 'myPath'
           }
@@ -308,13 +308,13 @@ describe('yarn', () => {
   describe('runScripts', () => {
     it('should use yarn run for the given scripts', () => {
       Utils.spawnProcess.returns(BbPromise.resolve({ stdout: 'success', stderr: '' }));
-      return expect(yarnModule.runScripts('myPath', [ 's1', 's2' ])).to.be.fulfilled.then(result => {
+      return expect(yarnModule.runScripts('myPath', ['s1', 's2'])).to.be.fulfilled.then(result => {
         expect(result).to.be.undefined;
         expect(Utils.spawnProcess).to.have.been.calledTwice;
-        expect(Utils.spawnProcess.firstCall).to.have.been.calledWithExactly(sinon.match(/^yarn/), [ 'run', 's1' ], {
+        expect(Utils.spawnProcess.firstCall).to.have.been.calledWithExactly(sinon.match(/^yarn/), ['run', 's1'], {
           cwd: 'myPath'
         });
-        expect(Utils.spawnProcess.secondCall).to.have.been.calledWithExactly(sinon.match(/^yarn/), [ 'run', 's2' ], {
+        expect(Utils.spawnProcess.secondCall).to.have.been.calledWithExactly(sinon.match(/^yarn/), ['run', 's2'], {
           cwd: 'myPath'
         });
         return null;

@@ -6,7 +6,7 @@ const chai = require('chai');
 const sinon = require('sinon');
 const Serverless = require('serverless');
 const path = require('path');
-const Utils = require('./utils');
+const Utils = require('../lib/utils');
 
 chai.use(require('chai-as-promised'));
 chai.use(require('sinon-chai'));
@@ -28,7 +28,7 @@ describe('prepareLocalInvoke', () => {
   });
 
   beforeEach(() => {
-    serverless = new Serverless();
+    serverless = new Serverless({ commands: ['print'], options: {}, serviceDir: null });
     serverless.cli = {
       log: sandbox.stub()
     };

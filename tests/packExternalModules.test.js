@@ -35,7 +35,7 @@ const packagerMockFactory = {
   create(sandbox) {
     const packagerMock = {
       lockfileName: 'mocked-lock.json',
-      copyPackageSectionNames: [ 'section1', 'section2' ],
+      copyPackageSectionNames: ['section1', 'section2'],
       mustCopyModules: true,
       rebaseLockfile: sandbox.stub(),
       getProdDependencies: sandbox.stub(),
@@ -91,7 +91,7 @@ describe('packExternalModules', () => {
   });
 
   beforeEach(() => {
-    serverless = new Serverless();
+    serverless = new Serverless({ commands: ['print'], options: {}, serviceDir: null });
     serverless.cli = {
       log: sandbox.stub(),
       consoleLog: sandbox.stub()
@@ -130,7 +130,7 @@ describe('packExternalModules', () => {
 
   describe('packExternalModules()', () => {
     // Test data
-    const stats = createStatsMock([ '@scoped/vendor', 'uuid', 'bluebird' ]);
+    const stats = createStatsMock(['@scoped/vendor', 'uuid', 'bluebird']);
     const noExtStats = {
       stats: [
         {
@@ -138,8 +138,8 @@ describe('packExternalModules', () => {
         }
       ]
     };
-    const statsWithFileRef = createStatsMock([ '@scoped/vendor', 'uuid', 'localmodule', 'bluebird' ]);
-    const statsWithDevDependency = createStatsMock([ 'eslint', '@scoped/vendor', 'uuid', 'localmodule', 'bluebird' ]);
+    const statsWithFileRef = createStatsMock(['@scoped/vendor', 'uuid', 'localmodule', 'bluebird']);
+    const statsWithDevDependency = createStatsMock(['eslint', '@scoped/vendor', 'uuid', 'localmodule', 'bluebird']);
     const statsWithIgnoredDevDependency = createStatsMock([
       '@scoped/vendor',
       'uuid',
@@ -519,7 +519,7 @@ describe('packExternalModules', () => {
       fsExtraMock.copy.yields();
       packagerMock.getProdDependencies.returns(
         BbPromise.resolve({
-          problems: [ 'Problem 1', 'Problem 2' ]
+          problems: ['Problem 1', 'Problem 2']
         })
       );
       packagerMock.install.returns(BbPromise.resolve());
@@ -1007,7 +1007,7 @@ describe('packExternalModules', () => {
           };
 
           const dependencyGraph = require('./data/npm-ls-peerdeps.json');
-          const peerDepStats = createStatsMock([ 'bluebird', 'request-promise' ]);
+          const peerDepStats = createStatsMock(['bluebird', 'request-promise']);
 
           module.webpackOutputPath = 'outputPath';
           fsExtraMock.pathExists.yields(null, false);
@@ -1064,7 +1064,7 @@ describe('packExternalModules', () => {
         };
 
         const dependencyGraph = require('./data/npm-ls-peerdeps.json');
-        const peerDepStats = createStatsMock([ 'bluebird', 'request-promise' ]);
+        const peerDepStats = createStatsMock(['bluebird', 'request-promise']);
 
         describe('without nodeModulesRelativeDir', () => {
           before(() => {
