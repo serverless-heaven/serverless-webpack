@@ -32,7 +32,7 @@ describe('ServerlessWebpack', () => {
     mockery.registerMock('ts-node/register', {});
     mockery.registerMock('webpack', {});
 
-    ServerlessWebpack = require('./index');
+    ServerlessWebpack = require('../index');
     moduleStub = sandbox.stub(Module, '_load');
   });
 

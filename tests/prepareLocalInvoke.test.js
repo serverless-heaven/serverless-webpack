@@ -23,7 +23,7 @@ describe('prepareLocalInvoke', () => {
     sandbox = sinon.createSandbox();
     sandbox.usingPromise(BbPromise.Promise);
 
-    baseModule = require('./prepareLocalInvoke');
+    baseModule = require('../lib/prepareLocalInvoke');
     Object.freeze(baseModule);
   });
 

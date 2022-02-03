@@ -7,7 +7,7 @@ const _ = require('lodash');
 const chai = require('chai');
 const sinon = require('sinon');
 const childProcess = require('child_process');
-const Utils = require('./utils');
+const Utils = require('../lib/utils');
 
 chai.use(require('chai-as-promised'));
 chai.use(require('sinon-chai'));

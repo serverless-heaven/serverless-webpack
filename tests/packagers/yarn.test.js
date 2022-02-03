@@ -6,7 +6,7 @@
 const BbPromise = require('bluebird');
 const chai = require('chai');
 const sinon = require('sinon');
-const Utils = require('../utils');
+const Utils = require('../../lib/utils');
 
 chai.use(require('chai-as-promised'));
 chai.use(require('sinon-chai'));
@@ -22,7 +22,7 @@ describe('yarn', () => {
     sandbox.usingPromise(BbPromise.Promise);
 
     sandbox.stub(Utils, 'spawnProcess');
-    yarnModule = require('./yarn');
+    yarnModule = require('../../lib/packagers/yarn');
   });
 
   after(() => {

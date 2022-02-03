@@ -33,7 +33,7 @@ describe('packagers factory', () => {
     mockery.registerAllowables(['./index', 'lodash']);
     mockery.registerMock('./npm', npmMock);
     mockery.registerMock('./yarn', yarnMock);
-    baseModule = require('./index');
+    baseModule = require('../../lib/packagers/index');
     Object.freeze(baseModule);
   });
 

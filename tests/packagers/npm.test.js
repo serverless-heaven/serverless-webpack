@@ -7,7 +7,7 @@ const _ = require('lodash');
 const BbPromise = require('bluebird');
 const chai = require('chai');
 const sinon = require('sinon');
-const Utils = require('../utils');
+const Utils = require('../../lib/utils');
 
 chai.use(require('chai-as-promised'));
 chai.use(require('sinon-chai'));
@@ -23,7 +23,7 @@ describe('npm', () => {
     sandbox.usingPromise(BbPromise.Promise);
 
     sandbox.stub(Utils, 'spawnProcess');
-    npmModule = require('./npm');
+    npmModule = require('../../lib/packagers/npm');
   });
 
   after(() => {

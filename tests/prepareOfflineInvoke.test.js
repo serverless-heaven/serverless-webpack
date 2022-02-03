@@ -21,7 +21,7 @@ describe('prepareOfflineInvoke', () => {
     sandbox = sinon.createSandbox();
     sandbox.usingPromise(BbPromise.Promise);
 
-    baseModule = require('./prepareOfflineInvoke');
+    baseModule = require('../lib/prepareOfflineInvoke');
     Object.freeze(baseModule);
   });
 
