@@ -50,7 +50,7 @@ describe('Integration test - Packaging', function () {
     const nonNodeModulesFiles = zipfiles.filter(f => !f.startsWith('node_modules'));
 
     expect(Array.from(nodeModules)).to.deep.equal(['universalify']);
-    expect(nonNodeModulesFiles).to.deep.equal(['handler.js', 'package-lock.json', 'package.json', 'webpack.config.js']);
+    expect(nonNodeModulesFiles).to.deep.equal(['handler.js', 'package-lock.json', 'package.json']);
 
     const files = fs.readdirSync(serviceDir);
     expect(files).not.to.include('.webpack');
@@ -78,6 +78,7 @@ describe('Integration test - Packaging', function () {
     expect(nonNodeModulesFiles).to.deep.equal(['handler.js', 'package-lock.json', 'package.json', 'webpack.config.js']);
 
     const files = fs.readdirSync(serviceDir);
+    console.log(files)
     expect(files).to.include('.webpack');
   });
 });
