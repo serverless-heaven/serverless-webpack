@@ -18,6 +18,7 @@ jobs:
           - windows-latest
           - ubuntu-18.04
         node:
+          - "10"
           - "12"
           - "14"
           - "16"

@@ -30,7 +30,7 @@ describe('packagers factory', () => {
       hello: 'I am Yarn'
     };
     mockery.enable({ useCleanCache: true });
-    mockery.registerAllowables(['./index', 'lodash']);
+    mockery.registerAllowables(['../../lib/packagers/index', 'util', 'lodash']);
     mockery.registerMock('./npm', npmMock);
     mockery.registerMock('./yarn', yarnMock);
     baseModule = require('../../lib/packagers/index');
