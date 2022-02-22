@@ -9,6 +9,6 @@ declare module 'serverless-webpack' {
     entries: {
       [name: string]: string | string[];
     };
-    options: { [name: string]: string | boolean | number };
+    options: { [name: string]: string | boolean | number } & { param?: string[] };
   };
 }
