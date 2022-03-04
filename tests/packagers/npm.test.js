@@ -137,7 +137,7 @@ describe('npm', () => {
     const stderr =
       'ENOENT: No such file\nnpm ERR! extraneous: sinon@2.3.8 ./babel-dynamically-entries/node_modules/serverless-webpack/node_modules/sinon\n\n';
     Utils.spawnProcess.returns(BbPromise.reject(new Utils.SpawnError('Command execution failed', '{}', stderr)));
-    return expect(npmModule.getProdDependencies('myPath', 1))
+    return expect(npmModule.getProdDependencies('myPath', 1, {}))
       .to.be.rejectedWith('Command execution failed')
       .then(() =>
         BbPromise.all([
