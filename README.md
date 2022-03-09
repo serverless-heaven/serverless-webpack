@@ -319,7 +319,7 @@ custom:
       nodeModulesRelativeDir: '../../' # relative path to current working directory.
 ```
 
-> When using NPM 8, `peerDependencies` are automatically installed by default. In order to avoid adding all transitive dependencies to your package.json, we will use the `package-lock.json` when possible. If your project is included in a monorepo, you can specify the path to the `package-lock.json`:
+When using NPM 8, `peerDependencies` are automatically installed by default. In order to avoid adding all transitive dependencies to your `package.json`, we will use the `package-lock.json` when possible. If your project is included in a monorepo, you can specify the path to the `package-lock.json`:
 
 ```yaml
 # serverless.yml
@@ -387,7 +387,7 @@ The NPM packager supports the following `packagerOptions`:
 | noInstall          | bool   | false                 | Do not run `npm install` (assume install completed) |
 | lockFile           | string | ./package-lock.json   | Relative path to lock file to use                   |
 
-When using NPM version `>= 7.0.0`, we will use the package lock file instead of the installed node_modules. This improves the 
+When using NPM version `>= 7.0.0`, we will use the `package-lock.json` file instead of modules installed in `node_modules`. This improves the 
 supports of NPM `>= 8.0.0` which installs `peer-dependencies` automatically. The plugin will be able to detect the correct version.
 
 ##### Yarn
