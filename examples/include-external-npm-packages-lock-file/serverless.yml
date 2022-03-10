@@ -1,0 +1,24 @@
+service: serverless-webpack-multiple-entries-example
+
+# Add the serverless-webpack plugin
+plugins:
+  - serverless-webpack
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+
+custom:
+  webpack:
+    webpackConfig: 'webpack.config.js'
+    packager: 'npm'
+    includeModules: true
+
+functions:
+  first:
+    handler: handler.hello
+    events:
+      - http:
+          method: GET
+          path: first
+          integration: lambda

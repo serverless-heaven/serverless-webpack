@@ -58,6 +58,7 @@
   "devDependencies": {
     "@babel/core": "^7.17.8",
     "@babel/eslint-parser": "^7.17.0",
+    "@serverless/test": "^9.0.0",
     "chai": "^4.3.6",
     "chai-as-promised": "^7.1.1",
     "coveralls": "^3.1.1",
@@ -75,7 +76,8 @@
     "prettier": "^2.6.0",
     "serverless": "^3.8.0",
     "sinon": "^13.0.1",
-    "sinon-chai": "^3.7.0"
+    "sinon-chai": "^3.7.0",
+    "unzipper": "^0.10.11"
   },
   "peerDependencies": {
     "serverless": "1 || 2 || 3",
@@ -86,5 +88,14 @@
   },
   "engines": {
     "node": ">= 10.12.0"
+  },
+  "mocha": {
+    "require": [
+      "@serverless/test/setup/patch",
+      "@serverless/test/setup/log",
+      "@serverless/test/setup/mock-homedir",
+      "@serverless/test/setup/mock-cwd",
+      "@serverless/test/setup/restore-env"
+    ]
   }
 }
