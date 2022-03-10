@@ -11,6 +11,7 @@ const mockery = require('mockery');
 const Utils = require('../../lib/utils');
 const fsMockFactory = require('../mocks/fs.mock');
 const fseMockFactory = require('../mocks/fs-extra.mock');
+const { delimiter } = require('path');
 
 chai.use(require('chai-as-promised'));
 chai.use(require('sinon-chai'));
@@ -128,7 +129,7 @@ describe('npm', () => {
             '-json',
             '-depth=10'
           ]);
-          expect(fseMock.pathExistsSync).to.have.been.calledWith('myPath/package-lock.json');
+          expect(fseMock.pathExistsSync).to.have.been.calledWith(`myPath${delimiter}package-lock.json`);
           return null;
         });
       });
@@ -144,7 +145,7 @@ describe('npm', () => {
             '-json',
             '-depth=1'
           ]);
-          expect(fseMock.pathExistsSync).to.have.been.calledWith('myPath/package-lock.json');
+          expect(fseMock.pathExistsSync).to.have.been.calledWith(`myPath${delimiter}package-lock.json`);
           return null;
         });
       });
@@ -164,8 +165,8 @@ describe('npm', () => {
             '-json',
             '-depth=1'
           ]);
-          expect(fseMock.pathExistsSync).to.have.been.calledWith('myPath/package-lock.json');
-          expect(fsMock.readFileSync).to.have.been.calledWith('myPath/package-lock.json');
+          expect(fseMock.pathExistsSync).to.have.been.calledWith(`myPath${delimiter}package-lock.json`);
+          expect(fsMock.readFileSync).to.have.been.calledWith(`myPath${delimiter}package-lock.json`);
           return null;
         });
       });
@@ -191,8 +192,8 @@ describe('npm', () => {
         return expect(npmModule.getProdDependencies('myPath')).to.be.fulfilled.then(result => {
           expect(result).to.deep.equal(lockData);
           expect(Utils.spawnProcess).to.not.have.been.called;
-          expect(fseMock.pathExistsSync).to.have.been.calledWith('myPath/package-lock.json');
-          expect(fsMock.readFileSync).to.have.been.calledWith('myPath/package-lock.json');
+          expect(fseMock.pathExistsSync).to.have.been.calledWith(`myPath${delimiter}package-lock.json`);
+          expect(fsMock.readFileSync).to.have.been.calledWith(`myPath${delimiter}package-lock.json`);
           return null;
         });
       });
@@ -222,8 +223,8 @@ describe('npm', () => {
         ).to.be.fulfilled.then(result => {
           expect(result).to.deep.equal(lockData);
           expect(Utils.spawnProcess).to.not.have.been.called;
-          expect(fseMock.pathExistsSync).to.have.been.calledWith('root-workspace/package-lock.json');
-          expect(fsMock.readFileSync).to.have.been.calledWith('root-workspace/package-lock.json');
+          expect(fseMock.pathExistsSync).to.have.been.calledWith(`root-workspace${delimiter}package-lock.json`);
+          expect(fsMock.readFileSync).to.have.been.calledWith(`root-workspace${delimiter}package-lock.json`);
           return null;
         });
       });
