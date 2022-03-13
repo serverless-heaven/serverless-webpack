@@ -77,7 +77,8 @@
     "serverless": "^3.8.0",
     "sinon": "^13.0.1",
     "sinon-chai": "^3.7.0",
-    "unzipper": "^0.10.11"
+    "unzipper": "^0.10.11",
+    "webpack": "^5.70.0"
   },
   "peerDependencies": {
     "serverless": "1 || 2 || 3",

@@ -8,3 +8,5 @@ coverage
 .idea
 /.nyc_output
 .history
+.vscode
+/.test-temp

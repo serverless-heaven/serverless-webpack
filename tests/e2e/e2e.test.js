@@ -3,20 +3,13 @@ const stream = require('stream');
 const fs = require('fs');
 const unzipper = require('unzipper');
 const chai = require('chai');
+const _ = require('lodash');
+const { runServerless } = require('./e2eUtils');
 
 chai.use(require('chai-as-promised'));
 chai.use(require('sinon-chai'));
 
 const expect = chai.expect;
-
-const setupRunServerless = require('@serverless/test/setup-run-serverless-fixtures-engine');
-
-const FIXTURES_DIR = path.resolve(__dirname, '..', '..', 'examples');
-
-const runServerless = setupRunServerless({
-  fixturesDir: FIXTURES_DIR,
-  serverlessDir: path.dirname(require.resolve('serverless/package.json'))
-});
 
 async function unzipArtefacts(archivePath) {
   const files = {};
@@ -57,30 +50,24 @@ async function unzipArtefacts(archivePath) {
 }
 
 describe('end-to-end testing', () => {
-  it('should support include-external-npm-packages example', async () => {
-    const result = await runServerless({
-      fixture: 'include-external-npm-packages',
-      command: 'package',
-      configExt: {
-        plugins: {
-          apiName: 'test-api-name',
-          stackTags: {
-            key: 'value'
-          }
-        }
-      }
-    });
+  it('should support include-external-npm-packages example', async function () {
+    if (_.startsWith(process.version, 'v10')) {
+      // Serverless v3 doesn't support node 10
+      this.skip();
+    }
 
-    const name = result.fixtureData.serviceConfig.service;
-    const outputDir = path.join(result.fixtureData.servicePath, '.serverless');
-    const archivePath = path.join(outputDir, `${name}.zip`);
+    const fixture = 'include-external-npm-packages';
+    const result = await runServerless({ fixture });
+
+    const outputDir = path.join(result.servicePath, '.serverless');
+    const archivePath = path.join(outputDir, `${fixture}.zip`);
     const files = await unzipArtefacts(archivePath);
 
     expect(files.node_modules).to.equal(true);
     expect(JSON.parse(files['package.json'])).to.deep.equal({
-      name,
+      name: fixture,
       version: '1.0.0',
-      description: `Packaged externals for ${name}`,
+      description: `Packaged externals for ${fixture}`,
       private: true,
       scripts: {},
       dependencies: {
@@ -88,32 +75,26 @@ describe('end-to-end testing', () => {
       }
     });
     expect(files['handler.js']).to.not.be.empty;
-  }).timeout(60_000);
+  }).timeout(300000);
 
-  it('should support include-external-npm-packages-lock-file example', async () => {
-    const result = await runServerless({
-      fixture: 'include-external-npm-packages-lock-file',
-      command: 'package',
-      configExt: {
-        plugins: {
-          apiName: 'test-api-name',
-          stackTags: {
-            key: 'value'
-          }
-        }
-      }
-    });
+  it('should support include-external-npm-packages-lock-file example', async function () {
+    if (_.startsWith(process.version, 'v10')) {
+      // Serverless v3 doesn't support node 10
+      this.skip();
+    }
 
-    const name = result.fixtureData.serviceConfig.service;
-    const outputDir = path.join(result.fixtureData.servicePath, '.serverless');
-    const archivePath = path.join(outputDir, `${name}.zip`);
+    const fixture = 'include-external-npm-packages-lock-file';
+    const result = await runServerless({ fixture });
+
+    const outputDir = path.join(result.servicePath, '.serverless');
+    const archivePath = path.join(outputDir, `${fixture}.zip`);
     const files = await unzipArtefacts(archivePath);
 
     // fbgraph is not included because of tree-shaking
     expect(JSON.parse(files['package.json'])).to.deep.equal({
-      name,
+      name: fixture,
       version: '1.0.0',
-      description: `Packaged externals for ${name}`,
+      description: `Packaged externals for ${fixture}`,
       private: true,
       scripts: {},
       dependencies: {
@@ -123,5 +104,5 @@ describe('end-to-end testing', () => {
     });
     expect(files['handler.js']).to.not.be.empty;
     expect(files.node_modules).to.equal(true);
-  }).timeout(60_000);
+  }).timeout(300000);
 });

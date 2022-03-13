@@ -1,5 +1,6 @@
 'use strict';
 
+const { spawn } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 
@@ -17,4 +18,18 @@ module.exports = originalFixturePath => {
   // eslint-disable-next-line lodash/prefer-lodash-method
   const updatedWebpackConfig = String(webpackConfig).replace("'serverless-webpack'", `'${pluginPath}'`);
   fs.writeFileSync(WEBPACK_CONFIG_PATH, updatedWebpackConfig);
+  return new Promise((resolve, reject) => {
+    console.log(pluginPath);
+    spawn('npm', ['install', `serverless-webpack@file:${pluginPath}`, '--save-dev'], { cwd: __dirname })
+      .on('error', err => {
+        reject(err);
+      })
+      .on('close', exitCode => {
+        if (exitCode !== 0) {
+          reject(`Error: _setup failed with code ${exitCode}`);
+        } else {
+          resolve();
+        }
+      });
+  });
 };
