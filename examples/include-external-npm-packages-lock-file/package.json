@@ -1,5 +1,5 @@
 {
-  "name": "serverless-include-external-npm-package",
+  "name": "include-external-npm-packages-lock-file",
   "version": "1.0.0",
   "description": "Serverless webpack example",
   "main": "handler.js",
