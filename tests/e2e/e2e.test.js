@@ -78,8 +78,8 @@ describe('end-to-end testing', () => {
   }).timeout(300000);
 
   it('should support include-external-npm-packages-lock-file example', async function () {
-    if (_.startsWith(process.version, 'v10')) {
-      // Serverless v3 doesn't support node 10
+    // lock-file v2 is supported by Node16+
+    if (!_.startsWith(process.version, 'v16')) {
       this.skip();
     }
 
