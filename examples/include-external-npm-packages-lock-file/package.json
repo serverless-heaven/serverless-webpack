@@ -17,7 +17,9 @@
     "webpack-node-externals": "^2.5.0"
   },
   "dependencies": {
+    "dotenv": "^16.0.0",
     "fbgraph": "^1.4.4",
-    "lodash": "^4.17.21"
+    "lodash": "^4.17.21",
+    "lodash.isequal": "^4.5.0"
   }
 }

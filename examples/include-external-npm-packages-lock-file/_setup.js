@@ -17,5 +17,7 @@ module.exports = async (originalFixturePath, fixturePath, utils) => {
     utils.replaceInFile(LOCK_PATH, '../..', `${pluginPath}`)
   ]);
 
-  return utils.spawnProcess('yarn', ['install'], { cwd: __dirname });
+  const command = /^win/.test(process.platform) ? 'npm.cmd' : 'npm';
+
+  return utils.spawnProcess(command, ['install'], { cwd: __dirname });
 };
