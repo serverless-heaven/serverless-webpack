@@ -3,13 +3,17 @@ const stream = require('stream');
 const fs = require('fs');
 const unzipper = require('unzipper');
 const chai = require('chai');
-const _ = require('lodash');
 const { runServerless } = require('./e2eUtils');
+const semver = require('semver');
+const pkg = require('../../package.json');
 
 chai.use(require('chai-as-promised'));
 chai.use(require('sinon-chai'));
 
 const expect = chai.expect;
+
+const isSlsV3 = semver.satisfies(pkg.dependencies.serverless, '^3.0.0');
+const nodeVersion = semver.parse(process.version);
 
 async function unzipArtefacts(archivePath) {
   const files = {};
@@ -51,7 +55,7 @@ async function unzipArtefacts(archivePath) {
 
 describe('end-to-end testing', () => {
   it('should support include-external-npm-packages example', async function () {
-    if (_.startsWith(process.version, 'v10')) {
+    if (nodeVersion.major < 12 || !isSlsV3) {
       // Serverless v3 doesn't support node 10
       this.skip();
     }
@@ -79,7 +83,7 @@ describe('end-to-end testing', () => {
 
   it('should support include-external-npm-packages-lock-file example', async function () {
     // lock-file v2 is supported by Node16+
-    if (!_.startsWith(process.version, 'v16')) {
+    if (nodeVersion.major < 16 || !isSlsV3) {
       this.skip();
     }
 
