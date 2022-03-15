@@ -12,7 +12,7 @@ chai.use(require('sinon-chai'));
 
 const expect = chai.expect;
 
-const isSlsV3 = semver.satisfies(pkg.dependencies.serverless, '^3.0.0');
+const slsVersion = semver.parse(pkg.dependencies.serverless);
 const nodeVersion = semver.parse(process.version);
 
 async function unzipArtefacts(archivePath) {
@@ -55,7 +55,7 @@ async function unzipArtefacts(archivePath) {
 
 describe('end-to-end testing', () => {
   it('should support include-external-npm-packages example', async function () {
-    if (nodeVersion.major < 12 || !isSlsV3) {
+    if (nodeVersion.major < 12 || slsVersion.major !== 3) {
       // Serverless v3 doesn't support node 10
       this.skip();
     }
@@ -83,7 +83,7 @@ describe('end-to-end testing', () => {
 
   it('should support include-external-npm-packages-lock-file example', async function () {
     // lock-file v2 is supported by Node16+
-    if (nodeVersion.major < 16 || !isSlsV3) {
+    if (nodeVersion.major < 16 || slsVersion.major !== 3) {
       this.skip();
     }
 
