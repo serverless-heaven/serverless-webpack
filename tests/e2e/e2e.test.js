@@ -59,6 +59,7 @@ describe('end-to-end testing', () => {
     if (nodeVersion.major < 12 || slsMajor !== 3) {
       // Serverless v3 doesn't support node 10
       this.skip();
+      return;
     }
 
     const fixture = 'include-external-npm-packages';
@@ -86,6 +87,7 @@ describe('end-to-end testing', () => {
     // lock-file v2 is supported by Node16+
     if (nodeVersion.major < 16 || slsMajor !== 3) {
       this.skip();
+      return;
     }
 
     const fixture = 'include-external-npm-packages-lock-file';
