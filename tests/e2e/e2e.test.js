@@ -5,6 +5,7 @@ const unzipper = require('unzipper');
 const { runServerless } = require('./e2eUtils');
 const semver = require('semver');
 const pkg = require('../../package.json');
+const _ = require('lodash');
 
 // unmock global modules
 jest.unmock('bestzip');
@@ -56,64 +57,62 @@ async function unzipArtefacts(archivePath) {
 }
 
 describe('end-to-end testing', () => {
-  it('should support include-external-npm-packages example', async () => {
-    if (nodeVersion.major < 12 || slsMajor !== 3) {
-      // Serverless v3 doesn't support node 10
-      this.skip();
-      return;
-    }
+  if (nodeVersion.major < 12 || slsMajor !== 3) {
+    // Serverless v3 doesn't support node 10
+    it.skip('should support include-external-npm-packages example', _.noop);
+  } else {
+    it('should support include-external-npm-packages example', async () => {
+      const fixture = 'include-external-npm-packages';
+      const result = await runServerless({ fixture });
 
-    const fixture = 'include-external-npm-packages';
-    const result = await runServerless({ fixture });
+      const outputDir = path.join(result.servicePath, '.serverless');
+      const archivePath = path.join(outputDir, `${fixture}.zip`);
+      const files = await unzipArtefacts(archivePath);
 
-    const outputDir = path.join(result.servicePath, '.serverless');
-    const archivePath = path.join(outputDir, `${fixture}.zip`);
-    const files = await unzipArtefacts(archivePath);
+      expect(files.node_modules).toEqual(true);
+      expect(JSON.parse(files['package.json'])).toEqual({
+        name: fixture,
+        version: '1.0.0',
+        description: `Packaged externals for ${fixture}`,
+        private: true,
+        scripts: {},
+        dependencies: {
+          fbgraph: '^1.4.4'
+        }
+      });
+      expect(files['handler.js']).not.toHaveLength(0);
+    }, 300000);
+  }
 
-    expect(files.node_modules).toEqual(true);
-    expect(JSON.parse(files['package.json'])).toEqual({
-      name: fixture,
-      version: '1.0.0',
-      description: `Packaged externals for ${fixture}`,
-      private: true,
-      scripts: {},
-      dependencies: {
-        fbgraph: '^1.4.4'
-      }
-    });
-    expect(files['handler.js']).not.toHaveLength(0);
-  }, 300000);
+  // lock-file v2 is supported by Node16+
+  if (nodeVersion.major < 16 || slsMajor !== 3) {
+    it.skip('should support include-external-npm-packages-lock-file example', _.noop);
+  } else {
+    it('should support include-external-npm-packages-lock-file example', async () => {
+      const fixture = 'include-external-npm-packages-lock-file';
+      const result = await runServerless({ fixture });
 
-  it('should support include-external-npm-packages-lock-file example', async () => {
-    // lock-file v2 is supported by Node16+
-    if (nodeVersion.major < 16 || slsMajor !== 3) {
-      this.skip();
-      return;
-    }
+      const outputDir = path.join(result.servicePath, '.serverless');
+      const archivePath = path.join(outputDir, `${fixture}.zip`);
+      const files = await unzipArtefacts(archivePath);
 
-    const fixture = 'include-external-npm-packages-lock-file';
-    const result = await runServerless({ fixture });
-
-    const outputDir = path.join(result.servicePath, '.serverless');
-    const archivePath = path.join(outputDir, `${fixture}.zip`);
-    const files = await unzipArtefacts(archivePath);
-
-    // fbgraph is not included because of tree-shaking
-    expect(JSON.parse(files['package.json'])).toEqual({
-      name: fixture,
-      version: '1.0.0',
-      description: `Packaged externals for ${fixture}`,
-      private: true,
-      scripts: {},
-      dependencies: {
-        // We should use fix version to respect lock file
-        dotenv: '^16.0.0',
-        fbgraph: '^1.4.4',
-        lodash: '^4.17.21',
-        'lodash.isequal': '^4.5.0'
-      }
-    });
-    expect(files['handler.js']).not.toHaveLength(0);
-    expect(files.node_modules).toEqual(true);
-  }, 300000);
+      // fbgraph is not included because of tree-shaking
+      expect(JSON.parse(files['package.json'])).toEqual({
+        name: fixture,
+        version: '1.0.0',
+        description: `Packaged externals for ${fixture}`,
+        private: true,
+        scripts: {},
+        dependencies: {
+          // We should use fix version to respect lock file
+          dotenv: '^16.0.0',
+          fbgraph: '^1.4.4',
+          lodash: '^4.17.21',
+          'lodash.isequal': '^4.5.0'
+        }
+      });
+      expect(files['handler.js']).not.toHaveLength(0);
+      expect(files.node_modules).toEqual(true);
+    }, 300000);
+  }
 });
