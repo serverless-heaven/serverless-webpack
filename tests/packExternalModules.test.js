@@ -346,9 +346,9 @@ describe('packExternalModules', () => {
       packagerFactoryMock.get('npm').runScripts.mockReturnValue(BbPromise.resolve());
       module.compileStats = statsWithFileRef;
 
-      sandbox.stub(process, 'cwd').returns('/my/Service/Path');
+      sandbox.stub(process, 'cwd').returns(path.join(path.sep, 'my', 'Service', 'Path'));
       jest.doMock(
-        '/my/Service/Path/locals/package.json',
+        path.join(process.cwd(), 'locals', 'package.json'),
         () => jest.requireActual('./mocks/packageLocalRef.mock.json'),
         { virtual: true }
       );
@@ -753,7 +753,7 @@ describe('packExternalModules', () => {
       packagerFactoryMock.get('npm').runScripts.mockReturnValue(BbPromise.resolve());
       module.compileStats = statsWithIgnoredDevDependency;
       jest.doMock(
-        '../ignoreDevDeps/package.json',
+        path.join('..', 'ignoreDevDeps', 'package.json'),
         () => jest.requireActual('./mocks/packageIgnoredDevDeps.mock.json'),
         { virtual: true }
       );
@@ -983,10 +983,10 @@ describe('packExternalModules', () => {
       describe('default behavior', () => {
         beforeAll(() => {
           jest.resetModules();
-          jest.doMock('../package.json', () => jest.requireActual('./data/package-peerdeps.json'));
+          jest.doMock(path.join('..', 'package.json'), () => jest.requireActual('./data/package-peerdeps.json'));
           // Mock request-promise package.json
           jest.doMock(
-            '../node_modules/request-promise/package.json',
+            path.join('..', 'node_modules', 'request-promise', 'package.json'),
             () => jest.requireActual('./data/rp-package.json'),
             { virtual: true }
           );
@@ -1083,10 +1083,10 @@ describe('packExternalModules', () => {
         describe('without nodeModulesRelativeDir', () => {
           beforeAll(() => {
             jest.resetModules();
-            jest.doMock('../package.json', () => jest.requireActual('./data/package-peerdeps.json'));
+            jest.doMock(path.join('..', 'package.json'), () => jest.requireActual('./data/package-peerdeps.json'));
             // Mock request-promise package.json
             jest.doMock(
-              '../node_modules/request-promise/package.json',
+              path.join('..', 'node_modules', 'request-promise', 'package.json'),
               () => jest.requireActual('./data/rp-package-optional.json'),
               { virtual: true }
             );

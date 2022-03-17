@@ -19,7 +19,7 @@ describe('validate', () => {
     jest.resetModules();
     fsExtraMock = require('fs-extra');
     globMock = require('glob');
-    jest.doMock('../lib/index', () => ({
+    jest.doMock(path.join('..', 'lib', 'index'), () => ({
       entries: {},
       webpack: {
         isLocal: false
@@ -222,14 +222,14 @@ describe('validate', () => {
       const loadedConfig = {
         entry: 'testentry'
       };
-      jest.doMock('testServicePath/testconfig', () => loadedConfig, { virtual: true });
+      jest.doMock(path.join('testServicePath', 'testconfig'), () => loadedConfig, { virtual: true });
       module.serverless.config.servicePath = 'testServicePath';
       module.serverless.service.custom.webpack = 'testconfig';
       serverless.utils.fileExistsSync = jest.fn().mockReturnValue(true);
       return expect(module.validate())
         .resolves.toBeUndefined()
         .then(() => {
-          expect(serverless.utils.fileExistsSync).toHaveBeenCalledWith('testServicePath/testconfig');
+          expect(serverless.utils.fileExistsSync).toHaveBeenCalledWith(path.join('testServicePath', 'testconfig'));
           expect(module.webpackConfig).toBe(loadedConfig);
           return null;
         });
@@ -239,14 +239,14 @@ describe('validate', () => {
       const loadedConfig = {
         entry: 'testentry'
       };
-      jest.doMock('testServicePath/testconfig', () => BbPromise.resolve(loadedConfig), { virtual: true });
+      jest.doMock(path.join('testServicePath', 'testconfig'), () => BbPromise.resolve(loadedConfig), { virtual: true });
       module.serverless.config.servicePath = 'testServicePath';
       module.serverless.service.custom.webpack = 'testconfig';
       serverless.utils.fileExistsSync = jest.fn().mockReturnValue(true);
       return expect(module.validate())
         .resolves.toBeUndefined()
         .then(() => {
-          expect(serverless.utils.fileExistsSync).toHaveBeenCalledWith('testServicePath/testconfig');
+          expect(serverless.utils.fileExistsSync).toHaveBeenCalledWith(path.join('testServicePath', 'testconfig'));
           expect(module.webpackConfig).toEqual(loadedConfig);
           return null;
         });
@@ -299,11 +299,11 @@ describe('validate', () => {
         then: 'I am not a Promise member',
         entry: 'testentry'
       };
-      jest.doMock('testconfig/testpath', () => loadedConfig, { virtual: true });
+      jest.doMock(path.join('testconfig', 'testpath'), () => loadedConfig, { virtual: true });
       return expect(module.validate())
         .resolves.toBeUndefined()
         .then(() => {
-          expect(serverless.utils.fileExistsSync).toHaveBeenCalledWith('testconfig/testpath');
+          expect(serverless.utils.fileExistsSync).toHaveBeenCalledWith(path.join('testconfig', 'testpath'));
           expect(module.webpackConfig).toEqual(loadedConfig);
           return null;
         });
@@ -324,11 +324,11 @@ describe('validate', () => {
       const loadedConfig = {
         entry: 'testentry'
       };
-      jest.doMock('testpath/webpack.config.js', () => loadedConfig, { virtual: true });
+      jest.doMock(path.join('testpath', 'webpack.config.js'), () => loadedConfig, { virtual: true });
       return expect(module.validate())
         .resolves.toBeUndefined()
         .then(() => {
-          expect(serverless.utils.fileExistsSync).toHaveBeenCalledWith('testpath/webpack.config.js');
+          expect(serverless.utils.fileExistsSync).toHaveBeenCalledWith(path.join('testpath', 'webpack.config.js'));
           expect(module.webpackConfig).toEqual(loadedConfig);
           return null;
         });
