@@ -366,7 +366,7 @@ describe('packExternalModules', () => {
             // Lock file rebase should have been called
             expect(packagerFactoryMock.get('npm').rebaseLockfile).toHaveBeenCalledTimes(1),
             expect(packagerFactoryMock.get('npm').rebaseLockfile).toHaveBeenCalledWith(
-              '../../locals',
+              path.join('..', '..', 'locals'),
               fakePackageLockJSON
             ),
             // npm ls and npm prune should have been called

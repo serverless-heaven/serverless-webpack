@@ -215,7 +215,7 @@ describe('validate', () => {
 
   describe('config file load', () => {
     afterEach(() => {
-      jest.unmock('testServicePath/testconfig');
+      jest.unmock(path.join('testServicePath', 'testconfig'));
     });
 
     it('should load a webpack config from file if `custom.webpack` is a string', () => {
