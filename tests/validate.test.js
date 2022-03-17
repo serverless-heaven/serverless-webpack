@@ -341,7 +341,9 @@ describe('validate', () => {
       module.serverless.service.custom.webpack = testConfig;
       serverless.utils.fileExistsSync = jest.fn().mockReturnValue(true);
       return expect(module.validate())
-        .rejects.toThrow("Cannot find module 'testpath/invalid.webpack.config.js' from 'lib/validate.js'")
+        .rejects.toThrow(
+          `Cannot find module '${path.join('testpath', 'invalid.webpack.config.js')}' from 'lib/validate.js'`
+        )
         .then(() =>
           expect(serverless.cli.log).toHaveBeenCalledWith(expect.stringMatching(/^Could not load webpack config/))
         );
