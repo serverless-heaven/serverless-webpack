@@ -7,7 +7,7 @@ const Serverless = require('serverless');
 const path = require('path');
 const baseModule = require('../lib/runPluginSupport');
 
-const pluginPath = path.join('plugin', 'run', 'utils');
+const pluginPath = path.join('plugins', 'run', 'utils');
 const deployFunctionsToLocalEmulatorStub = require(path.join(pluginPath, 'deployFunctionsToLocalEmulator'));
 const getLocalRootUrlStub = require(path.join(pluginPath, 'getLocalRootUrl'));
 
