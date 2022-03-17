@@ -6,13 +6,17 @@ const sinon = require('sinon');
 const Serverless = require('serverless');
 const path = require('path');
 const baseModule = require('../lib/runPluginSupport');
-const deployFunctionsToLocalEmulatorStub = require('plugins/run/utils/deployFunctionsToLocalEmulator');
-const getLocalRootUrlStub = require('plugins/run/utils/getLocalRootUrl');
+
+const pluginPath = path.join('plugin', 'run', 'utils');
+const deployFunctionsToLocalEmulatorStub = require(path.join(pluginPath, 'deployFunctionsToLocalEmulator'));
+const getLocalRootUrlStub = require(path.join(pluginPath, 'getLocalRootUrl'));
 
 jest.mock('plugins/run/utils/deployFunctionsToLocalEmulator', () => jest.fn().mockResolvedValue(), { virtual: true });
 jest.mock('plugins/run/utils/getLocalRootUrl', () => jest.fn(), { virtual: true });
 // Support windowsr
-jest.mock('plugins\\run\\utils\\deployFunctionsToLocalEmulator', () => jest.fn().mockResolvedValue(), { virtual: true });
+jest.mock('plugins\\run\\utils\\deployFunctionsToLocalEmulator', () => jest.fn().mockResolvedValue(), {
+  virtual: true
+});
 jest.mock('plugins\\run\\utils\\getLocalRootUrl', () => jest.fn(), { virtual: true });
 
 describe('runPluginSupport', () => {
