@@ -17,6 +17,7 @@ jest.unmock('webpack');
 const slsVersion = semver.parse(pkg.dependencies.serverless);
 const slsMajor = slsVersion ? slsVersion.major : 3;
 const nodeVersion = semver.parse(process.version);
+const isWin = /^win/.test(process.platform);
 
 async function unzipArtefacts(archivePath) {
   const files = {};
@@ -57,8 +58,9 @@ async function unzipArtefacts(archivePath) {
 }
 
 describe('end-to-end testing', () => {
-  if (nodeVersion.major < 12 || slsMajor !== 3) {
+  if (nodeVersion.major < 12 || slsMajor !== 3 || isWin) {
     // Serverless v3 doesn't support node 10
+    // We have an issue with Windows e2e tests
     it.skip('should support include-external-npm-packages example', _.noop);
   } else {
     it('should support include-external-npm-packages example', async () => {
@@ -85,7 +87,8 @@ describe('end-to-end testing', () => {
   }
 
   // lock-file v2 is supported by Node16+
-  if (nodeVersion.major < 16 || slsMajor !== 3) {
+  // We have an issue with Windows e2e tests
+  if (nodeVersion.major < 16 || slsMajor !== 3 || isWin) {
     it.skip('should support include-external-npm-packages-lock-file example', _.noop);
   } else {
     it('should support include-external-npm-packages-lock-file example', async () => {

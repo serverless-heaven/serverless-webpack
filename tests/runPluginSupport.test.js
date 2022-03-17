@@ -11,6 +11,9 @@ const getLocalRootUrlStub = require('plugins/run/utils/getLocalRootUrl');
 
 jest.mock('plugins/run/utils/deployFunctionsToLocalEmulator', () => jest.fn().mockResolvedValue(), { virtual: true });
 jest.mock('plugins/run/utils/getLocalRootUrl', () => jest.fn(), { virtual: true });
+// Support windowsr
+jest.mock('plugins\\run\\utils\\deployFunctionsToLocalEmulator', () => jest.fn().mockResolvedValue(), { virtual: true });
+jest.mock('plugins\\run\\utils\\getLocalRootUrl', () => jest.fn(), { virtual: true });
 
 describe('runPluginSupport', () => {
   let sandbox;
