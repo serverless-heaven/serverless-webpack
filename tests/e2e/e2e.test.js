@@ -2,15 +2,16 @@ const path = require('path');
 const stream = require('stream');
 const fs = require('fs');
 const unzipper = require('unzipper');
-const chai = require('chai');
 const { runServerless } = require('./e2eUtils');
 const semver = require('semver');
 const pkg = require('../../package.json');
 
-chai.use(require('chai-as-promised'));
-chai.use(require('sinon-chai'));
-
-const expect = chai.expect;
+// unmock global modules
+jest.unmock('bestzip');
+jest.unmock('fs-extra');
+jest.unmock('fs');
+jest.unmock('glob');
+jest.unmock('webpack');
 
 const slsVersion = semver.parse(pkg.dependencies.serverless);
 const slsMajor = slsVersion ? slsVersion.major : 3;
@@ -55,7 +56,7 @@ async function unzipArtefacts(archivePath) {
 }
 
 describe('end-to-end testing', () => {
-  it('should support include-external-npm-packages example', async function () {
+  it('should support include-external-npm-packages example', async () => {
     if (nodeVersion.major < 12 || slsMajor !== 3) {
       // Serverless v3 doesn't support node 10
       this.skip();
@@ -69,8 +70,8 @@ describe('end-to-end testing', () => {
     const archivePath = path.join(outputDir, `${fixture}.zip`);
     const files = await unzipArtefacts(archivePath);
 
-    expect(files.node_modules).to.equal(true);
-    expect(JSON.parse(files['package.json'])).to.deep.equal({
+    expect(files.node_modules).toEqual(true);
+    expect(JSON.parse(files['package.json'])).toEqual({
       name: fixture,
       version: '1.0.0',
       description: `Packaged externals for ${fixture}`,
@@ -80,10 +81,10 @@ describe('end-to-end testing', () => {
         fbgraph: '^1.4.4'
       }
     });
-    expect(files['handler.js']).to.not.be.empty;
-  }).timeout(300000);
+    expect(files['handler.js']).not.toHaveLength(0);
+  }, 300000);
 
-  it('should support include-external-npm-packages-lock-file example', async function () {
+  it('should support include-external-npm-packages-lock-file example', async () => {
     // lock-file v2 is supported by Node16+
     if (nodeVersion.major < 16 || slsMajor !== 3) {
       this.skip();
@@ -98,7 +99,7 @@ describe('end-to-end testing', () => {
     const files = await unzipArtefacts(archivePath);
 
     // fbgraph is not included because of tree-shaking
-    expect(JSON.parse(files['package.json'])).to.deep.equal({
+    expect(JSON.parse(files['package.json'])).toEqual({
       name: fixture,
       version: '1.0.0',
       description: `Packaged externals for ${fixture}`,
@@ -112,7 +113,7 @@ describe('end-to-end testing', () => {
         'lodash.isequal': '^4.5.0'
       }
     });
-    expect(files['handler.js']).to.not.be.empty;
-    expect(files.node_modules).to.equal(true);
-  }).timeout(300000);
+    expect(files['handler.js']).not.toHaveLength(0);
+    expect(files.node_modules).toEqual(true);
+  }, 300000);
 });

@@ -1,47 +1,21 @@
 'use strict';
 
-const BbPromise = require('bluebird');
 const _ = require('lodash');
-const chai = require('chai');
-const sinon = require('sinon');
-const mockery = require('mockery');
 const Serverless = require('serverless');
-const makeWebpackMock = require('./webpack.mock');
+const webpackMock = require('webpack');
+const baseModule = require('../lib/compile');
 
-chai.use(require('chai-as-promised'));
-chai.use(require('sinon-chai'));
-
-const expect = chai.expect;
+jest.mock('webpack');
 
 describe('compile', () => {
-  let sandbox;
-  let webpackMock;
-  let baseModule;
   let serverless;
   let module;
-
-  before(() => {
-    sandbox = sinon.createSandbox();
-    sandbox.usingPromise(BbPromise);
-
-    webpackMock = makeWebpackMock(sandbox);
-
-    mockery.enable({ warnOnUnregistered: false });
-    mockery.registerMock('webpack', webpackMock);
-    baseModule = require('../lib/compile');
-    Object.freeze(baseModule);
-  });
-
-  after(() => {
-    mockery.disable();
-    mockery.deregisterAll();
-  });
 
   beforeEach(() => {
     serverless = new Serverless({ commands: ['print'], options: {}, serviceDir: null });
     serverless.cli = {
-      log: sandbox.stub(),
-      consoleLog: sandbox.stub()
+      log: jest.fn(),
+      consoleLog: jest.fn()
     };
 
     module = _.assign(
@@ -53,43 +27,45 @@ describe('compile', () => {
     );
   });
 
-  afterEach(() => {
-    // This will reset the webpackMock too
-    sandbox.restore();
-  });
-
   it('should expose a `compile` method', () => {
-    expect(module.compile).to.be.a('function');
+    expect(module.compile).toEqual(expect.any(Function));
   });
 
   it('should compile with webpack from a context configuration', () => {
     const testWebpackConfig = 'testconfig';
     module.webpackConfig = testWebpackConfig;
     module.configuration = { concurrency: 1 };
-    return expect(module.compile()).to.be.fulfilled.then(() => {
-      expect(webpackMock).to.have.been.calledWith(testWebpackConfig);
-      expect(webpackMock.compilerMock.run).to.have.been.calledOnce;
-      return null;
-    });
+    return expect(module.compile())
+      .resolves.toBeUndefined()
+      .then(() => {
+        expect(webpackMock).toHaveBeenCalledWith(testWebpackConfig);
+        expect(webpackMock.compilerMock.run).toHaveBeenCalledTimes(1);
+        return null;
+      });
   });
 
   it('should fail if configuration is missing', () => {
-    return expect(module.compile()).to.be.rejectedWith('Unable to find Webpack configuration');
+    expect.assertions(1);
+    delete module.webpackConfig;
+    return module.compile().catch(e => {
+      expect(e).toEqual('Unable to find Webpack configuration');
+    });
   });
 
   it('should fail if plugin configuration is missing', () => {
     const testWebpackConfig = 'testconfig';
     module.webpackConfig = testWebpackConfig;
     module.configuration = undefined;
-    return expect(module.compile()).to.be.rejectedWith('Missing plugin configuration');
+    expect.assertions(1);
+    return module.compile().catch(e => expect(e.toString()).toEqual('ServerlessError: Missing plugin configuration'));
   });
 
   it('should fail if there are compilation errors', () => {
     module.webpackConfig = 'testconfig';
     module.configuration = { concurrency: 1 };
-    // We stub errors here. It will be reset again in afterEach()
-    sandbox.stub(webpackMock.statsMock.compilation, 'errors').value(['error']);
-    return expect(module.compile()).to.be.rejectedWith(/compilation error/);
+    webpackMock.statsMock.compilation.errors = ['error'];
+    expect.assertions(1);
+    return expect(module.compile()).rejects.toThrow(/compilation error/);
   });
 
   it('should work with multi compile', () => {
@@ -104,20 +80,22 @@ describe('compile', () => {
             },
             modules: []
           },
-          toString: sandbox.stub().returns('testStats'),
+          toString: jest.fn().mockReturnValue('testStats'),
           hasErrors: _.constant(false)
         }
       ]
     };
     module.webpackConfig = testWebpackConfig;
     module.configuration = { concurrency: 1 };
-    webpackMock.compilerMock.run.reset();
-    webpackMock.compilerMock.run.yields(null, multiStats);
-    return expect(module.compile()).to.be.fulfilled.then(() => {
-      expect(webpackMock).to.have.been.calledWith(testWebpackConfig);
-      expect(webpackMock.compilerMock.run).to.have.been.calledOnce;
-      return null;
-    });
+    webpackMock.compilerMock.run.mockClear();
+    webpackMock.compilerMock.run.mockImplementation(cb => cb(null, multiStats));
+    return expect(module.compile())
+      .resolves.toBeUndefined()
+      .then(() => {
+        expect(webpackMock).toHaveBeenCalledWith(testWebpackConfig);
+        expect(webpackMock.compilerMock.run).toHaveBeenCalledTimes(1);
+        return null;
+      });
   });
 
   it('should work with concurrent compile', () => {
@@ -132,21 +110,23 @@ describe('compile', () => {
             },
             modules: []
           },
-          toString: sandbox.stub().returns('testStats'),
+          toString: jest.fn().mockReturnValue('testStats'),
           hasErrors: _.constant(false)
         }
       ]
     };
     module.webpackConfig = testWebpackConfig;
     module.configuration = { concurrency: 2 };
-    webpackMock.compilerMock.run.reset();
-    webpackMock.compilerMock.run.yields(null, multiStats);
-    return expect(module.compile()).to.be.fulfilled.then(() => {
-      expect(webpackMock).to.have.been.calledWith(testWebpackConfig[0]);
-      expect(webpackMock).to.have.been.calledWith(testWebpackConfig[1]);
-      expect(webpackMock.compilerMock.run).to.have.been.calledTwice;
-      return null;
-    });
+    webpackMock.compilerMock.run.mockClear();
+    webpackMock.compilerMock.run.mockImplementation(cb => cb(null, multiStats));
+    return expect(module.compile())
+      .resolves.toBeUndefined()
+      .then(() => {
+        expect(webpackMock).toHaveBeenCalledWith(testWebpackConfig[0]);
+        expect(webpackMock).toHaveBeenCalledWith(testWebpackConfig[1]);
+        expect(webpackMock.compilerMock.run).toHaveBeenCalledTimes(2);
+        return null;
+      });
   });
 
   it('should use correct stats option', () => {
@@ -161,24 +141,25 @@ describe('compile', () => {
         },
         modules: []
       },
-      toString: sandbox.stub().returns('testStats'),
+      toString: jest.fn().mockReturnValue('testStats'),
       hasErrors: _.constant(false)
     };
 
     module.webpackConfig = testWebpackConfig;
     module.configuration = { concurrency: 1 };
-    webpackMock.compilerMock.run.reset();
-    webpackMock.compilerMock.run.yields(null, mockStats);
+    webpackMock.compilerMock.run.mockClear();
+    webpackMock.compilerMock.run.mockImplementation(cb => cb(null, mockStats));
     return expect(module.compile())
-      .to.be.fulfilled.then(() => {
-        expect(webpackMock).to.have.been.calledWith(testWebpackConfig);
-        expect(mockStats.toString.firstCall.args).to.eql([testWebpackConfig.stats]);
+      .resolves.toBeUndefined()
+      .then(() => {
+        expect(webpackMock).toHaveBeenCalledWith(testWebpackConfig);
+        expect(mockStats.toString.mock.calls).toEqual([[testWebpackConfig.stats]]);
         module.webpackConfig = [testWebpackConfig];
-        return expect(module.compile()).to.be.fulfilled;
+        return expect(module.compile()).resolves.toBeUndefined();
       })
       .then(() => {
-        expect(webpackMock).to.have.been.calledWith(testWebpackConfig);
-        expect(mockStats.toString.args).to.eql([[testWebpackConfig.stats], [testWebpackConfig.stats]]);
+        expect(webpackMock).toHaveBeenCalledWith(testWebpackConfig);
+        expect(mockStats.toString.mock.calls).toEqual([[testWebpackConfig.stats], [testWebpackConfig.stats]]);
         return null;
       });
   });
@@ -195,19 +176,21 @@ describe('compile', () => {
             },
             modules: []
           },
-          toString: sandbox.stub().returns('testStats'),
+          toString: jest.fn().mockReturnValue('testStats'),
           hasErrors: _.constant(false)
         }
       ]
     };
     module.webpackConfig = testWebpackConfig;
     module.configuration = { concurrency: 1 };
-    webpackMock.compilerMock.run.reset();
-    webpackMock.compilerMock.run.yields(null, multiStats);
-    return expect(module.compile()).to.be.fulfilled.then(() => {
-      expect(module.compileStats.stats[0].outputPath).to.equal('compileStats-outputPath');
-      return null;
-    });
+    webpackMock.compilerMock.run.mockClear();
+    webpackMock.compilerMock.run.mockImplementation(cb => cb(null, multiStats));
+    return expect(module.compile())
+      .resolves.toBeUndefined()
+      .then(() => {
+        expect(module.compileStats.stats[0].outputPath).toEqual('compileStats-outputPath');
+        return null;
+      });
   });
 
   it('should set stats externals', () => {
@@ -238,29 +221,31 @@ describe('compile', () => {
               { identifier: _.constant('external umd2 "hiyou"'), usedExports: true }
             ]
           },
-          toString: sandbox.stub().returns('testStats'),
+          toString: jest.fn().mockReturnValue('testStats'),
           hasErrors: _.constant(false)
         }
       ]
     };
     module.webpackConfig = testWebpackConfig;
     module.configuration = { concurrency: 1 };
-    webpackMock.compilerMock.run.reset();
-    webpackMock.compilerMock.run.yields(null, multiStats);
-    return expect(module.compile()).to.be.fulfilled.then(() => {
-      expect(module.compileStats.stats[0].externalModules).to.eql([
-        { external: '@scoped/vendor', origin: undefined },
-        { external: 'uuid', origin: undefined },
-        { external: 'localmodule', origin: undefined },
-        { external: 'aws-sdk', origin: undefined },
-        { external: 'lodash', origin: undefined },
-        { external: 'glob', origin: undefined },
-        { external: 'semver', origin: undefined },
-        { external: 'whatever', origin: undefined },
-        { external: 'hiyou', origin: undefined }
-      ]);
-      return null;
-    });
+    webpackMock.compilerMock.run.mockClear();
+    webpackMock.compilerMock.run.mockImplementation(cb => cb(null, multiStats));
+    return expect(module.compile())
+      .resolves.toBeUndefined()
+      .then(() => {
+        expect(module.compileStats.stats[0].externalModules).toEqual([
+          { external: '@scoped/vendor', origin: undefined },
+          { external: 'uuid', origin: undefined },
+          { external: 'localmodule', origin: undefined },
+          { external: 'aws-sdk', origin: undefined },
+          { external: 'lodash', origin: undefined },
+          { external: 'glob', origin: undefined },
+          { external: 'semver', origin: undefined },
+          { external: 'whatever', origin: undefined },
+          { external: 'hiyou', origin: undefined }
+        ]);
+        return null;
+      });
   });
 
   it('should fail to set stats externals', () => {
@@ -275,16 +260,15 @@ describe('compile', () => {
             },
             modules: [{ identifier: _.constant('external node-commonjs "aws-sdk".') }]
           },
-          toString: sandbox.stub().returns('testStats'),
+          toString: jest.fn().mockReturnValue('testStats'),
           hasErrors: _.constant(false)
         }
       ]
     };
     module.webpackConfig = testWebpackConfig;
     module.configuration = { concurrency: 1 };
-    webpackMock.compilerMock.run.reset();
-    webpackMock.compilerMock.run.yields(null, multiStats);
-    return expect(module.compile()).to.be.rejectedWith(
+    webpackMock.compilerMock.run.mockImplementation(cb => cb(null, multiStats));
+    return expect(module.compile()).rejects.toThrow(
       'Unable to extract module name from Webpack identifier: external node-commonjs "aws-sdk".'
     );
   });

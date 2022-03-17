@@ -4,49 +4,28 @@
  */
 
 const _ = require('lodash');
-const chai = require('chai');
-const sinon = require('sinon');
-const mockery = require('mockery');
 const Serverless = require('serverless');
+const baseModule = require('../../lib/packagers/index');
 
-chai.use(require('sinon-chai'));
-
-const expect = chai.expect;
+jest.mock('fs-extra');
+jest.mock('../../lib/packagers/npm', () => {
+  return {
+    hello: 'I am NPM'
+  };
+});
+jest.mock('../../lib/packagers/yarn', () => ({
+  hello: 'I am Yarn'
+}));
 
 describe('packagers factory', () => {
-  let sandbox;
   let serverless;
-  let npmMock;
-  let yarnMock;
-  let baseModule;
   let module;
-
-  before(() => {
-    sandbox = sinon.createSandbox();
-    npmMock = {
-      hello: 'I am NPM'
-    };
-    yarnMock = {
-      hello: 'I am Yarn'
-    };
-    mockery.enable({ useCleanCache: true });
-    mockery.registerAllowables(['../../lib/packagers/index', 'util', 'lodash']);
-    mockery.registerMock('./npm', npmMock);
-    mockery.registerMock('./yarn', yarnMock);
-    baseModule = require('../../lib/packagers/index');
-    Object.freeze(baseModule);
-  });
-
-  after(() => {
-    mockery.disable();
-    mockery.deregisterAll();
-  });
 
   beforeEach(() => {
     serverless = new Serverless({ commands: ['print'], options: {}, serviceDir: null });
     serverless.cli = {
-      log: sandbox.stub(),
-      consoleLog: sandbox.stub()
+      log: jest.fn(),
+      consoleLog: jest.fn()
     };
 
     module = _.assign(
@@ -60,17 +39,14 @@ describe('packagers factory', () => {
     );
   });
 
-  afterEach(() => {
-    sandbox.reset();
-    sandbox.restore();
-  });
-
   it('should throw on unknown packagers', () => {
-    expect(() => module.get.call({ serverless }, 'unknown')).to.throw(/Could not find packager/);
+    expect(() => module.get.call({ serverless }, 'unknown')).toThrow(/Could not find packager/);
   });
 
   it('should return npm packager', () => {
     const npm = module.get.call(module, 'npm');
-    expect(npm).to.deep.equal(npmMock);
+    expect(npm).toEqual({
+      hello: 'I am NPM'
+    });
   });
 });

@@ -4,60 +4,48 @@
  */
 
 const BbPromise = require('bluebird');
-const chai = require('chai');
-const sinon = require('sinon');
 const Utils = require('../../lib/utils');
+const yarnModule = require('../../lib/packagers/yarn');
 
-chai.use(require('chai-as-promised'));
-chai.use(require('sinon-chai'));
-
-const expect = chai.expect;
+jest.mock('../../lib/utils', () => {
+  const original = jest.requireActual('../../lib/utils');
+  // eslint-disable-next-line lodash/prefer-lodash-method
+  return Object.assign({}, original, {
+    spawnProcess: jest.fn()
+  });
+});
 
 describe('yarn', () => {
-  let sandbox;
-  let yarnModule;
-
-  before(() => {
-    sandbox = sinon.createSandbox();
-    sandbox.usingPromise(BbPromise.Promise);
-
-    sandbox.stub(Utils, 'spawnProcess');
-    yarnModule = require('../../lib/packagers/yarn');
-  });
-
-  after(() => {
-    sandbox.restore();
-  });
-
-  afterEach(() => {
-    sandbox.reset();
-  });
-
   it('should return "yarn.lock" as lockfile name', () => {
-    expect(yarnModule.lockfileName).to.equal('yarn.lock');
+    expect(yarnModule.lockfileName).toEqual('yarn.lock');
   });
 
   it('should return packager sections', () => {
-    expect(yarnModule.copyPackageSectionNames).to.deep.equal(['resolutions']);
+    expect(yarnModule.copyPackageSectionNames).toEqual(['resolutions']);
   });
 
   it('does not require to copy modules', () => {
-    expect(yarnModule.mustCopyModules).to.be.false;
+    expect(yarnModule.mustCopyModules).toBe(false);
   });
 
   describe('getProdDependencies', () => {
     it('should use yarn list', () => {
-      Utils.spawnProcess.returns(BbPromise.resolve({ stdout: '{}', stderr: '' }));
-      return expect(yarnModule.getProdDependencies('myPath', 1)).to.be.fulfilled.then(result => {
-        expect(result).to.be.an('object');
-        expect(Utils.spawnProcess).to.have.been.calledOnce;
-        expect(Utils.spawnProcess.firstCall).to.have.been.calledWith(
-          sinon.match(/^yarn/),
-          ['list', '--depth=1', '--json', '--production'],
-          { cwd: 'myPath' }
-        );
-        return null;
-      });
+      Utils.spawnProcess.mockReturnValue(BbPromise.resolve({ stdout: '{}', stderr: '' }));
+      return expect(yarnModule.getProdDependencies('myPath', 1))
+        .resolves.toEqual({
+          dependencies: {},
+          problems: []
+        })
+        .then(() => {
+          expect(Utils.spawnProcess).toHaveBeenCalledTimes(1);
+          expect(Utils.spawnProcess).toHaveBeenNthCalledWith(
+            1,
+            expect.stringMatching(/^yarn/),
+            ['list', '--depth=1', '--json', '--production'],
+            { cwd: 'myPath' }
+          );
+          return null;
+        });
     });
 
     it('should transform yarn trees to npm dependencies', () => {
@@ -107,18 +95,15 @@ describe('yarn', () => {
           }
         }
       };
-      Utils.spawnProcess.returns(BbPromise.resolve({ stdout: testYarnResult, stderr: '' }));
-      return expect(yarnModule.getProdDependencies('myPath', 1)).to.be.fulfilled.then(result => {
-        expect(result).to.deep.equal(expectedResult);
-        return null;
-      });
+      Utils.spawnProcess.mockReturnValue(BbPromise.resolve({ stdout: testYarnResult, stderr: '' }));
+      return expect(yarnModule.getProdDependencies('myPath', 1)).resolves.toEqual(expectedResult);
     });
 
     it('should reject on critical yarn errors', () => {
-      Utils.spawnProcess.returns(
+      Utils.spawnProcess.mockReturnValue(
         BbPromise.reject(new Utils.SpawnError('Exited with code 1', '', 'Yarn failed.\nerror Could not find module.'))
       );
-      return expect(yarnModule.getProdDependencies('myPath', 1)).to.be.rejectedWith('Exited with code 1');
+      return expect(yarnModule.getProdDependencies('myPath', 1)).rejects.toThrow('Exited with code 1');
     });
   });
 
@@ -126,7 +111,7 @@ describe('yarn', () => {
     it('should return the original lockfile', () => {
       const testContent = 'eugfogfoigqwoeifgoqwhhacvaisvciuviwefvc';
       const testContent2 = 'eugfogfoigqwoeifgoqwhhacvaisvciuviwefvc';
-      expect(yarnModule.rebaseLockfile('.', testContent)).to.equal(testContent2);
+      expect(yarnModule.rebaseLockfile('.', testContent)).toEqual(testContent2);
     });
 
     it('should rebase file references', () => {
@@ -206,119 +191,121 @@ describe('yarn', () => {
           resolved "https://registry.yarnpkg.com/acorn/-/acorn-5.5.3.tgz#f473dd47e0277a08e28e9bec5aeeb04751f0b8c9"
       `;
 
-      expect(yarnModule.rebaseLockfile('../../project', testContent)).to.equal(expectedContent);
+      expect(yarnModule.rebaseLockfile('../../project', testContent)).toEqual(expectedContent);
     });
   });
 
   describe('install', () => {
     it('should use yarn install', () => {
-      Utils.spawnProcess.returns(BbPromise.resolve({ stdout: 'installed successfully', stderr: '' }));
-      return expect(yarnModule.install('myPath', {})).to.be.fulfilled.then(result => {
-        expect(result).to.be.undefined;
-        expect(Utils.spawnProcess).to.have.been.calledOnce;
-        expect(Utils.spawnProcess).to.have.been.calledWithExactly(
-          sinon.match(/^yarn/),
-          ['install', '--non-interactive', '--frozen-lockfile'],
-          {
-            cwd: 'myPath'
-          }
-        );
-        return null;
-      });
+      Utils.spawnProcess.mockReturnValue(BbPromise.resolve({ stdout: 'installed successfully', stderr: '' }));
+      return expect(yarnModule.install('myPath', {}))
+        .resolves.toBeUndefined()
+        .then(() => {
+          expect(Utils.spawnProcess).toHaveBeenCalledTimes(1);
+          expect(Utils.spawnProcess).toHaveBeenCalledWith(
+            expect.stringMatching(/^yarn/),
+            ['install', '--non-interactive', '--frozen-lockfile'],
+            {
+              cwd: 'myPath'
+            }
+          );
+          return null;
+        });
     });
 
     it('should use ignoreScripts option', () => {
-      Utils.spawnProcess.returns(BbPromise.resolve({ stdout: 'installed successfully', stderr: '' }));
-      return expect(yarnModule.install('myPath', { ignoreScripts: true })).to.be.fulfilled.then(result => {
-        expect(result).to.be.undefined;
-        expect(Utils.spawnProcess).to.have.been.calledOnce;
-        expect(Utils.spawnProcess).to.have.been.calledWithExactly(
-          sinon.match(/^yarn/),
-          ['install', '--non-interactive', '--frozen-lockfile', '--ignore-scripts'],
-          {
-            cwd: 'myPath'
-          }
-        );
-        return null;
-      });
+      Utils.spawnProcess.mockReturnValue(BbPromise.resolve({ stdout: 'installed successfully', stderr: '' }));
+      return expect(yarnModule.install('myPath', { ignoreScripts: true }))
+        .resolves.toBeUndefined()
+        .then(() => {
+          expect(Utils.spawnProcess).toHaveBeenCalledTimes(1);
+          expect(Utils.spawnProcess).toHaveBeenCalledWith(
+            expect.stringMatching(/^yarn/),
+            ['install', '--non-interactive', '--frozen-lockfile', '--ignore-scripts'],
+            {
+              cwd: 'myPath'
+            }
+          );
+          return null;
+        });
     });
 
     it('should use noFrozenLockfile option', () => {
-      Utils.spawnProcess.returns(BbPromise.resolve({ stdout: 'installed successfully', stderr: '' }));
-      return expect(yarnModule.install('myPath', { noFrozenLockfile: true })).to.be.fulfilled.then(result => {
-        expect(result).to.be.undefined;
-        expect(Utils.spawnProcess).to.have.been.calledOnce;
-        expect(Utils.spawnProcess).to.have.been.calledWithExactly(
-          sinon.match(/^yarn/),
-          ['install', '--non-interactive'],
-          {
-            cwd: 'myPath'
-          }
-        );
-        return null;
-      });
+      Utils.spawnProcess.mockReturnValue(BbPromise.resolve({ stdout: 'installed successfully', stderr: '' }));
+      return expect(yarnModule.install('myPath', { noFrozenLockfile: true }))
+        .resolves.toBeUndefined()
+        .then(() => {
+          expect(Utils.spawnProcess).toHaveBeenCalledTimes(1);
+          expect(Utils.spawnProcess).toHaveBeenCalledWith(
+            expect.stringMatching(/^yarn/),
+            ['install', '--non-interactive'],
+            {
+              cwd: 'myPath'
+            }
+          );
+          return null;
+        });
     });
 
     it('should use networkConcurrency option', () => {
-      Utils.spawnProcess.returns(BbPromise.resolve({ stdout: 'installed successfully', stderr: '' }));
-      return expect(yarnModule.install('myPath', { networkConcurrency: 1 })).to.be.fulfilled.then(result => {
-        expect(result).to.be.undefined;
-        expect(Utils.spawnProcess).to.have.been.calledOnce;
-        expect(Utils.spawnProcess).to.have.been.calledWithExactly(
-          sinon.match(/^yarn/),
-          ['install', '--non-interactive', '--frozen-lockfile', '--network-concurrency 1'],
-          {
-            cwd: 'myPath'
-          }
-        );
-        return null;
-      });
+      Utils.spawnProcess.mockReturnValue(BbPromise.resolve({ stdout: 'installed successfully', stderr: '' }));
+      return expect(yarnModule.install('myPath', { networkConcurrency: 1 }))
+        .resolves.toBeUndefined()
+        .then(() => {
+          expect(Utils.spawnProcess).toHaveBeenCalledTimes(1);
+          expect(Utils.spawnProcess).toHaveBeenCalledWith(
+            expect.stringMatching(/^yarn/),
+            ['install', '--non-interactive', '--frozen-lockfile', '--network-concurrency 1'],
+            {
+              cwd: 'myPath'
+            }
+          );
+          return null;
+        });
     });
   });
 
   describe('noInstall', () => {
     it('should skip yarn install', () => {
-      return expect(yarnModule.install('myPath', { noInstall: true })).to.be.fulfilled.then(result => {
-        expect(result).to.be.undefined;
-        return null;
-      });
+      return expect(yarnModule.install('myPath', { noInstall: true })).resolves.toBeUndefined();
     });
   });
 
   describe('prune', () => {
-    let installStub;
-
-    before(() => {
-      installStub = sandbox.stub(yarnModule, 'install').returns(BbPromise.resolve());
-    });
-
-    after(() => {
-      installStub.restore();
-    });
-
     it('should call install', () => {
-      return expect(yarnModule.prune('myPath', {})).to.be.fulfilled.then(() => {
-        expect(installStub).to.have.been.calledOnce;
-        expect(installStub).to.have.been.calledWithExactly('myPath', {});
-        return null;
-      });
+      Utils.spawnProcess.mockReturnValue(BbPromise.resolve({ stdout: 'success', stderr: '' }));
+      return expect(yarnModule.prune('myPath', {}))
+        .resolves.toBeUndefined()
+        .then(() => {
+          expect(Utils.spawnProcess).toHaveBeenCalledTimes(1);
+          expect(Utils.spawnProcess).toHaveBeenNthCalledWith(
+            1,
+            expect.stringMatching(/^yarn/),
+            ['install', '--non-interactive', '--frozen-lockfile'],
+            {
+              cwd: 'myPath'
+            }
+          );
+          return null;
+        });
     });
   });
 
   describe('runScripts', () => {
     it('should use yarn run for the given scripts', () => {
-      Utils.spawnProcess.returns(BbPromise.resolve({ stdout: 'success', stderr: '' }));
-      return expect(yarnModule.runScripts('myPath', ['s1', 's2'])).to.be.fulfilled.then(result => {
-        expect(result).to.be.undefined;
-        expect(Utils.spawnProcess).to.have.been.calledTwice;
-        expect(Utils.spawnProcess.firstCall).to.have.been.calledWithExactly(sinon.match(/^yarn/), ['run', 's1'], {
-          cwd: 'myPath'
+      Utils.spawnProcess.mockReturnValue(BbPromise.resolve({ stdout: 'success', stderr: '' }));
+      return expect(yarnModule.runScripts('myPath', ['s1', 's2']))
+        .resolves.toBeUndefined()
+        .then(() => {
+          expect(Utils.spawnProcess).toHaveBeenCalledTimes(2);
+          expect(Utils.spawnProcess).toHaveBeenNthCalledWith(1, expect.stringMatching(/^yarn/), ['run', 's1'], {
+            cwd: 'myPath'
+          });
+          expect(Utils.spawnProcess).toHaveBeenNthCalledWith(2, expect.stringMatching(/^yarn/), ['run', 's2'], {
+            cwd: 'myPath'
+          });
+          return null;
         });
-        expect(Utils.spawnProcess.secondCall).to.have.been.calledWithExactly(sinon.match(/^yarn/), ['run', 's2'], {
-          cwd: 'myPath'
-        });
-        return null;
-      });
     });
   });
 });

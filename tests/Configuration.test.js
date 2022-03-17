@@ -4,16 +4,13 @@
  */
 
 const os = require('os');
-const chai = require('chai');
 const Configuration = require('../lib/Configuration');
-
-const expect = chai.expect;
 
 describe('Configuration', () => {
   describe('defaults', () => {
     let expectedDefaults;
 
-    before(() => {
+    beforeAll(() => {
       expectedDefaults = {
         webpackConfig: 'webpack.config.js',
         includeModules: false,
@@ -27,14 +24,14 @@ describe('Configuration', () => {
 
     it('should set default configuration without custom', () => {
       const config = new Configuration();
-      expect(config).to.have.a.property('_config').that.deep.equals(expectedDefaults);
-      expect(config).to.have.a.property('hasLegacyConfig').that.is.false;
+      expect(config._config).toEqual(expectedDefaults);
+      expect(config.hasLegacyConfig).toBe(false);
     });
 
     it('should set default configuration without webpack property', () => {
       const config = new Configuration({});
-      expect(config).to.have.a.property('_config').that.deep.equals(expectedDefaults);
-      expect(config).to.have.a.property('hasLegacyConfig').that.is.false;
+      expect(config._config).toEqual(expectedDefaults);
+      expect(config.hasLegacyConfig).toBe(false);
     });
   });
 
@@ -42,19 +39,19 @@ describe('Configuration', () => {
     it('should use custom.webpackIncludeModules', () => {
       const testCustom = { webpackIncludeModules: { forceInclude: ['mod1'] } };
       const config = new Configuration(testCustom);
-      expect(config).to.have.a.property('includeModules').that.deep.equals(testCustom.webpackIncludeModules);
+      expect(config.includeModules).toEqual(testCustom.webpackIncludeModules);
     });
 
     it('should use custom.webpack as string', () => {
       const testCustom = { webpack: 'myWebpackFile.js' };
       const config = new Configuration(testCustom);
-      expect(config).to.have.a.property('webpackConfig').that.equals('myWebpackFile.js');
+      expect(config.webpackConfig).toBe('myWebpackFile.js');
     });
 
     it('should detect it', () => {
       const testCustom = { webpack: 'myWebpackFile.js' };
       const config = new Configuration(testCustom);
-      expect(config).to.have.a.property('hasLegacyConfig').that.is.true;
+      expect(config.hasLegacyConfig).toBe(true);
     });
 
     it('should add defaults', () => {
@@ -63,8 +60,8 @@ describe('Configuration', () => {
         webpack: 'myWebpackFile.js'
       };
       const config = new Configuration(testCustom);
-      expect(config).to.have.a.property('includeModules').that.deep.equals(testCustom.webpackIncludeModules);
-      expect(config._config).to.deep.equal({
+      expect(config.includeModules).toEqual(testCustom.webpackIncludeModules);
+      expect(config._config).toEqual({
         webpackConfig: 'myWebpackFile.js',
         includeModules: { forceInclude: ['mod1'] },
         packager: 'npm',
@@ -85,7 +82,7 @@ describe('Configuration', () => {
         }
       };
       const config = new Configuration(testCustom);
-      expect(config._config).to.deep.equal({
+      expect(config._config).toEqual({
         webpackConfig: 'myWebpackFile.js',
         includeModules: { forceInclude: ['mod1'] },
         packager: 'npm',
@@ -105,7 +102,7 @@ describe('Configuration', () => {
         }
       };
       const config = new Configuration(testCustom);
-      expect(config._config).to.deep.equal({
+      expect(config._config).toEqual({
         webpackConfig: 'myWebpackFile.js',
         includeModules: { forceInclude: ['mod1'] },
         packager: 'npm',
@@ -125,7 +122,7 @@ describe('Configuration', () => {
         }
       };
       const config = new Configuration(testCustom);
-      expect(config.concurrency).to.equal(3);
+      expect(config.concurrency).toBe(3);
     });
 
     it('should not accept an invalid string as concurrency value', () => {
@@ -136,7 +133,7 @@ describe('Configuration', () => {
           concurrency: '3abc'
         }
       };
-      expect(() => new Configuration(testCustom)).throws();
+      expect(() => new Configuration(testCustom)).toThrow();
     });
 
     it('should not accept a non-positive number as concurrency value', () => {
@@ -147,7 +144,7 @@ describe('Configuration', () => {
           concurrency: 0
         }
       };
-      expect(() => new Configuration(testCustom)).throws();
+      expect(() => new Configuration(testCustom)).toThrow();
     });
 
     it('should be backward compatible with serializedCompile', () => {
@@ -157,7 +154,7 @@ describe('Configuration', () => {
         }
       };
       const config = new Configuration(testCustom);
-      expect(config.concurrency).to.equal(1);
+      expect(config.concurrency).toBe(1);
     });
   });
 });
