@@ -19,7 +19,7 @@ const slsMajor = slsVersion ? slsVersion.major : 3;
 const nodeVersion = semver.parse(process.version);
 const isWin = /^win/.test(process.platform);
 
-async function unzipArtefacts(archivePath) {
+async function unzipArtifacts(archivePath) {
   const files = {};
 
   await new Promise((resolve, reject) => {
@@ -69,7 +69,7 @@ describe('end-to-end testing', () => {
 
       const outputDir = path.join(result.servicePath, '.serverless');
       const archivePath = path.join(outputDir, `${fixture}.zip`);
-      const files = await unzipArtefacts(archivePath);
+      const files = await unzipArtifacts(archivePath);
 
       expect(files.node_modules).toEqual(true);
       expect(JSON.parse(files['package.json'])).toEqual({
@@ -97,7 +97,7 @@ describe('end-to-end testing', () => {
 
       const outputDir = path.join(result.servicePath, '.serverless');
       const archivePath = path.join(outputDir, `${fixture}.zip`);
-      const files = await unzipArtefacts(archivePath);
+      const files = await unzipArtifacts(archivePath);
 
       // fbgraph is not included because of tree-shaking
       expect(JSON.parse(files['package.json'])).toEqual({
