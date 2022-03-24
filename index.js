@@ -22,9 +22,14 @@ class ServerlessWebpack {
     return lib;
   }
 
-  constructor(serverless, options) {
+  constructor(serverless, options, v3Utils) {
     this.serverless = serverless;
     this.options = options;
+
+    if (v3Utils) {
+      this.log = v3Utils.log;
+      this.progress = v3Utils.progress;
+    }
 
     if (
       ((_.has(this.serverless, 'service.custom.webpack') &&
@@ -101,7 +106,8 @@ class ServerlessWebpack {
         BbPromise.bind(this)
           .then(() => this.serverless.pluginManager.spawn('webpack:validate'))
           .then(() => (this.skipCompile ? BbPromise.resolve() : this.serverless.pluginManager.spawn('webpack:compile')))
-          .then(() => this.serverless.pluginManager.spawn('webpack:package')),
+          .then(() => this.serverless.pluginManager.spawn('webpack:package'))
+          .then(() => this.log && this.progress.get('webpack').remove()),
 
       'after:package:createDeploymentArtifacts': () => BbPromise.bind(this).then(this.cleanup),
 
