@@ -9,6 +9,7 @@ const Serverless = require('serverless');
 const ServerlessWebpack = require('../index');
 
 jest.mock('webpack');
+// jest.mock('ts-node/register');
 
 describe('ServerlessWebpack', () => {
   let serverless;
@@ -30,10 +31,6 @@ describe('ServerlessWebpack', () => {
   });
 
   describe('with a TS webpack configuration', () => {
-    afterEach(() => {
-      jest.unmock('ts-node/register');
-    });
-
     it('should support old config and register ts-node', () => {
       jest.setMock('ts-node/register', null, { virtual: true });
       _.set(serverless, 'service.custom.webpack', 'webpack.config.ts');
@@ -55,6 +52,9 @@ describe('ServerlessWebpack', () => {
 
     it('should throw an error if config use TS but ts-node was not added as dependency', () => {
       _.set(serverless, 'service.custom.webpack.webpackConfig', 'webpack.config.ts');
+      jest.mock('ts-node/register', () => {
+        throw new Error('ts-node not found');
+      });
 
       const badDeps = function () {
         new ServerlessWebpack(serverless, {});

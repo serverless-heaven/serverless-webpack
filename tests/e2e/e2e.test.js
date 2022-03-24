@@ -8,7 +8,6 @@ const pkg = require('../../package.json');
 const _ = require('lodash');
 
 // unmock global modules
-jest.unmock('bestzip');
 jest.unmock('fs-extra');
 jest.unmock('fs');
 jest.unmock('glob');

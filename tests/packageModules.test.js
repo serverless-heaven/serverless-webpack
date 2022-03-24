@@ -7,12 +7,10 @@ const Serverless = require('serverless');
 const Configuration = require('../lib/Configuration');
 const fsMock = require('fs');
 const globMock = require('glob');
-const bestzipMock = require('bestzip');
 const baseModule = require('../lib/packageModules');
 
 jest.mock('fs');
 jest.mock('glob');
-jest.mock('bestzip');
 
 describe('packageModules', () => {
   let serverless;
