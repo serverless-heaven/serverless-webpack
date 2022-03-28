@@ -8,11 +8,9 @@ const Serverless = require('serverless');
 const baseModule = require('../../lib/packagers/index');
 
 jest.mock('fs-extra');
-jest.mock('../../lib/packagers/npm', () => {
-  return {
-    hello: 'I am NPM'
-  };
-});
+jest.mock('../../lib/packagers/npm', () => ({
+  hello: 'I am NPM'
+}));
 jest.mock('../../lib/packagers/yarn', () => ({
   hello: 'I am Yarn'
 }));

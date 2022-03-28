@@ -327,6 +327,7 @@ custom:
   webpack:
     includeModules:
       nodeModulesRelativeDir: '../../' # relative path to current working directory.
+    packagerOptions:
       lockFile: '../../package-lock.json' # relative path to package-lock.json
 ```
 #### Runtime dependencies
