@@ -28,7 +28,7 @@
   },
   "homepage": "https://github.com/serverless-heaven/serverless-webpack#readme",
   "scripts": {
-    "test": "jest",
+    "test": "jest --verbose",
     "test-coverage": "jest --coverage",
     "eslint": "eslint --ext .js *.js lib tests"
   },
