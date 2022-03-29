@@ -119,7 +119,7 @@ describe('compile', () => {
             },
             modules: []
           },
-          toString: sandbox.stub().returns('testStats'),
+          toString: jest.fn().mockReturnValue('testStats'),
           hasErrors: _.constant(false)
         }
       ]
@@ -143,21 +143,23 @@ describe('compile', () => {
         }
       }
     ];
-    webpackMock.compilerMock.run.reset();
-    webpackMock.compilerMock.run.yields(null, multiStats);
-    return expect(module.compile()).to.be.fulfilled.then(() => {
-      expect(webpackMock).to.have.been.calledWith({
-        cache: {
-          type: 'filesystem',
-          name: 'service-stage-function-name'
-        },
-        entry: {
-          'function-name/handler': './function-name/handler.js'
-        }
+    webpackMock.compilerMock.run.mockClear();
+    webpackMock.compilerMock.run.mockImplementation(cb => cb(null, multiStats));
+    return expect(module.compile())
+      .resolves.toBeUndefined()
+      .then(() => {
+        expect(webpackMock).toHaveBeenCalledWith({
+          cache: {
+            type: 'filesystem',
+            name: 'service-stage-function-name'
+          },
+          entry: {
+            'function-name/handler': './function-name/handler.js'
+          }
+        });
+        expect(webpackMock.compilerMock.run).toHaveBeenCalledTimes(1);
+        return null;
       });
-      expect(webpackMock.compilerMock.run).to.have.been.calledOnce;
-      return null;
-    });
   });
 
   it('should work with concurrent compile', () => {
@@ -224,7 +226,7 @@ describe('compile', () => {
             },
             modules: []
           },
-          toString: sandbox.stub().returns('testStats'),
+          toString: jest.fn().mockReturnValue('testStats'),
           hasErrors: _.constant(false)
         }
       ]
@@ -260,30 +262,32 @@ describe('compile', () => {
         }
       }
     ];
-    webpackMock.compilerMock.run.reset();
-    webpackMock.compilerMock.run.yields(null, multiStats);
-    return expect(module.compile()).to.be.fulfilled.then(() => {
-      expect(webpackMock).to.have.been.calledWith({
-        cache: {
-          type: 'filesystem',
-          name: 'service-stage-function-name-1'
-        },
-        entry: {
-          'function-name-1/handler': './function-name-1/handler.js'
-        }
+    webpackMock.compilerMock.run.mockClear();
+    webpackMock.compilerMock.run.mockImplementation(cb => cb(null, multiStats));
+    return expect(module.compile())
+      .resolves.toBeUndefined()
+      .then(() => {
+        expect(webpackMock).toHaveBeenCalledWith({
+          cache: {
+            type: 'filesystem',
+            name: 'service-stage-function-name-1'
+          },
+          entry: {
+            'function-name-1/handler': './function-name-1/handler.js'
+          }
+        });
+        expect(webpackMock).toHaveBeenCalledWith({
+          cache: {
+            type: 'filesystem',
+            name: 'service-stage-function-name-2'
+          },
+          entry: {
+            'function-name-2/handler': './function-name-2/handler.js'
+          }
+        });
+        expect(webpackMock.compilerMock.run).toHaveBeenCalledTimes(2);
+        return null;
       });
-      expect(webpackMock).to.have.been.calledWith({
-        cache: {
-          type: 'filesystem',
-          name: 'service-stage-function-name-2'
-        },
-        entry: {
-          'function-name-2/handler': './function-name-2/handler.js'
-        }
-      });
-      expect(webpackMock.compilerMock.run).to.have.been.calledTwice;
-      return null;
-    });
   });
 
   it('should use correct stats option', () => {
