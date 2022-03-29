@@ -7,6 +7,9 @@ on:
       - master
       - release/*
 
+env:
+  FORCE_COLOR: true
+
 jobs:
   mocha:
     runs-on: ${{ matrix.os }}
