@@ -2,31 +2,20 @@
 
 const BbPromise = require('bluebird');
 const _ = require('lodash');
-const chai = require('chai');
 const path = require('path');
-const sinon = require('sinon');
-const mockery = require('mockery');
 const Serverless = require('serverless');
 const Configuration = require('../lib/Configuration');
+const fsMock = require('fs');
+const globMock = require('glob');
+const baseModule = require('../lib/packageModules');
 
-// Mocks
-const fsMockFactory = require('./mocks/fs.mock');
-const globMockFactory = require('./mocks/glob.mock');
-
-chai.use(require('chai-as-promised'));
-chai.use(require('sinon-chai'));
-
-const expect = chai.expect;
+jest.mock('fs');
+jest.mock('glob');
 
 describe('packageModules', () => {
-  let sandbox;
-  let baseModule;
   let serverless;
   let module;
 
-  // Mocks
-  let fsMock;
-  let globMock;
   // Serverless stubs
   let writeFileDirStub;
   let getAllFunctionsStub;
@@ -34,37 +23,23 @@ describe('packageModules', () => {
   let getServiceObjectStub;
   let getVersionStub;
 
-  before(() => {
-    sandbox = sinon.createSandbox();
-    sandbox.usingPromise(BbPromise);
-
-    fsMock = fsMockFactory.create(sandbox);
-    globMock = globMockFactory.create(sandbox);
-
-    mockery.enable({ warnOnUnregistered: false });
-    mockery.registerMock('fs', fsMock);
-    mockery.registerMock('glob', globMock);
-    baseModule = require('../lib/packageModules');
-    Object.freeze(baseModule);
-  });
-
-  after(() => {
-    mockery.disable();
-    mockery.deregisterAll();
-  });
-
   beforeEach(() => {
     serverless = new Serverless({ commands: ['print'], options: {}, serviceDir: null });
     serverless.cli = {
-      log: sandbox.stub(),
-      consoleLog: sandbox.stub()
+      log: jest.fn(),
+      consoleLog: jest.fn()
     };
 
-    writeFileDirStub = sandbox.stub(serverless.utils, 'writeFileDir');
-    getAllFunctionsStub = sandbox.stub(serverless.service, 'getAllFunctions');
-    getFunctionStub = sandbox.stub(serverless.service, 'getFunction');
-    getServiceObjectStub = sandbox.stub(serverless.service, 'getServiceObject');
-    getVersionStub = sandbox.stub(serverless, 'getVersion');
+    writeFileDirStub = jest.fn();
+    serverless.utils.writeFileDir = writeFileDirStub;
+    getAllFunctionsStub = jest.fn();
+    serverless.service.getAllFunctions = getAllFunctionsStub;
+    getFunctionStub = jest.fn();
+    serverless.service.getFunction = getFunctionStub;
+    getServiceObjectStub = jest.fn();
+    serverless.service.getServiceObject = getServiceObjectStub;
+    getVersionStub = jest.fn();
+    serverless.getVersion = getVersionStub;
 
     module = _.assign(
       {
@@ -79,33 +54,31 @@ describe('packageModules', () => {
     );
   });
 
-  afterEach(() => {
-    // Reset all counters and restore all stubbed functions
-    sandbox.reset();
-    sandbox.restore();
-  });
-
   describe('packageModules()', () => {
     it('should do nothing if no compile stats are available', () => {
       module.compileStats = { stats: [] };
-      return expect(module.packageModules()).to.be.fulfilled.then(() =>
-        BbPromise.all([
-          expect(writeFileDirStub).to.not.have.been.called,
-          expect(fsMock.createWriteStream).to.not.have.been.called,
-          expect(globMock.sync).to.not.have.been.called
-        ])
-      );
+      return expect(module.packageModules())
+        .resolves.toEqual([])
+        .then(() =>
+          BbPromise.all([
+            expect(writeFileDirStub).toHaveBeenCalledTimes(0),
+            expect(fsMock.createWriteStream).toHaveBeenCalledTimes(0),
+            expect(globMock.sync).toHaveBeenCalledTimes(0)
+          ])
+        );
     });
 
     it('should do nothing if skipCompile is true', () => {
       module.skipCompile = true;
-      return expect(module.packageModules()).to.be.fulfilled.then(() =>
-        BbPromise.all([
-          expect(writeFileDirStub).to.not.have.been.called,
-          expect(fsMock.createWriteStream).to.not.have.been.called,
-          expect(globMock.sync).to.not.have.been.called
-        ])
-      );
+      return expect(module.packageModules())
+        .resolves.toBeUndefined()
+        .then(() =>
+          BbPromise.all([
+            expect(writeFileDirStub).toHaveBeenCalledTimes(0),
+            expect(fsMock.createWriteStream).toHaveBeenCalledTimes(0),
+            expect(globMock.sync).toHaveBeenCalledTimes(0)
+          ])
+        );
     });
 
     describe('with service packaging', () => {
@@ -135,21 +108,31 @@ describe('packageModules', () => {
           events: []
         };
         // Serverless behavior
-        getVersionStub.returns('1.18.0');
-        getServiceObjectStub.returns({
+        getVersionStub.mockReturnValue('1.18.0');
+        getServiceObjectStub.mockReturnValue({
           name: 'test-service'
         });
-        getAllFunctionsStub.returns(allFunctions);
-        getFunctionStub.withArgs('func1').returns(func1);
-        getFunctionStub.withArgs('func2').returns(func2);
+        getAllFunctionsStub.mockReturnValue(allFunctions);
+        getFunctionStub.mockImplementation(name => {
+          if (name === 'func1') {
+            return func1;
+          } else if (name === 'func2') {
+            return func2;
+          }
+        });
         // Mock behavior
-        globMock.sync.returns(files);
-        fsMock._streamMock.on.withArgs('open').yields();
-        fsMock._streamMock.on.withArgs('close').yields();
-        fsMock._statMock.isDirectory.returns(false);
+        globMock.sync.mockReturnValue(files);
+        fsMock._streamMock.on.mockImplementation((evt, cb) => {
+          if (evt === 'open' || evt === 'close') {
+            cb();
+          }
+        });
+        fsMock._statMock.isDirectory.mockReturnValue(false);
 
         module.compileStats = stats;
-        return expect(module.packageModules()).to.be.fulfilled.then(() => BbPromise.all([]));
+        return expect(module.packageModules())
+          .resolves.toEqual([path.join('.webpack', 'test-service.zip')])
+          .then(() => BbPromise.all([]));
       });
 
       describe('with the Google provider', () => {
@@ -188,21 +171,29 @@ describe('packageModules', () => {
             handler: 'handler2',
             events: []
           };
-          getVersionStub.returns('1.18.0');
-          getServiceObjectStub.returns({
+          getVersionStub.mockReturnValue('1.18.0');
+          getServiceObjectStub.mockReturnValue({
             name: 'test-service'
           });
-          getAllFunctionsStub.returns(allFunctions);
-          getFunctionStub.withArgs('func1').returns(func1);
-          getFunctionStub.withArgs('func2').returns(func2);
+          getAllFunctionsStub.mockReturnValue(allFunctions);
+          getFunctionStub.mockImplementation(name => {
+            if (name === 'func1') {
+              return func1;
+            } else if (name === 'func2') {
+              return func2;
+            }
+          });
           // Mock behavior
-          globMock.sync.returns(files);
-          fsMock._streamMock.on.withArgs('open').yields();
-          fsMock._streamMock.on.withArgs('close').yields();
-          fsMock._statMock.isDirectory.returns(false);
+          globMock.sync.mockReturnValue(files);
+          fsMock._streamMock.on.mockImplementation((evt, cb) => {
+            if (evt === 'open' || evt === 'close') {
+              cb();
+            }
+          });
+          fsMock._statMock.isDirectory.mockReturnValue(false);
 
           module.compileStats = stats;
-          return expect(module.packageModules()).to.be.fulfilled;
+          return expect(module.packageModules()).resolves.toEqual([path.join('.webpack', 'test-service.zip')]);
         });
       });
 
@@ -226,26 +217,38 @@ describe('packageModules', () => {
           events: []
         };
         // Serverless behavior
-        getServiceObjectStub.returns({
+        getServiceObjectStub.mockReturnValue({
           name: 'test-service'
         });
-        getAllFunctionsStub.returns(allFunctions);
-        getFunctionStub.withArgs('func1').returns(func1);
-        getFunctionStub.withArgs('func2').returns(func2);
+        getAllFunctionsStub.mockReturnValue(allFunctions);
+        getFunctionStub.mockImplementation(name => {
+          if (name === 'func1') {
+            return func1;
+          } else if (name === 'func2') {
+            return func2;
+          }
+        });
         // Mock behavior
-        globMock.sync.returns(files);
-        fsMock._streamMock.on.withArgs('open').yields();
-        fsMock._streamMock.on.withArgs('close').yields();
-        fsMock._statMock.isDirectory.returns(false);
+        globMock.sync.mockReturnValue(files);
+        fsMock._streamMock.on.mockImplementation((evt, cb) => {
+          if (evt === 'open' || evt === 'close') {
+            cb();
+          }
+        });
+        fsMock._statMock.isDirectory.mockReturnValue(false);
 
         module.compileStats = stats;
         return BbPromise.each(['1.18.1', '2.17.0', '10.15.3'], version => {
-          getVersionStub.returns(version);
-          return expect(module.packageModules()).to.be.fulfilled.then(() => BbPromise.all([]));
+          getVersionStub.mockReturnValue(version);
+          return expect(module.packageModules())
+            .resolves.toEqual([path.join('.webpack', 'test-service.zip')])
+            .then(() => BbPromise.all([]));
         }).then(() =>
           BbPromise.each(['1.17.0', '1.16.0-alpha', '1.15.3'], version => {
-            getVersionStub.returns(version);
-            return expect(module.packageModules()).to.be.fulfilled.then(() => BbPromise.all([]));
+            getVersionStub.mockReturnValue(version);
+            return expect(module.packageModules())
+              .resolves.toEqual([path.join('.webpack', 'test-service.zip')])
+              .then(() => BbPromise.all([]));
           })
         );
       });
@@ -270,21 +273,29 @@ describe('packageModules', () => {
           events: []
         };
         // Serverless behavior
-        getVersionStub.returns('1.18.0');
-        getServiceObjectStub.returns({
+        getVersionStub.mockReturnValue('1.18.0');
+        getServiceObjectStub.mockReturnValue({
           name: 'test-service'
         });
-        getAllFunctionsStub.returns(allFunctions);
-        getFunctionStub.withArgs('func1').returns(func1);
-        getFunctionStub.withArgs('func2').returns(func2);
+        getAllFunctionsStub.mockReturnValue(allFunctions);
+        getFunctionStub.mockImplementation(name => {
+          if (name === 'func1') {
+            return func1;
+          } else if (name === 'func2') {
+            return func2;
+          }
+        });
         // Mock behavior
-        globMock.sync.returns(files);
-        fsMock._streamMock.on.withArgs('open').yields();
-        fsMock._streamMock.on.withArgs('close').yields();
-        fsMock._statMock.isDirectory.returns(false);
+        globMock.sync.mockReturnValue(files);
+        fsMock._streamMock.on.mockImplementation((evt, cb) => {
+          if (evt === 'open' || evt === 'close') {
+            cb();
+          }
+        });
+        fsMock._statMock.isDirectory.mockReturnValue(false);
 
         module.compileStats = stats;
-        return expect(module.packageModules()).to.be.rejectedWith('Packaging: No files found');
+        return expect(module.packageModules()).rejects.toThrow('Packaging: No files found');
       });
 
       it('should reject if no files are found because all files are excluded using regex', () => {
@@ -313,21 +324,29 @@ describe('packageModules', () => {
           events: []
         };
         // Serverless behavior
-        getVersionStub.returns('1.18.0');
-        getServiceObjectStub.returns({
+        getVersionStub.mockReturnValue('1.18.0');
+        getServiceObjectStub.mockReturnValue({
           name: 'test-service'
         });
-        getAllFunctionsStub.returns(allFunctions);
-        getFunctionStub.withArgs('func1').returns(func1);
-        getFunctionStub.withArgs('func2').returns(func2);
+        getAllFunctionsStub.mockReturnValue(allFunctions);
+        getFunctionStub.mockImplementation(name => {
+          if (name === 'func1') {
+            return func1;
+          } else if (name === 'func2') {
+            return func2;
+          }
+        });
         // Mock behavior
-        globMock.sync.returns(files);
-        fsMock._streamMock.on.withArgs('open').yields();
-        fsMock._streamMock.on.withArgs('close').yields();
-        fsMock._statMock.isDirectory.returns(false);
+        globMock.sync.mockReturnValue(files);
+        fsMock._streamMock.on.mockImplementation((evt, cb) => {
+          if (evt === 'open' || evt === 'close') {
+            cb();
+          }
+        });
+        fsMock._statMock.isDirectory.mockReturnValue(false);
 
         module.compileStats = stats;
-        return expect(module.packageModules()).to.be.rejectedWith('Packaging: No files found');
+        return expect(module.packageModules()).rejects.toThrow('Packaging: No files found');
       });
 
       it('should reject only .md files without verbose log', () => {
@@ -357,21 +376,29 @@ describe('packageModules', () => {
           events: []
         };
         // Serverless behavior
-        getVersionStub.returns('1.18.0');
-        getServiceObjectStub.returns({
+        getVersionStub.mockReturnValue('1.18.0');
+        getServiceObjectStub.mockReturnValue({
           name: 'test-service'
         });
-        getAllFunctionsStub.returns(allFunctions);
-        getFunctionStub.withArgs('func1').returns(func1);
-        getFunctionStub.withArgs('func2').returns(func2);
+        getAllFunctionsStub.mockReturnValue(allFunctions);
+        getFunctionStub.mockImplementation(name => {
+          if (name === 'func1') {
+            return func1;
+          } else if (name === 'func2') {
+            return func2;
+          }
+        });
         // Mock behavior
-        globMock.sync.returns(files);
-        fsMock._streamMock.on.withArgs('open').yields();
-        fsMock._streamMock.on.withArgs('close').yields();
-        fsMock._statMock.isDirectory.returns(false);
+        globMock.sync.mockReturnValue(files);
+        fsMock._streamMock.on.mockImplementation((evt, cb) => {
+          if (evt === 'open' || evt === 'close') {
+            cb();
+          }
+        });
+        fsMock._statMock.isDirectory.mockReturnValue(false);
 
         module.compileStats = stats;
-        return expect(module.packageModules()).to.be.fulfilled;
+        return expect(module.packageModules()).resolves.toEqual([path.join('.webpack', 'test-service.zip')]);
       });
     });
 
@@ -418,22 +445,33 @@ describe('packageModules', () => {
 
       it('should package', () => {
         // Serverless behavior
-        getVersionStub.returns('1.18.0');
-        getServiceObjectStub.returns({
+        getVersionStub.mockReturnValue('1.18.0');
+        getServiceObjectStub.mockReturnValue({
           name: 'test-service'
         });
-        getAllFunctionsStub.returns(allFunctions);
-        getFunctionStub.withArgs('func1').returns(func1);
-        getFunctionStub.withArgs('func2').returns(func2);
+        getAllFunctionsStub.mockReturnValue(allFunctions);
+        getFunctionStub.mockImplementation(name => {
+          if (name === 'func1') {
+            return func1;
+          } else if (name === 'func2') {
+            return func2;
+          }
+        });
         // Mock behavior
-        globMock.sync.returns(files);
-        fsMock._streamMock.on.withArgs('open').yields();
-        fsMock._streamMock.on.withArgs('close').yields();
-        fsMock._statMock.isDirectory.returns(false);
+        globMock.sync.mockReturnValue(files);
+        fsMock._streamMock.on.mockImplementation((evt, cb) => {
+          if (evt === 'open' || evt === 'close') {
+            cb();
+          }
+        });
+        fsMock._statMock.isDirectory.mockReturnValue(false);
 
         module.compileStats = stats;
 
-        return expect(module.packageModules()).to.be.fulfilled;
+        return expect(module.packageModules()).resolves.toEqual([
+          path.join('.webpack', 'func1.zip'),
+          path.join('.webpack', 'func2.zip')
+        ]);
       });
     });
   });
@@ -475,38 +513,42 @@ describe('packageModules', () => {
     ];
 
     describe('with service packaging', () => {
-      afterEach(() => {
-        fsMock.copyFileSync.resetHistory();
-      });
-
       beforeEach(() => {
         _.set(module, 'entryFunctions', entryFunctions);
         _.set(serverless.service.package, 'individually', false);
-        getVersionStub.returns('1.18.0');
-        getServiceObjectStub.returns({
+        getVersionStub.mockReturnValue('1.18.0');
+        getServiceObjectStub.mockReturnValue({
           name: 'test-service'
         });
-        getAllFunctionsStub.returns(allFunctions);
-        getFunctionStub.withArgs('func1').returns(func1);
-        getFunctionStub.withArgs('func2').returns(func2);
-        getFunctionStub.withArgs('funcPython').returns(funcPython);
+        getAllFunctionsStub.mockReturnValue(allFunctions);
+        getFunctionStub.mockImplementation(name => {
+          if (name === 'func1') {
+            return func1;
+          } else if (name === 'func2') {
+            return func2;
+          } else if (name === 'funcPython') {
+            return funcPython;
+          }
+        });
       });
 
       it('copies the artifact', () => {
         const expectedArtifactSource = path.join('.webpack', 'test-service.zip');
         const expectedArtifactDestination = path.join('.serverless', 'test-service.zip');
 
-        return expect(module.copyExistingArtifacts()).to.be.fulfilled.then(() =>
-          BbPromise.all([
-            // Should copy the artifact into .serverless
-            expect(fsMock.copyFileSync).callCount(1),
-            expect(fsMock.copyFileSync).to.be.calledWith(expectedArtifactSource, expectedArtifactDestination),
+        return expect(module.copyExistingArtifacts())
+          .resolves.toBeUndefined()
+          .then(() =>
+            BbPromise.all([
+              // Should copy the artifact into .serverless
+              expect(fsMock.copyFileSync).toHaveBeenCalledTimes(1),
+              expect(fsMock.copyFileSync).toHaveBeenCalledWith(expectedArtifactSource, expectedArtifactDestination),
 
-            // Should set package artifact for each function to the single artifact
-            expect(func1).to.have.a.nested.property('package.artifact').that.equals(expectedArtifactDestination),
-            expect(func2).to.have.a.nested.property('package.artifact').that.equals(expectedArtifactDestination)
-          ])
-        );
+              // Should set package artifact for each function to the single artifact
+              expect(func1).toHaveProperty('package.artifact', expectedArtifactDestination),
+              expect(func2).toHaveProperty('package.artifact', expectedArtifactDestination)
+            ])
+          );
       });
 
       it('should set the function artifact depending on the serverless version', () => {
@@ -529,40 +571,52 @@ describe('packageModules', () => {
           events: []
         };
         // Serverless behavior
-        getServiceObjectStub.returns({
+        getServiceObjectStub.mockReturnValue({
           name: 'test-service'
         });
-        getAllFunctionsStub.returns(allFunctions);
-        getFunctionStub.withArgs('func1').returns(func1);
-        getFunctionStub.withArgs('func2').returns(func2);
+        getAllFunctionsStub.mockReturnValue(allFunctions);
+        getFunctionStub.mockImplementation(name => {
+          if (name === 'func1') {
+            return func1;
+          } else if (name === 'func2') {
+            return func2;
+          }
+        });
         // Mock behavior
-        globMock.sync.returns(files);
-        fsMock._streamMock.on.withArgs('open').yields();
-        fsMock._streamMock.on.withArgs('close').yields();
-        fsMock._statMock.isDirectory.returns(false);
+        globMock.sync.mockReturnValue(files);
+        fsMock._streamMock.on.mockImplementation((evt, cb) => {
+          if (evt === 'open' || evt === 'close') {
+            cb();
+          }
+        });
+        fsMock._statMock.isDirectory.mockReturnValue(false);
 
         const expectedArtifactPath = path.join('.serverless', 'test-service.zip');
 
         module.compileStats = stats;
         return BbPromise.each(['1.18.1', '2.17.0', '10.15.3'], version => {
-          getVersionStub.returns(version);
-          return expect(module.copyExistingArtifacts()).to.be.fulfilled.then(() =>
-            BbPromise.all([
-              expect(func1).to.have.a.nested.property('package.artifact').that.equals(expectedArtifactPath),
-              expect(func2).to.have.a.nested.property('package.artifact').that.equals(expectedArtifactPath)
-            ])
-          );
-        }).then(() =>
-          BbPromise.each(['1.17.0', '1.16.0-alpha', '1.15.3'], version => {
-            getVersionStub.returns(version);
-            return expect(module.copyExistingArtifacts()).to.be.fulfilled.then(() =>
+          getVersionStub.mockReturnValue(version);
+          return expect(module.copyExistingArtifacts())
+            .resolves.toBeUndefined()
+            .then(() =>
               BbPromise.all([
-                expect(func1).to.have.a.nested.property('artifact').that.equals(expectedArtifactPath),
-                expect(func2).to.have.a.nested.property('artifact').that.equals(expectedArtifactPath),
-                expect(func1).to.have.a.nested.property('package.disable').that.is.true,
-                expect(func2).to.have.a.nested.property('package.disable').that.is.true
+                expect(func1).toHaveProperty('package.artifact', expectedArtifactPath),
+                expect(func2).toHaveProperty('package.artifact', expectedArtifactPath)
               ])
             );
+        }).then(() =>
+          BbPromise.each(['1.17.0', '1.16.0-alpha', '1.15.3'], version => {
+            getVersionStub.mockReturnValue(version);
+            return expect(module.copyExistingArtifacts())
+              .resolves.toBeUndefined()
+              .then(() =>
+                BbPromise.all([
+                  expect(func1).toHaveProperty('artifact', expectedArtifactPath),
+                  expect(func2).toHaveProperty('artifact', expectedArtifactPath),
+                  expect(func1).toHaveProperty('package.disable', true),
+                  expect(func2).toHaveProperty('package.disable', true)
+                ])
+              );
           })
         );
       });
@@ -595,13 +649,18 @@ describe('packageModules', () => {
             handler: 'handler2',
             events: []
           };
-          getVersionStub.returns('1.18.0');
-          getServiceObjectStub.returns({
+          getVersionStub.mockReturnValue('1.18.0');
+          getServiceObjectStub.mockReturnValue({
             name: 'test-service'
           });
-          getAllFunctionsStub.returns(allFunctions);
-          getFunctionStub.withArgs('func1').returns(func1);
-          getFunctionStub.withArgs('func2').returns(func2);
+          getAllFunctionsStub.mockReturnValue(allFunctions);
+          getFunctionStub.mockImplementation(name => {
+            if (name === 'func1') {
+              return func1;
+            } else if (name === 'func2') {
+              return func2;
+            }
+          });
           // Mock behavior
           // fsMock._streamMock.on.withArgs('open').yields();
           // fsMock._streamMock.on.withArgs('close').yields();
@@ -609,63 +668,78 @@ describe('packageModules', () => {
 
           const expectedArtifactPath = path.join('.serverless', 'test-service.zip');
 
-          return expect(module.copyExistingArtifacts()).to.be.fulfilled.then(() =>
-            expect(serverless.service).to.have.a.nested.property('package.artifact').that.equals(expectedArtifactPath)
-          );
+          return expect(module.copyExistingArtifacts())
+            .resolves.toBeUndefined()
+            .then(() => expect(serverless.service).toHaveProperty('package.artifact', expectedArtifactPath));
         });
       });
     });
 
     describe('with individual packaging', () => {
-      afterEach(() => {
-        fsMock.copyFileSync.resetHistory();
-      });
-
       beforeEach(() => {
         _.set(module, 'entryFunctions', entryFunctions);
         _.set(serverless.service.package, 'individually', true);
-        getVersionStub.returns('1.18.0');
-        getServiceObjectStub.returns({
+        getVersionStub.mockReturnValue('1.18.0');
+        getServiceObjectStub.mockReturnValue({
           name: 'test-service'
         });
-        getAllFunctionsStub.returns(allFunctions);
-        getFunctionStub.withArgs('func1').returns(func1);
-        getFunctionStub.withArgs('func2').returns(func2);
-        getFunctionStub.withArgs('funcPython').returns(funcPython);
+        getAllFunctionsStub.mockReturnValue(allFunctions);
+        getFunctionStub.mockImplementation(name => {
+          if (name === 'func1') {
+            return func1;
+          } else if (name === 'func2') {
+            return func2;
+          } else if (name === 'funcPython') {
+            return funcPython;
+          }
+        });
       });
 
       it('copies each node artifact', () => {
         const expectedFunc1Destination = path.join('.serverless', 'func1.zip');
         const expectedFunc2Destination = path.join('.serverless', 'func2.zip');
 
-        return expect(module.copyExistingArtifacts()).to.be.fulfilled.then(() =>
-          BbPromise.all([
-            // Should copy an artifact per function into .serverless
-            expect(fsMock.copyFileSync).callCount(2),
-            expect(fsMock.copyFileSync).to.be.calledWith(path.join('.webpack', 'func1.zip'), expectedFunc1Destination),
-            expect(fsMock.copyFileSync).to.be.calledWith(path.join('.webpack', 'func2.zip'), expectedFunc2Destination),
+        return expect(module.copyExistingArtifacts())
+          .resolves.toBeUndefined()
+          .then(() =>
+            BbPromise.all([
+              // Should copy an artifact per function into .serverless
+              expect(fsMock.copyFileSync).toHaveBeenCalledTimes(2),
+              expect(fsMock.copyFileSync).toHaveBeenCalledWith(
+                path.join('.webpack', 'func1.zip'),
+                expectedFunc1Destination
+              ),
+              expect(fsMock.copyFileSync).toHaveBeenCalledWith(
+                path.join('.webpack', 'func2.zip'),
+                expectedFunc2Destination
+              ),
 
-            // Should set package artifact locations
-            expect(func1).to.have.a.nested.property('package.artifact').that.equals(expectedFunc1Destination),
-            expect(func2).to.have.a.nested.property('package.artifact').that.equals(expectedFunc2Destination)
-          ])
-        );
+              // Should set package artifact locations
+              expect(func1).toHaveProperty('package.artifact', expectedFunc1Destination),
+              expect(func2).toHaveProperty('package.artifact', expectedFunc2Destination)
+            ])
+          );
       });
 
       it('copies only the artifact for function specified in options', () => {
         _.set(module, 'options.function', 'func1');
         const expectedFunc1Destination = path.join('.serverless', 'func1.zip');
 
-        return expect(module.copyExistingArtifacts()).to.be.fulfilled.then(() =>
-          BbPromise.all([
-            // Should copy an artifact per function into .serverless
-            expect(fsMock.copyFileSync).callCount(1),
-            expect(fsMock.copyFileSync).to.be.calledWith(path.join('.webpack', 'func1.zip'), expectedFunc1Destination),
+        return expect(module.copyExistingArtifacts())
+          .resolves.toBeUndefined()
+          .then(() =>
+            BbPromise.all([
+              // Should copy an artifact per function into .serverless
+              expect(fsMock.copyFileSync).toHaveBeenCalledTimes(1),
+              expect(fsMock.copyFileSync).toHaveBeenCalledWith(
+                path.join('.webpack', 'func1.zip'),
+                expectedFunc1Destination
+              ),
 
-            // Should set package artifact locations
-            expect(func1).to.have.a.nested.property('package.artifact').that.equals(expectedFunc1Destination)
-          ])
-        );
+              // Should set package artifact locations
+              expect(func1).toHaveProperty('package.artifact', expectedFunc1Destination)
+            ])
+          );
       });
     });
   });

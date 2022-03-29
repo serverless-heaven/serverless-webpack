@@ -2,55 +2,38 @@
 
 const BbPromise = require('bluebird');
 const _ = require('lodash');
-const chai = require('chai');
 const sinon = require('sinon');
-const mockery = require('mockery');
 const Serverless = require('serverless');
 const path = require('path');
+const baseModule = require('../lib/runPluginSupport');
 
-chai.use(require('chai-as-promised'));
-chai.use(require('sinon-chai'));
+const pluginPath = path.join('plugins', 'run', 'utils');
+const deployFunctionsToLocalEmulatorStub = require(path.join(pluginPath, 'deployFunctionsToLocalEmulator'));
+const getLocalRootUrlStub = require(path.join(pluginPath, 'getLocalRootUrl'));
 
-const expect = chai.expect;
+jest.mock('plugins/run/utils/deployFunctionsToLocalEmulator', () => jest.fn().mockResolvedValue(), { virtual: true });
+jest.mock('plugins/run/utils/getLocalRootUrl', () => jest.fn(), { virtual: true });
+// Support windowsr
+jest.mock('plugins\\run\\utils\\deployFunctionsToLocalEmulator', () => jest.fn().mockResolvedValue(), {
+  virtual: true
+});
+jest.mock('plugins\\run\\utils\\getLocalRootUrl', () => jest.fn(), { virtual: true });
 
 describe('runPluginSupport', () => {
   let sandbox;
-  let baseModule;
   let serverless;
   let module;
   let chdirStub;
-  let getLocalRootUrlStub;
-  let deployFunctionsToLocalEmulatorStub;
 
-  before(() => {
+  beforeAll(() => {
     sandbox = sinon.createSandbox();
-    sandbox.usingPromise(BbPromise.Promise);
-
-    const pluginRunUtils = path.join('.', 'plugins', 'run', 'utils');
-
-    deployFunctionsToLocalEmulatorStub = sandbox.stub().resolves();
-    getLocalRootUrlStub = sandbox.stub();
-
-    mockery.enable({ warnOnUnregistered: false });
-    mockery.registerMock(
-      path.join(pluginRunUtils, 'deployFunctionsToLocalEmulator'),
-      deployFunctionsToLocalEmulatorStub
-    );
-    mockery.registerMock(path.join(pluginRunUtils, 'getLocalRootUrl'), getLocalRootUrlStub);
-    baseModule = require('../lib/runPluginSupport');
-    Object.freeze(baseModule);
-  });
-
-  after(() => {
-    mockery.disable();
-    mockery.deregisterAll();
   });
 
   beforeEach(() => {
     serverless = new Serverless({ commands: ['print'], options: {}, serviceDir: null });
     serverless.cli = {
-      log: sandbox.stub(),
-      consoleLog: sandbox.stub()
+      log: jest.fn(),
+      consoleLog: jest.fn()
     };
 
     module = _.assign(
@@ -81,15 +64,17 @@ describe('runPluginSupport', () => {
       _.set(module, 'webpackOutputPath', webpackOutputPath);
       _.unset(module, 'keepOutputDirectory');
 
-      return expect(prepareRun()).to.be.fulfilled.then(() =>
-        BbPromise.join(
-          expect(module.originalServicePath).to.equal(servicePath),
-          expect(module.originalWebpackOutputPath).to.equal(webpackOutputPath),
-          expect(module.keepOutputDirectory).to.be.true,
-          expect(serverless.config.servicePath).to.equal(path.join(webpackOutputPath, 'service')),
-          expect(chdirStub).to.have.been.calledWith(serverless.config.servicePath)
-        )
-      );
+      return expect(prepareRun())
+        .resolves.toBeUndefined()
+        .then(() =>
+          BbPromise.join(
+            expect(module.originalServicePath).toEqual(servicePath),
+            expect(module.originalWebpackOutputPath).toEqual(webpackOutputPath),
+            expect(module.keepOutputDirectory).toBe(true),
+            expect(serverless.config.servicePath).toEqual(path.join(webpackOutputPath, 'service')),
+            expect(chdirStub.args[0]).toEqual([serverless.config.servicePath])
+          )
+        );
     });
   });
 
@@ -104,16 +89,18 @@ describe('runPluginSupport', () => {
         name: 'testService',
         functions: {}
       };
-      _.set(module, 'hooks[before:run:run]', sandbox.stub().resolves());
+      _.set(module, 'hooks[before:run:run]', jest.fn().mockResolvedValue());
       _.set(serverless, 'service', service);
 
-      return expect(watchRun()).to.be.fulfilled.then(() =>
-        BbPromise.join(
-          expect(deployFunctionsToLocalEmulatorStub).to.have.been.calledOnce,
-          expect(getLocalRootUrlStub).to.have.been.calledOnce,
-          expect(deployFunctionsToLocalEmulatorStub).to.have.been.calledWith(service)
-        )
-      );
+      return expect(watchRun())
+        .resolves.toBeUndefined()
+        .then(() =>
+          BbPromise.join(
+            expect(deployFunctionsToLocalEmulatorStub).toHaveBeenCalledTimes(1),
+            expect(getLocalRootUrlStub).toHaveBeenCalledTimes(1),
+            expect(deployFunctionsToLocalEmulatorStub).toHaveBeenCalledWith(service, undefined, undefined)
+          )
+        );
     });
   });
 });

@@ -1,5 +1,5 @@
 {
-  "name": "include-external-npm-packages",
+  "name": "include-external-npm-packages-lock-file",
   "version": "1.0.0",
   "description": "Serverless webpack example",
   "main": "handler.js",
@@ -10,13 +10,16 @@
   "license": "MIT",
   "devDependencies": {
     "aws-sdk": "^2.814.0",
-    "serverless": "3",
+    "serverless": "^3.7.4",
     "serverless-offline": "^6.5.0",
     "serverless-webpack": "file:../..",
     "webpack": "^4.44.1",
     "webpack-node-externals": "^2.5.0"
   },
   "dependencies": {
-    "fbgraph": "^1.4.4"
+    "dotenv": "^16.0.0",
+    "fbgraph": "^1.4.4",
+    "lodash": "^4.17.21",
+    "lodash.isequal": "^4.5.0"
   }
 }

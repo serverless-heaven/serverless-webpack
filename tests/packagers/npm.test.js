@@ -5,130 +5,211 @@
 
 const _ = require('lodash');
 const BbPromise = require('bluebird');
-const chai = require('chai');
-const sinon = require('sinon');
 const Utils = require('../../lib/utils');
+const { sep } = require('path');
+const npmModule = require('../../lib/packagers/npm');
+const fseMock = require('fs-extra');
+const fsMock = require('fs');
 
-chai.use(require('chai-as-promised'));
-chai.use(require('sinon-chai'));
-
-const expect = chai.expect;
+jest.mock('fs-extra');
+jest.mock('fs');
+jest.mock('../../lib/utils', () => {
+  const original = jest.requireActual('../../lib/utils');
+  // eslint-disable-next-line lodash/prefer-lodash-method
+  return Object.assign({}, original, {
+    spawnProcess: jest.fn()
+  });
+});
 
 describe('npm', () => {
-  let sandbox;
-  let npmModule;
-
-  before(() => {
-    sandbox = sinon.createSandbox();
-    sandbox.usingPromise(BbPromise.Promise);
-
-    sandbox.stub(Utils, 'spawnProcess');
-    npmModule = require('../../lib/packagers/npm');
-  });
-
-  after(() => {
-    sandbox.restore();
-  });
-
-  afterEach(() => {
-    sandbox.reset();
+  beforeEach(() => {
+    fsMock.readFileSync.mockReturnValue(false);
   });
 
   it('should return "package-lock.json" as lockfile name', () => {
-    expect(npmModule.lockfileName).to.equal('package-lock.json');
+    expect(npmModule.lockfileName).toEqual('package-lock.json');
   });
 
   it('should return no packager sections', () => {
-    expect(npmModule.copyPackageSectionNames).to.be.an('array').that.is.empty;
+    expect(npmModule.copyPackageSectionNames).toEqual([]);
   });
 
   it('requires to copy modules', () => {
-    expect(npmModule.mustCopyModules).to.be.true;
+    expect(npmModule.mustCopyModules).toBe(true);
   });
 
   describe('install', () => {
     it('should use npm install', () => {
-      Utils.spawnProcess.returns(BbPromise.resolve({ stdout: 'installed successfully', stderr: '' }));
-      return expect(npmModule.install('myPath', {})).to.be.fulfilled.then(result => {
-        expect(result).to.be.undefined;
-        expect(Utils.spawnProcess).to.have.been.calledOnce;
-        expect(Utils.spawnProcess).to.have.been.calledWithExactly(sinon.match(/^npm/), ['install'], {
-          cwd: 'myPath'
+      Utils.spawnProcess.mockReturnValue(BbPromise.resolve({ stdout: 'installed successfully', stderr: '' }));
+      return expect(npmModule.install('myPath', {}))
+        .resolves.toBeUndefined()
+        .then(() => {
+          expect(Utils.spawnProcess).toHaveBeenCalledTimes(1);
+          expect(Utils.spawnProcess).toHaveBeenCalledWith(expect.stringMatching(/^npm/), ['install'], {
+            cwd: 'myPath'
+          });
+          return null;
         });
-        return null;
-      });
     });
   });
 
   describe('noInstall', () => {
     it('should skip npm install', () => {
-      return expect(npmModule.install('myPath', { noInstall: true })).to.be.fulfilled.then(result => {
-        expect(result).to.be.undefined;
-        expect(Utils.spawnProcess).not.to.have.been.called;
-        return null;
-      });
+      return expect(npmModule.install('myPath', { noInstall: true }))
+        .resolves.toBeUndefined()
+        .then(() => {
+          expect(Utils.spawnProcess).toHaveBeenCalledTimes(0);
+          return null;
+        });
     });
   });
 
   describe('prune', () => {
     it('should use npm prune', () => {
-      Utils.spawnProcess.returns(BbPromise.resolve({ stdout: 'success', stderr: '' }));
-      return expect(npmModule.prune('myPath')).to.be.fulfilled.then(result => {
-        expect(result).to.be.undefined;
-        expect(Utils.spawnProcess).to.have.been.calledOnce;
-        expect(Utils.spawnProcess).to.have.been.calledWithExactly(sinon.match(/^npm/), ['prune'], {
-          cwd: 'myPath'
+      Utils.spawnProcess.mockReturnValue(BbPromise.resolve({ stdout: 'success', stderr: '' }));
+      return expect(npmModule.prune('myPath'))
+        .resolves.toBeUndefined()
+        .then(() => {
+          expect(Utils.spawnProcess).toHaveBeenCalledTimes(1);
+          expect(Utils.spawnProcess).toHaveBeenCalledWith(expect.stringMatching(/^npm/), ['prune'], {
+            cwd: 'myPath'
+          });
+          return null;
         });
-        return null;
-      });
     });
   });
 
   describe('runScripts', () => {
     it('should use npm run for the given scripts', () => {
-      Utils.spawnProcess.returns(BbPromise.resolve({ stdout: 'success', stderr: '' }));
-      return expect(npmModule.runScripts('myPath', ['s1', 's2'])).to.be.fulfilled.then(result => {
-        expect(result).to.be.undefined;
-        expect(Utils.spawnProcess).to.have.been.calledTwice;
-        expect(Utils.spawnProcess.firstCall).to.have.been.calledWithExactly(sinon.match(/^npm/), ['run', 's1'], {
-          cwd: 'myPath'
+      Utils.spawnProcess.mockReturnValue(BbPromise.resolve({ stdout: 'success', stderr: '' }));
+      return expect(npmModule.runScripts('myPath', ['s1', 's2']))
+        .resolves.toBeUndefined()
+        .then(() => {
+          expect(Utils.spawnProcess).toHaveBeenCalledTimes(2);
+          expect(Utils.spawnProcess).toHaveBeenNthCalledWith(1, expect.stringMatching(/^npm/), ['run', 's1'], {
+            cwd: 'myPath'
+          });
+          expect(Utils.spawnProcess).toHaveBeenNthCalledWith(2, expect.stringMatching(/^npm/), ['run', 's2'], {
+            cwd: 'myPath'
+          });
+          return null;
         });
-        expect(Utils.spawnProcess.secondCall).to.have.been.calledWithExactly(sinon.match(/^npm/), ['run', 's2'], {
-          cwd: 'myPath'
-        });
-        return null;
-      });
     });
   });
 
   describe('getProdDependencies', () => {
-    it('should use npm ls', () => {
-      Utils.spawnProcess.returns(BbPromise.resolve({ stdout: '{}', stderr: '' }));
-      return expect(npmModule.getProdDependencies('myPath', 10)).to.be.fulfilled.then(result => {
-        expect(result).to.be.an('object').that.is.empty;
-        expect(Utils.spawnProcess).to.have.been.calledOnce,
-          expect(Utils.spawnProcess.firstCall).to.have.been.calledWith(sinon.match(/^npm/), [
-            'ls',
-            '-prod',
-            '-json',
-            '-depth=10'
-          ]);
-        return null;
+    describe('without lock file', () => {
+      it('should use npm ls', () => {
+        Utils.spawnProcess.mockReturnValue(BbPromise.resolve({ stdout: '{}', stderr: '' }));
+        return expect(npmModule.getProdDependencies('myPath', 10))
+          .resolves.toEqual({})
+          .then(() => {
+            expect(Utils.spawnProcess).toHaveBeenCalledTimes(1);
+            expect(Utils.spawnProcess).toHaveBeenCalledWith(
+              expect.stringMatching(/^npm/),
+              ['ls', '-prod', '-json', '-depth=10'],
+              { cwd: 'myPath' }
+            );
+            expect(fseMock.pathExistsSync).toHaveBeenCalledWith(`myPath${sep}package-lock.json`);
+            return null;
+          });
+      });
+
+      it('should default to depth 1', () => {
+        Utils.spawnProcess.mockReturnValue(BbPromise.resolve({ stdout: '{}', stderr: '' }));
+        return expect(npmModule.getProdDependencies('myPath'))
+          .resolves.toEqual({})
+          .then(() => {
+            expect(Utils.spawnProcess).toHaveBeenCalledTimes(1);
+            expect(Utils.spawnProcess).toHaveBeenCalledWith(
+              expect.stringMatching(/^npm/),
+              ['ls', '-prod', '-json', '-depth=1'],
+              { cwd: 'myPath' }
+            );
+            expect(fseMock.pathExistsSync).toHaveBeenCalledWith(`myPath${sep}package-lock.json`);
+            return null;
+          });
       });
     });
 
-    it('should default to depth 1', () => {
-      Utils.spawnProcess.returns(BbPromise.resolve({ stdout: '{}', stderr: '' }));
-      return expect(npmModule.getProdDependencies('myPath')).to.be.fulfilled.then(result => {
-        expect(result).to.be.an('object').that.is.empty;
-        expect(Utils.spawnProcess).to.have.been.calledOnce,
-          expect(Utils.spawnProcess.firstCall).to.have.been.calledWith(sinon.match(/^npm/), [
-            'ls',
-            '-prod',
-            '-json',
-            '-depth=1'
-          ]);
-        return null;
+    describe('with lock file', () => {
+      it('should use npm ls when lock file is not version 2', () => {
+        fseMock.pathExistsSync.mockReturnValue(true);
+        fsMock.readFileSync.mockReturnValue(JSON.stringify({ lockfileVersion: 1 }));
+        Utils.spawnProcess.mockReturnValue(BbPromise.resolve({ stdout: '{}', stderr: '' }));
+        return expect(npmModule.getProdDependencies('myPath'))
+          .resolves.toEqual({})
+          .then(() => {
+            expect(Utils.spawnProcess).toHaveBeenCalledTimes(1);
+            expect(Utils.spawnProcess).toHaveBeenCalledWith(
+              expect.stringMatching(/^npm/),
+              ['ls', '-prod', '-json', '-depth=1'],
+              { cwd: 'myPath' }
+            );
+            expect(fseMock.pathExistsSync).toHaveBeenCalledWith(`myPath${sep}package-lock.json`);
+            expect(fsMock.readFileSync).toHaveBeenCalledWith(`myPath${sep}package-lock.json`);
+            return null;
+          });
+      });
+
+      it('should returns lock file when is version 2', () => {
+        fseMock.pathExistsSync.mockReturnValue(true);
+        const lockData = {
+          lockfileVersion: 2,
+          dependencies: {
+            '@babel/code-frame': {
+              version: '7.16.7',
+              resolved: 'https://registry.npmjs.org/@babel/code-frame/-/code-frame-7.16.7.tgz',
+              integrity:
+                'sha512-iAXqUn8IIeBTNd72xsFlgaXHkMBMt6y4HJp1tIaK465CWLT/fG1aqB7ykr95gHHmlBdGbFeWWfyB4NJJ0nmeIg==',
+              dev: true,
+              requires: {
+                '@babel/highlight': '^7.16.7'
+              }
+            }
+          }
+        };
+        fsMock.readFileSync.mockReturnValue(JSON.stringify(lockData));
+        return expect(npmModule.getProdDependencies('myPath'))
+          .resolves.toEqual(lockData)
+          .then(() => {
+            expect(Utils.spawnProcess).toHaveBeenCalledTimes(0);
+            expect(fseMock.pathExistsSync).toHaveBeenCalledWith(`myPath${sep}package-lock.json`);
+            expect(fsMock.readFileSync).toHaveBeenCalledWith(`myPath${sep}package-lock.json`);
+            return null;
+          });
+      });
+
+      it('should lockfile path be customisable', () => {
+        fseMock.pathExistsSync.mockReturnValue(true);
+        const lockData = {
+          lockfileVersion: 2,
+          dependencies: {
+            '@babel/code-frame': {
+              version: '7.16.7',
+              resolved: 'https://registry.npmjs.org/@babel/code-frame/-/code-frame-7.16.7.tgz',
+              integrity:
+                'sha512-iAXqUn8IIeBTNd72xsFlgaXHkMBMt6y4HJp1tIaK465CWLT/fG1aqB7ykr95gHHmlBdGbFeWWfyB4NJJ0nmeIg==',
+              dev: true,
+              requires: {
+                '@babel/highlight': '^7.16.7'
+              }
+            }
+          }
+        };
+        fsMock.readFileSync.mockReturnValue(JSON.stringify(lockData));
+        return expect(
+          npmModule.getProdDependencies('root-workspace/packages/my-package', 1, {
+            lockFile: '../../package-lock.json'
+          })
+        )
+          .resolves.toEqual(lockData)
+          .then(() => {
+            expect(Utils.spawnProcess).toHaveBeenCalledTimes(0);
+            expect(fseMock.pathExistsSync).toHaveBeenCalledWith(`root-workspace${sep}package-lock.json`);
+            expect(fsMock.readFileSync).toHaveBeenCalledWith(`root-workspace${sep}package-lock.json`);
+            return null;
+          });
       });
     });
   });
@@ -136,37 +217,36 @@ describe('npm', () => {
   it('should reject if npm returns critical and minor errors', () => {
     const stderr =
       'ENOENT: No such file\nnpm ERR! extraneous: sinon@2.3.8 ./babel-dynamically-entries/node_modules/serverless-webpack/node_modules/sinon\n\n';
-    Utils.spawnProcess.returns(BbPromise.reject(new Utils.SpawnError('Command execution failed', '{}', stderr)));
-    return expect(npmModule.getProdDependencies('myPath', 1))
-      .to.be.rejectedWith('Command execution failed')
-      .then(() =>
-        BbPromise.all([
-          // npm ls and npm prune should have been called
-          expect(Utils.spawnProcess).to.have.been.calledOnce,
-          expect(Utils.spawnProcess.firstCall).to.have.been.calledWith(sinon.match(/^npm/), [
-            'ls',
-            '-prod',
-            '-json',
-            '-depth=1'
-          ])
-        ])
-      );
+    Utils.spawnProcess.mockReturnValue(
+      BbPromise.reject(new Utils.SpawnError('Command execution failed', '{}', stderr))
+    );
+    return expect(npmModule.getProdDependencies('myPath', 1, {}))
+      .rejects.toThrow('Command execution failed')
+      .then(() => {
+        // npm ls and npm prune should have been called
+        expect(Utils.spawnProcess).toHaveBeenCalledTimes(1);
+        expect(Utils.spawnProcess).toHaveBeenCalledWith(
+          expect.stringMatching(/^npm/),
+          ['ls', '-prod', '-json', '-depth=1'],
+          { cwd: 'myPath' }
+        );
+        return null;
+      });
   });
 
   it('should reject if an error happens without any information in stdout', () => {
-    Utils.spawnProcess.returns(BbPromise.reject(new Utils.SpawnError('Command execution failed', '', '')));
+    Utils.spawnProcess.mockReturnValue(BbPromise.reject(new Utils.SpawnError('Command execution failed', '', '')));
     return expect(npmModule.getProdDependencies('myPath', 1))
-      .to.be.rejectedWith('Command execution failed')
+      .rejects.toThrow('Command execution failed')
       .then(() =>
-        BbPromise.all([
+        Promise.all([
           // npm ls and npm prune should have been called
-          expect(Utils.spawnProcess).to.have.been.calledOnce,
-          expect(Utils.spawnProcess.firstCall).to.have.been.calledWith(sinon.match(/^npm/), [
-            'ls',
-            '-prod',
-            '-json',
-            '-depth=1'
-          ])
+          expect(Utils.spawnProcess).toHaveBeenCalledTimes(1),
+          expect(Utils.spawnProcess).toHaveBeenCalledWith(
+            expect.stringMatching(/^npm/),
+            ['ls', '-prod', '-json', '-depth=1'],
+            { cwd: 'myPath' }
+          )
         ])
       );
   });
@@ -194,22 +274,22 @@ describe('npm', () => {
       }
     };
 
-    Utils.spawnProcess.returns(
+    Utils.spawnProcess.mockReturnValue(
       BbPromise.reject(new Utils.SpawnError('Command execution failed', JSON.stringify(lsResult), stderr))
     );
-    return expect(npmModule.getProdDependencies('myPath', 1)).to.be.fulfilled.then(dependencies =>
-      BbPromise.all([
-        // npm ls and npm prune should have been called
-        expect(Utils.spawnProcess).to.have.been.calledOnce,
-        expect(Utils.spawnProcess.firstCall).to.have.been.calledWith(sinon.match(/^npm/), [
-          'ls',
-          '-prod',
-          '-json',
-          '-depth=1'
-        ]),
-        expect(dependencies).to.deep.equal(lsResult)
-      ])
-    );
+    return expect(npmModule.getProdDependencies('myPath', 1))
+      .resolves.toEqual(lsResult)
+      .then(() =>
+        Promise.all([
+          // npm ls and npm prune should have been called
+          expect(Utils.spawnProcess).toHaveBeenCalledTimes(1),
+          expect(Utils.spawnProcess).toHaveBeenCalledWith(
+            expect.stringMatching(/^npm/),
+            ['ls', '-prod', '-json', '-depth=1'],
+            { cwd: 'myPath' }
+          )
+        ])
+      );
   });
 
   it('should ignore minor local NPM errors and log them (NPM >= 7)', () => {
@@ -243,22 +323,22 @@ describe('npm', () => {
       }
     };
 
-    Utils.spawnProcess.returns(
+    Utils.spawnProcess.mockReturnValue(
       BbPromise.reject(new Utils.SpawnError('Command execution failed', JSON.stringify(lsResult), stderr))
     );
-    return expect(npmModule.getProdDependencies('myPath', 1)).to.be.fulfilled.then(dependencies =>
-      BbPromise.all([
-        // npm ls and npm prune should have been called
-        expect(Utils.spawnProcess).to.have.been.calledOnce,
-        expect(Utils.spawnProcess.firstCall).to.have.been.calledWith(sinon.match(/^npm/), [
-          'ls',
-          '-prod',
-          '-json',
-          '-depth=1'
-        ]),
-        expect(dependencies).to.deep.equal(lsResult)
-      ])
-    );
+    return expect(npmModule.getProdDependencies('myPath', 1))
+      .resolves.toEqual(lsResult)
+      .then(() =>
+        Promise.all([
+          // npm ls and npm prune should have been called
+          expect(Utils.spawnProcess).toHaveBeenCalledTimes(1),
+          expect(Utils.spawnProcess).toHaveBeenCalledWith(
+            expect.stringMatching(/^npm/),
+            ['ls', '-prod', '-json', '-depth=1'],
+            { cwd: 'myPath' }
+          )
+        ])
+      );
   });
 
   it('should rebase lock file references', () => {
@@ -301,6 +381,6 @@ describe('npm', () => {
     };
 
     npmModule.rebaseLockfile('../../locals', fakePackageLockJSON);
-    expect(fakePackageLockJSON).to.deep.equal(expectedPackageLockJSON);
+    expect(fakePackageLockJSON).toEqual(expectedPackageLockJSON);
   });
 });

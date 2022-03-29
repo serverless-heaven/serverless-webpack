@@ -3,6 +3,7 @@ coverage
 examples
 tests
 *.test.js
+__mocks__
 .nyc_output
 .github
 yarn.lock

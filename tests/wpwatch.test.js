@@ -2,53 +2,26 @@
 
 const BbPromise = require('bluebird');
 const _ = require('lodash');
-const chai = require('chai');
-const sinon = require('sinon');
-const mockery = require('mockery');
 const Serverless = require('serverless');
-const makeWebpackMock = require('./webpack.mock');
-const makeUtilsMock = require('./utils.mock');
 
-chai.use(require('chai-as-promised'));
-chai.use(require('sinon-chai'));
+jest.mock('webpack');
+jest.mock('../lib/utils');
 
-const expect = chai.expect;
-
-describe('wpwatch', function () {
-  let sandbox;
-  let webpackMock;
-  let utilsMock;
-  let baseModule;
+describe('wpwatch', () => {
   let serverless;
   let module;
   let spawnStub;
-
-  this.timeout(7000);
-
-  before(() => {
-    sandbox = sinon.createSandbox();
-    sandbox.usingPromise(BbPromise.Promise);
-
-    webpackMock = makeWebpackMock(sandbox);
-    utilsMock = makeUtilsMock();
-
-    mockery.enable({ warnOnUnregistered: false });
-    mockery.registerMock('webpack', webpackMock);
-    mockery.registerMock('./utils', utilsMock);
-    baseModule = require('../lib/wpwatch');
-    Object.freeze(baseModule);
-  });
-
-  after(() => {
-    mockery.disable();
-    mockery.deregisterAll();
-  });
+  let webpackMock;
+  let baseModule;
 
   beforeEach(() => {
+    jest.resetModules();
+    webpackMock = require('webpack');
+    baseModule = require('../lib/wpwatch');
     serverless = new Serverless({ commands: ['print'], options: {}, serviceDir: null });
     serverless.cli = {
-      log: sandbox.stub(),
-      consoleLog: sandbox.stub()
+      log: jest.fn(),
+      consoleLog: jest.fn()
     };
 
     module = _.assign(
@@ -59,7 +32,8 @@ describe('wpwatch', function () {
       baseModule
     );
 
-    spawnStub = sandbox.stub(serverless.pluginManager, 'spawn');
+    spawnStub = jest.fn();
+    serverless.pluginManager.spawn = spawnStub;
 
     const webpackConfig = {
       stats: 'minimal'
@@ -67,228 +41,247 @@ describe('wpwatch', function () {
     _.set(module, 'webpackConfig', webpackConfig);
   });
 
-  afterEach(() => {
-    // This will reset the mocks too
-    webpackMock.compilerMock.watch.reset();
-    sandbox.restore();
-  });
-
   it('should reject if webpack watch fails', () => {
     const wpwatch = module.wpwatch.bind(module);
-    webpackMock.compilerMock.watch.yields(new Error('Failed'));
+    webpackMock.compilerMock.watch.mockReset();
+    webpackMock.compilerMock.watch.mockImplementation((options, cb) => cb(new Error('Failed')));
 
-    return expect(wpwatch()).to.be.rejectedWith('Failed');
+    return expect(wpwatch()).rejects.toThrow('Failed');
   });
 
   it('should spawn compile if watch is disabled', () => {
     const wpwatch = module.wpwatch.bind(module);
-    webpackMock.compilerMock.watch.yields(null, {});
-    spawnStub.resolves();
+    webpackMock.compilerMock.watch.mockReset();
+    webpackMock.compilerMock.watch.mockImplementation((options, cb) => cb(null, {}));
+    spawnStub.mockResolvedValue();
     _.set(module.options, 'webpack-no-watch', true);
 
-    return expect(wpwatch()).to.be.fulfilled.then(() =>
-      BbPromise.join(
-        expect(spawnStub).to.have.been.calledWith('webpack:compile'),
-        expect(webpackMock.compilerMock.watch).to.not.have.been.called
-      )
-    );
+    return expect(wpwatch())
+      .resolves.toBeUndefined()
+      .then(() =>
+        BbPromise.join(
+          expect(spawnStub).toHaveBeenCalledWith('webpack:compile'),
+          expect(webpackMock.compilerMock.watch).toHaveBeenCalledTimes(0)
+        )
+      );
   });
 
   it('should enter watch mode and return after first compile', () => {
     const wpwatch = module.wpwatch.bind(module);
-    webpackMock.compilerMock.watch.yields(null, {});
-    spawnStub.resolves();
+    webpackMock.compilerMock.watch.mockReset();
+    webpackMock.compilerMock.watch.mockImplementation((options, cb) => cb(null, {}));
+    spawnStub.mockResolvedValue();
 
-    return expect(wpwatch()).to.be.fulfilled.then(() =>
-      BbPromise.join(
-        expect(spawnStub).to.not.have.been.called,
-        expect(webpackMock.compilerMock.watch).to.have.been.calledOnce
-      )
-    );
+    return expect(wpwatch())
+      .resolves.toBeUndefined()
+      .then(() =>
+        BbPromise.join(
+          expect(spawnStub).toHaveBeenCalledTimes(0),
+          expect(webpackMock.compilerMock.watch).toHaveBeenCalledTimes(1)
+        )
+      );
   });
 
   it('should still enter watch mode and return if lastHash is the same as previous', () => {
     const wpwatch = module.wpwatch.bind(module);
-    webpackMock.compilerMock.watch.yields(null, { hash: null });
+    webpackMock.compilerMock.watch.mockReset();
+    webpackMock.compilerMock.watch.mockImplementation((options, cb) => cb(null, { hash: null }));
 
-    return expect(wpwatch()).to.be.fulfilled.then(() =>
-      BbPromise.join(
-        expect(spawnStub).to.not.have.been.called,
-        expect(webpackMock.compilerMock.watch).to.have.been.calledOnce,
-        expect(spawnStub).to.not.have.been.called
-      )
-    );
+    return expect(wpwatch())
+      .resolves.toBeUndefined()
+      .then(() =>
+        BbPromise.join(
+          expect(spawnStub).toHaveBeenCalledTimes(0),
+          expect(webpackMock.compilerMock.watch).toHaveBeenCalledTimes(1),
+          expect(spawnStub).toHaveBeenCalledTimes(0)
+        )
+      );
   });
 
   it('should work if no stats are returned', () => {
     const wpwatch = module.wpwatch.bind(module);
-    webpackMock.compilerMock.watch.yields();
-    spawnStub.resolves();
+    webpackMock.compilerMock.watch.mockReset();
+    webpackMock.compilerMock.watch.mockImplementation((options, cb) => cb());
+    spawnStub.mockResolvedValue();
 
-    return expect(wpwatch()).to.be.fulfilled.then(() =>
-      BbPromise.join(
-        expect(spawnStub).to.not.have.been.called,
-        expect(webpackMock.compilerMock.watch).to.have.been.calledOnce
-      )
-    );
+    return expect(wpwatch())
+      .resolves.toBeUndefined()
+      .then(() =>
+        BbPromise.join(
+          expect(spawnStub).toHaveBeenCalledTimes(0),
+          expect(webpackMock.compilerMock.watch).toHaveBeenCalledTimes(1)
+        )
+      );
   });
 
   it('should enable polling with command line switch', () => {
     const wpwatch = module.wpwatch.bind(module);
-    webpackMock.compilerMock.watch.yields();
-    spawnStub.resolves();
+    webpackMock.compilerMock.watch.mockReset();
+    webpackMock.compilerMock.watch.mockImplementation((options, cb) => cb());
+    spawnStub.mockResolvedValue();
     _.set(module.options, 'webpack-use-polling', true);
 
-    return expect(wpwatch()).to.be.fulfilled.then(() =>
-      BbPromise.join(
-        expect(spawnStub).to.not.have.been.called,
-        expect(webpackMock.compilerMock.watch).to.have.been.calledOnce,
-        expect(webpackMock.compilerMock.watch).to.have.been.calledWith({
-          poll: 3000
-        })
-      )
-    );
+    return expect(wpwatch())
+      .resolves.toBeUndefined()
+      .then(() =>
+        BbPromise.join(
+          expect(spawnStub).toHaveBeenCalledTimes(0),
+          expect(webpackMock.compilerMock.watch).toHaveBeenCalledTimes(1),
+          expect(webpackMock.compilerMock.watch).toHaveBeenCalledWith(
+            {
+              poll: 3000
+            },
+            expect.any(Function)
+          )
+        )
+      );
   });
 
   it('should set specific polling interval if given with switch', () => {
     const wpwatch = module.wpwatch.bind(module);
-    webpackMock.compilerMock.watch.yields();
-    spawnStub.resolves();
+    webpackMock.compilerMock.watch.mockReset();
+    webpackMock.compilerMock.watch.mockImplementation((options, cb) => cb());
+    spawnStub.mockResolvedValue();
     _.set(module.options, 'webpack-use-polling', 5000);
 
-    return expect(wpwatch()).to.be.fulfilled.then(() =>
-      BbPromise.join(
-        expect(spawnStub).to.not.have.been.called,
-        expect(webpackMock.compilerMock.watch).to.have.been.calledOnce,
-        expect(webpackMock.compilerMock.watch).to.have.been.calledWith({
-          poll: 5000
-        })
-      )
-    );
+    return expect(wpwatch())
+      .resolves.toBeUndefined()
+      .then(() =>
+        BbPromise.join(
+          expect(spawnStub).toHaveBeenCalledTimes(0),
+          expect(webpackMock.compilerMock.watch).toHaveBeenCalledTimes(1),
+          expect(webpackMock.compilerMock.watch).toHaveBeenCalledWith(
+            {
+              poll: 5000
+            },
+            expect.any(Function)
+          )
+        )
+      );
   });
 
   it('should spawn webpack:compile:watch on subsequent runs', () => {
     const wpwatch = module.wpwatch.bind(module);
-    let watchCallbackSpy;
-    let beforeCompileCallbackSpy;
+    let watchCallbackCount = 0;
+    let beforeCompileCallback;
 
-    spawnStub.resolves();
+    spawnStub.mockResolvedValue();
 
-    webpackMock.compilerMock.hooks.beforeCompile.tapPromise.callsFake((options, cb) => {
-      beforeCompileCallbackSpy = sandbox.spy(cb);
+    webpackMock.compilerMock.hooks.beforeCompile.tapPromise.mockImplementation((options, cb) => {
+      beforeCompileCallback = cb;
     });
 
-    webpackMock.compilerMock.watch.onFirstCall().callsFake((options, cb) => {
-      watchCallbackSpy = sandbox.spy(cb);
-      watchCallbackSpy(null, { call: 1, hash: '1' });
-      watchCallbackSpy(null, { call: 2, hash: '2' });
+    webpackMock.compilerMock.watch.mockImplementationOnce((options, cb) => {
+      cb(null, { call: 1, hash: '1' });
+      watchCallbackCount++;
+      cb(null, { call: 2, hash: '2' });
+      watchCallbackCount++;
 
       // We only call this once, to simulate that promises that might take longer to resolve
       // don't cause a re-emit to avoid race-conditions.
-      beforeCompileCallbackSpy();
-      watchCallbackSpy(null, { call: 3, hash: '3' });
-      watchCallbackSpy(null, { call: 3, hash: '4' });
+      beforeCompileCallback();
+      cb(null, { call: 3, hash: '3' });
+      watchCallbackCount++;
+      cb(null, { call: 3, hash: '4' });
+      watchCallbackCount++;
     });
 
-    return expect(wpwatch()).to.be.fulfilled.then(() =>
-      BbPromise.join(
-        expect(watchCallbackSpy).to.have.been.callCount(4),
-        expect(spawnStub).to.have.been.calledOnce,
-        expect(spawnStub).to.have.been.calledWithExactly('webpack:compile:watch')
-      )
-    );
+    return expect(wpwatch())
+      .resolves.toBeUndefined()
+      .then(() =>
+        BbPromise.join(
+          expect(watchCallbackCount).toBe(4),
+          expect(spawnStub).toHaveBeenCalledTimes(1),
+          expect(spawnStub).toHaveBeenCalledWith('webpack:compile:watch')
+        )
+      );
   });
 
   it('should spawn more webpack:compile:watch when previous is resolved', () => {
     const wpwatch = module.wpwatch.bind(module);
-    let watchCallbackSpy;
-    let beforeCompileCallbackSpy;
-    let beforeCompileCallbackSpyPromise;
+    let watchCallbackCount = 0;
+    let beforeCompileCallback;
+    let beforeCompileCallbackPromise;
 
-    spawnStub.resolves();
+    spawnStub.mockResolvedValue();
 
-    webpackMock.compilerMock.hooks.beforeCompile.tapPromise.callsFake((options, cb) => {
-      beforeCompileCallbackSpy = sandbox.spy(cb);
+    webpackMock.compilerMock.hooks.beforeCompile.tapPromise.mockImplementation((options, cb) => {
+      beforeCompileCallback = cb;
     });
 
-    webpackMock.compilerMock.watch.onFirstCall().callsFake((options, cb) => {
-      watchCallbackSpy = sandbox.spy(cb);
-
-      watchCallbackSpy(null, { call: 1, hash: '1' });
-      watchCallbackSpy(null, { call: 2, hash: '2' });
+    webpackMock.compilerMock.watch.mockImplementationOnce((options, cb) => {
+      cb(null, { call: 1, hash: '1' });
+      watchCallbackCount++;
+      cb(null, { call: 2, hash: '2' });
+      watchCallbackCount++;
 
       // eslint-disable-next-line promise/always-return,promise/catch-or-return
-      beforeCompileCallbackSpyPromise = beforeCompileCallbackSpy().then(() => {
-        watchCallbackSpy(null, { call: 3, hash: '3' });
+      beforeCompileCallbackPromise = beforeCompileCallback().then(() => {
+        // eslint-disable-next-line promise/no-callback-in-promise
+        cb(null, { call: 3, hash: '3' });
+        watchCallbackCount++;
       });
     });
 
     return expect(wpwatch())
-      .to.be.fulfilled.then(() => beforeCompileCallbackSpyPromise)
+      .resolves.toBeUndefined()
+      .then(() => beforeCompileCallbackPromise)
       .then(() =>
         BbPromise.join(
-          expect(watchCallbackSpy).to.have.been.calledThrice,
-          expect(spawnStub).to.have.been.calledTwice,
-          expect(spawnStub).to.have.been.calledWithExactly('webpack:compile:watch')
+          expect(watchCallbackCount).toBe(3),
+          expect(spawnStub).toHaveBeenCalledTimes(2),
+          expect(spawnStub).toHaveBeenCalledWith('webpack:compile:watch')
         )
       );
   });
 
   it("should use plugins for webpack:compile:watch if hooks doesn't exist", () => {
     const wpwatch = module.wpwatch.bind(module);
-    sandbox.stub(webpackMock.compilerMock, 'hooks').value(false);
+    webpackMock.compilerMock.hooks = false;
 
-    webpackMock.compilerMock.plugin = sandbox.stub().yields(null, _.noop);
-    webpackMock.compilerMock.watch.yields(null, {});
+    webpackMock.compilerMock.plugin.mockImplementation((name, cb) => cb(null, _.noop));
+    webpackMock.compilerMock.watch.mockImplementation((options, cb) => cb(null, {}));
 
-    return expect(wpwatch()).to.be.fulfilled.then(
-      () => expect(webpackMock.compilerMock.plugin).to.have.been.calledOnce
-    );
+    return expect(wpwatch())
+      .resolves.toBeUndefined()
+      .then(() => expect(webpackMock.compilerMock.plugin).toHaveBeenCalledTimes(1));
   });
 
   it('should not resolve before compile if it has an error', () => {
     const wpwatch = module.wpwatch.bind(module);
-    spawnStub.returns(BbPromise.reject(new Error('actual error')));
+    spawnStub.mockReturnValue(BbPromise.reject(new Error('actual error')));
 
-    let beforeCompileCallbackSpy;
-    webpackMock.compilerMock.hooks.beforeCompile.tapPromise.callsFake((options, cb) => {
-      beforeCompileCallbackSpy = sandbox.spy(cb);
+    let beforeCompileCallback;
+    webpackMock.compilerMock.hooks.beforeCompile.tapPromise.mockImplementation((options, cb) => {
+      beforeCompileCallback = cb;
     });
 
     let doesResolve = false;
-    webpackMock.compilerMock.watch.onFirstCall().callsFake((options, cb) => {
+    webpackMock.compilerMock.watch.mockImplementationOnce((options, cb) => {
       cb(null, { call: 1, hash: '1' });
       cb(null, { call: 2, hash: '2' });
 
       // eslint-disable-next-line promise/catch-or-return,promise/always-return
-      beforeCompileCallbackSpy().then(() => {
+      beforeCompileCallback().then(() => {
         // We don't expect this to be set to true
         doesResolve = true;
       });
     });
 
-    return expect(wpwatch()).to.be.fulfilled.then(() => expect(doesResolve).to.be.false);
+    return expect(wpwatch())
+      .resolves.toBeUndefined()
+      .then(() => expect(doesResolve).toBe(false));
   });
 
   it('should throw if compile fails on subsequent runs', () => {
     const wpwatch = module.wpwatch.bind(module);
-    let watchCallbackSpy;
+    spawnStub.mockResolvedValue();
 
-    spawnStub.resolves();
-
-    webpackMock.compilerMock.watch.callsFake((options, cb) => {
-      // We'll spy the callback registered for watch
-      watchCallbackSpy = sandbox.spy(cb);
-
-      watchCallbackSpy(null, { call: 3, hash: '3' });
-      watchCallbackSpy(new Error('Compile failed'));
+    webpackMock.compilerMock.watch.mockImplementation((options, cb) => {
+      cb(null, { call: 3, hash: '3' });
+      cb(new Error('Compile failed'));
     });
 
-    return expect(wpwatch()).to.be.fulfilled.then(() =>
-      BbPromise.join(
-        expect(watchCallbackSpy).to.have.been.calledTwice,
-        expect(watchCallbackSpy.secondCall.threw()).to.be.true
-      )
-    );
+    return expect(wpwatch()).resolves.toBeUndefined();
   });
 });
