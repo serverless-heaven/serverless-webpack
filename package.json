@@ -59,7 +59,7 @@
     "serverless": "^3.10.2",
     "sinon": "^13.0.1",
     "unzipper": "^0.10.11",
-    "webpack": "^5.70.0"
+    "webpack": "^5.71.0"
   },
   "peerDependencies": {
     "serverless": "1 || 2 || 3",
