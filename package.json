@@ -57,7 +57,7 @@
     "lint-staged": "^10.5.4",
     "prettier": "^2.6.2",
     "serverless": "^3.16.0",
-    "sinon": "^13.0.2",
+    "sinon": "^14.0.0",
     "unzipper": "^0.10.11",
     "webpack": "^5.72.0"
   },
