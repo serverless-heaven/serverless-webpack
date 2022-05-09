@@ -873,13 +873,13 @@ See [the releases section](https://github.com/serverless-heaven/serverless-webpa
 [ico-serverless]: http://public.serverless.com/badges/v3.svg
 [ico-license]: https://img.shields.io/github/license/serverless-heaven/serverless-webpack.svg
 [ico-npm]: https://img.shields.io/npm/v/serverless-webpack.svg
-[ico-build]: https://travis-ci.org/serverless-heaven/serverless-webpack.svg?branch=master
+[ico-build]: https://github.com/serverless-heaven/serverless-webpack/actions/workflows/tests.yml/badge.svg
 [ico-coverage]: https://coveralls.io/repos/github/serverless-heaven/serverless-webpack/badge.svg?branch=master
 [ico-contributors]: https://img.shields.io/github/contributors/serverless-heaven/serverless-webpack.svg
 [link-serverless]: https://www.serverless.com/
 [link-license]: ./blob/master/LICENSE
 [link-npm]: https://www.npmjs.com/package/serverless-webpack
-[link-build]: https://travis-ci.org/serverless-heaven/serverless-webpack
+[link-build]: https://github.com/serverless-heaven/serverless-webpack/actions/workflows/tests.yml
 [link-coverage]: https://coveralls.io/github/serverless-heaven/serverless-webpack?branch=master
 [link-contributors]: https://github.com/serverless-heaven/serverless-webpack/graphs/contributors
 [link-webpack]: https://webpack.github.io/
