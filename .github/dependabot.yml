@@ -24,3 +24,7 @@ updates:
       - dependency-name: mocha
         versions:
           - ">= 9.0.0"
+      # require node > 10
+      - dependency-name: jest
+        versions:
+          - ">= 28.0.0"
