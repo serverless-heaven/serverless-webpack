@@ -56,7 +56,7 @@
     "jest": "^27.5.1",
     "lint-staged": "^10.5.4",
     "prettier": "^2.6.2",
-    "serverless": "^3.18.2",
+    "serverless": "^3.19.0",
     "sinon": "^14.0.0",
     "unzipper": "^0.10.11",
     "webpack": "^5.72.1"
