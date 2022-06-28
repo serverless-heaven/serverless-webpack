@@ -50,7 +50,7 @@
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-lodash": "^7.4.0",
-    "eslint-plugin-prettier": "^4.0.0",
+    "eslint-plugin-prettier": "^4.1.0",
     "eslint-plugin-promise": "^6.0.0",
     "husky": "^4.3.8",
     "jest": "^27.5.1",
