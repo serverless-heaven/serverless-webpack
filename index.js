@@ -92,6 +92,39 @@ class ServerlessWebpack {
             lifecycleEvents: ['packExternalModules', 'packageModules', 'copyExistingArtifacts']
           }
         }
+      },
+      invoke: {
+        commands: {
+          local: {
+            options: {
+              watch: {
+                usage: 'Flag to watch changes',
+                type: 'boolean'
+              },
+              'webpack-use-polling': {
+                usage: 'Define time (in ms) for polling for changes. Default: `3000`'
+              }
+            }
+          }
+        }
+      },
+      offline: {
+        options: {
+          'webpack-no-watch': {
+            usage: 'Disable automatic watch mode from Serverless Webpack',
+            type: 'boolean'
+          }
+        },
+        commands: {
+          start: {
+            options: {
+              'webpack-no-watch': {
+                usage: 'Disable automatic watch mode from Serverless Webpack',
+                type: 'boolean'
+              }
+            }
+          }
+        }
       }
     };
 
