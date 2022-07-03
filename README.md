@@ -385,6 +385,7 @@ The NPM packager supports the following `packagerOptions`:
 
 | Option             | Type   | Default               | Description                                         |
 | ------------------ | ------ | --------------------- | --------------------------------------------------- |
+| ignoreScripts      | bool   | false                 | Do not execute package.json hook scripts on install |
 | noInstall          | bool   | false                 | Do not run `npm install` (assume install completed) |
 | lockFile           | string | ./package-lock.json   | Relative path to lock file to use                   |
 
