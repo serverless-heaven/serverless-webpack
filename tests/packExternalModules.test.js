@@ -843,6 +843,78 @@ describe('packExternalModules', () => {
         .resolves.toBeUndefined()
         .then(() =>
           BbPromise.all([
+            expect(readFileSyncStub).toHaveBeenCalledTimes(2),
+            expect(readFileSyncStub.mock.calls[0][0]).toEqual(path.join(process.cwd(), './package.json')),
+            expect(readFileSyncStub.mock.calls[1][0]).toEqual(path.join(process.cwd(), './mocked-lock.json')),
+            // The module package JSON and the composite one should have been stored
+            expect(writeFileSyncStub).toHaveBeenCalledTimes(3),
+            expect(writeFileSyncStub.mock.calls[0][1]).toEqual(JSON.stringify(expectedCompositePackageJSON, null, 2)),
+            expect(writeFileSyncStub.mock.calls[1][1]).toEqual(JSON.stringify({ info: 'lockfile' }, null, 2)),
+            expect(writeFileSyncStub.mock.calls[2][1]).toEqual(JSON.stringify(expectedPackageJSON, null, 2)),
+            // The modules and the lock file should have been copied
+            expect(fsExtraMock.copy).toHaveBeenCalledTimes(2),
+            // npm ls and npm prune should have been called
+            expect(packagerFactoryMock.get('npm').getProdDependencies).toHaveBeenCalledTimes(1),
+            expect(packagerFactoryMock.get('npm').install).toHaveBeenCalledTimes(1),
+            expect(packagerFactoryMock.get('npm').prune).toHaveBeenCalledTimes(1),
+            expect(packagerFactoryMock.get('npm').runScripts).toHaveBeenCalledTimes(1)
+          ])
+        );
+    });
+
+    it('should read package-lock according to packagerOptions', () => {
+      const expectedCompositePackageJSON = {
+        name: 'test-service',
+        version: '1.0.0',
+        description: 'Packaged externals for test-service',
+        private: true,
+        scripts: {},
+        dependencies: {
+          '@scoped/vendor': '1.0.0',
+          bluebird: '^3.4.0',
+          uuid: '^5.4.1'
+        }
+      };
+      const expectedPackageJSON = {
+        name: 'test-service',
+        version: '1.0.0',
+        description: 'Packaged externals for test-service',
+        private: true,
+        scripts: {},
+        dependencies: {
+          '@scoped/vendor': '1.0.0',
+          bluebird: '^3.4.0',
+          uuid: '^5.4.1'
+        }
+      };
+      module.configuration = new Configuration({
+        webpack: {
+          includeModules: true,
+          packager: 'npm',
+          packagerOptions: {
+            lockFile: '../../package-lock.json'
+          }
+        }
+      });
+
+      module.webpackOutputPath = '/my/Service/Path/outputPath';
+      fsExtraMock.pathExists.mockImplementation((p, cb) => cb(null, true));
+      fsExtraMock.copy.mockImplementation((from, to, cb) => cb());
+      readFileSyncStub.mockReturnValueOnce(packageMock);
+      readFileSyncStub.mockReturnValue({ info: 'lockfile' });
+      packagerFactoryMock.get('npm').rebaseLockfile.mockImplementation((pathToPackageRoot, lockfile) => lockfile);
+      packagerFactoryMock.get('npm').getProdDependencies.mockReturnValue(BbPromise.resolve({}));
+      packagerFactoryMock.get('npm').install.mockReturnValue(BbPromise.resolve());
+      packagerFactoryMock.get('npm').prune.mockReturnValue(BbPromise.resolve());
+      packagerFactoryMock.get('npm').runScripts.mockReturnValue(BbPromise.resolve());
+      module.compileStats = stats;
+      return expect(module.packExternalModules())
+        .resolves.toBeUndefined()
+        .then(() =>
+          BbPromise.all([
+            expect(readFileSyncStub).toHaveBeenCalledTimes(2),
+            expect(readFileSyncStub.mock.calls[0][0]).toEqual(path.join(process.cwd(), './package.json')),
+            expect(readFileSyncStub.mock.calls[1][0]).toEqual(path.join(process.cwd(), '../../package-lock.json')),
             // The module package JSON and the composite one should have been stored
             expect(writeFileSyncStub).toHaveBeenCalledTimes(3),
             expect(writeFileSyncStub.mock.calls[0][1]).toEqual(JSON.stringify(expectedCompositePackageJSON, null, 2)),
