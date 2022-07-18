@@ -219,7 +219,7 @@ describe('ServerlessWebpack', () => {
             });
 
             it('should skip compile if requested', () => {
-              slsw.options.build = false;
+              slsw.options['skip-build'] = false;
               slsw.skipCompile = true;
               return expect(slsw.hooks['before:invoke:local:invoke']())
                 .resolves.toBeUndefined()
@@ -377,8 +377,7 @@ describe('ServerlessWebpack', () => {
           name: 'before:offline:start',
           test: () => {
             it('should prepare offline', () => {
-              slsw.skipCompile = false;
-              slsw.options.build = true;
+              slsw.options['skip-build'] = true;
               return expect(slsw.hooks['before:offline:start']())
                 .resolves.toBeUndefined()
                 .then(() => {
@@ -389,8 +388,7 @@ describe('ServerlessWebpack', () => {
                 });
             });
             it('should skip compiling when requested', () => {
-              slsw.skipCompile = true;
-              slsw.options.build = false;
+              slsw.options['skip-build'] = false;
               return expect(slsw.hooks['before:offline:start']())
                 .resolves.toBeUndefined()
                 .then(() => {
@@ -406,8 +404,7 @@ describe('ServerlessWebpack', () => {
           name: 'before:offline:start:init',
           test: () => {
             it('should prepare offline', () => {
-              slsw.skipCompile = false;
-              slsw.options.build = true;
+              slsw.options['skip-build'] = true;
               return expect(slsw.hooks['before:offline:start:init']())
                 .resolves.toBeUndefined()
                 .then(() => {
@@ -418,8 +415,7 @@ describe('ServerlessWebpack', () => {
                 });
             });
             it('should skip compiling when requested', () => {
-              slsw.skipCompile = true;
-              slsw.options.build = false;
+              slsw.options['skip-build'] = false;
               return expect(slsw.hooks['before:offline:start:init']())
                 .resolves.toBeUndefined()
                 .then(() => {

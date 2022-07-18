@@ -662,6 +662,16 @@ On CI systems it is likely that you'll run multiple integration tests with `invo
 sequentially. To improve this, you can do one compile and run multiple invokes on the
 compiled output - it is not necessary to compile again before each and every invoke.
 
+##### Using the CLI option `--skip-build`
+
+```bash
+$ serverless webpack
+$ serverless invoke local --function <function-name-1> --skip-build
+$ serverless invoke local --function <function-name-2> --skip-build
+```
+
+##### Using the parameter `noBuild`
+
 ```yaml
 custom:
   webpack:
@@ -736,7 +746,7 @@ e.g. a mounted volume in a Docker container, you can enable polling with the
 `--webpack-use-polling=<time in ms>` option. If you omit the value, it defaults
 to 3000 ms.
 
-If you don't want the plugin to build when using `serverless-offline`, select the `--no-build` option.
+If you don't want the plugin to build when using `serverless-offline`, select the `--skip-build` option.
 
 #### Custom paths
 

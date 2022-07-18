@@ -1188,7 +1188,7 @@ describe('validate', () => {
   });
 
   describe('with skipped builds', () => {
-    it('should set `skipCompile` to true if `options.build` is false', () => {
+    it('should set `skipCompile` to true if `options.skip-build` is true', () => {
       const testConfig = {
         entry: 'test',
         output: {}
@@ -1197,7 +1197,7 @@ describe('validate', () => {
       module.serverless.config.servicePath = testServicePath;
       _.set(module.serverless.service, 'custom.webpack.config', testConfig);
 
-      module.options.build = false;
+      module.options['skip-build'] = true;
 
       fsExtraMock.pathExistsSync.mockReturnValue(true);
       return module.validate().then(() => {
@@ -1214,7 +1214,7 @@ describe('validate', () => {
       const testServicePath = 'testpath';
       module.serverless.config.servicePath = testServicePath;
       _.set(module.serverless.service, 'custom.webpack.config', testConfig);
-      module.options.build = false;
+      module.options['skip-build'] = true;
       fsExtraMock.pathExistsSync.mockReturnValue(true);
       return module.validate().then(() => {
         expect(module.keepOutputDirectory).toBe(true);
@@ -1230,7 +1230,7 @@ describe('validate', () => {
       const testServicePath = 'testpath';
       module.serverless.config.servicePath = testServicePath;
       _.set(module.serverless.service, 'custom.webpack.config', testConfig);
-      module.options.build = false;
+      module.options['skip-build'] = true;
       fsExtraMock.pathExistsSync.mockReturnValue(false);
       return expect(module.validate()).rejects.toThrow(/No compiled output found/);
     });
