@@ -106,7 +106,8 @@ class ServerlessWebpack {
                 type: 'boolean'
               },
               'webpack-use-polling': {
-                usage: 'Define time (in ms) for polling for changes. Default: `3000`'
+                usage: 'Define time (in ms) for polling for changes. Default: `3000`',
+                type: 'string'
               }
             }
           }
