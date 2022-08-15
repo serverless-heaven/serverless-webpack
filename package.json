@@ -46,7 +46,7 @@
     "@babel/eslint-parser": "^7.18.9",
     "@serverless/test": "^11.0.1",
     "coveralls": "^3.1.1",
-    "eslint": "^8.21.0",
+    "eslint": "^8.22.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-lodash": "^7.4.0",
