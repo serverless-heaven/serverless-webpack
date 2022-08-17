@@ -500,6 +500,10 @@ describe('validate', () => {
               }
             }
           ]
+        },
+        layerFunc: {
+          handler: 'layer.handler',
+          entrypoint: 'module1.func1handler'
         }
       };
 
@@ -547,7 +551,7 @@ describe('validate', () => {
             };
 
             expect(lib.entries).toEqual(expectedLibEntries);
-            expect(globMock.sync).toHaveBeenCalledTimes(5);
+            expect(globMock.sync).toHaveBeenCalledTimes(6);
             expect(serverless.cli.log).toHaveBeenCalledTimes(0);
             return null;
           });
@@ -804,6 +808,7 @@ describe('validate', () => {
         _.set(module.serverless.service, 'custom.webpack.config', testConfig);
         module.serverless.service.functions = testFunctionsConfig;
         globMock.sync.mockImplementation(filename => [_.replace(filename, '*', 'js')]);
+
         return expect(module.validate())
           .resolves.toBeUndefined()
           .then(() => {
@@ -916,6 +921,12 @@ describe('validate', () => {
                   entry: { key: 'module1', value: './module1.js' }
                 },
                 {
+                  handlerFile: 'module1',
+                  funcName: 'layerFunc',
+                  func: { handler: 'layer.handler', entrypoint: 'module1.func1handler' },
+                  entry: { key: 'module1', value: './module1.js' }
+                },
+                {
                   handlerFile: 'module2',
                   funcName: 'func2',
                   func: testFunctionsConfig.func2,
@@ -960,12 +971,13 @@ describe('validate', () => {
           return expect(module.validate())
             .resolves.toBeUndefined()
             .then(() => {
-              expect(module.webpackConfig).toHaveLength(5);
+              expect(module.webpackConfig).toHaveLength(6);
               expect(module.webpackConfig[0].output.path).toEqual(path.join('output', 'func1'));
-              expect(module.webpackConfig[1].output.path).toEqual(path.join('output', 'func2'));
-              expect(module.webpackConfig[2].output.path).toEqual(path.join('output', 'func3'));
-              expect(module.webpackConfig[3].output.path).toEqual(path.join('output', 'func4'));
-              expect(module.webpackConfig[4].output.path).toEqual(path.join('output', 'dockerfunc'));
+              expect(module.webpackConfig[1].output.path).toEqual(path.join('output', 'layerFunc'));
+              expect(module.webpackConfig[2].output.path).toEqual(path.join('output', 'func2'));
+              expect(module.webpackConfig[3].output.path).toEqual(path.join('output', 'func3'));
+              expect(module.webpackConfig[4].output.path).toEqual(path.join('output', 'func4'));
+              expect(module.webpackConfig[5].output.path).toEqual(path.join('output', 'dockerfunc'));
 
               return null;
             });
@@ -988,22 +1000,28 @@ describe('validate', () => {
           return expect(module.validate())
             .resolves.toBeUndefined()
             .then(() => {
-              expect(module.webpackConfig).toHaveLength(5);
+              expect(module.webpackConfig).toHaveLength(6);
               expect(module.webpackConfig[0].devtool).toEqual('source-map');
               expect(module.webpackConfig[1].devtool).toEqual('source-map');
               expect(module.webpackConfig[2].devtool).toEqual('source-map');
               expect(module.webpackConfig[3].devtool).toEqual('source-map');
               expect(module.webpackConfig[4].devtool).toEqual('source-map');
+              expect(module.webpackConfig[5].devtool).toEqual('source-map');
+
               expect(module.webpackConfig[0].context).toEqual('some context');
               expect(module.webpackConfig[1].context).toEqual('some context');
               expect(module.webpackConfig[2].context).toEqual('some context');
               expect(module.webpackConfig[3].context).toEqual('some context');
               expect(module.webpackConfig[4].context).toEqual('some context');
+              expect(module.webpackConfig[5].context).toEqual('some context');
+
               expect(module.webpackConfig[0].output.libraryTarget).toEqual('commonjs');
               expect(module.webpackConfig[1].output.libraryTarget).toEqual('commonjs');
               expect(module.webpackConfig[2].output.libraryTarget).toEqual('commonjs');
               expect(module.webpackConfig[3].output.libraryTarget).toEqual('commonjs');
               expect(module.webpackConfig[4].output.libraryTarget).toEqual('commonjs');
+              expect(module.webpackConfig[5].output.libraryTarget).toEqual('commonjs');
+
               return null;
             });
         });
