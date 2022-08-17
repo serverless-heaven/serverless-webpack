@@ -15,6 +15,7 @@ const prepareStepOfflineInvoke = require('./lib/prepareStepOfflineInvoke');
 const packExternalModules = require('./lib/packExternalModules');
 const packageModules = require('./lib/packageModules');
 const { isNodeRuntime } = require('./lib/utils');
+const { extendFunctionProperties } = require('./lib/extendServerless');
 const lib = require('./lib');
 
 class ServerlessWebpack {
@@ -24,6 +25,8 @@ class ServerlessWebpack {
 
   constructor(serverless, options, v3Utils) {
     this.serverless = serverless;
+    extendFunctionProperties(this.serverless);
+
     this.options = options;
 
     if (v3Utils) {
