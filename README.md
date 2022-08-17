@@ -69,7 +69,17 @@ custom:
     includeModules: false # Node modules configuration for packaging
     packager: 'npm' # Packager that will be used to package your external modules
     excludeFiles: src/**/*.test.js # Provide a glob for files to ignore
-    lambdaEntrypoint: null # Provide a custom lambda entrypoint. Useful when using layer provided handlers.
+```
+
+### Layers
+
+```yaml
+functions:
+  my-function:
+    layers:
+      - LAYER-ARN
+    handler: layer.handler
+    entrypoint: src/index.handler
 ```
 
 ### Webpack configuration file
