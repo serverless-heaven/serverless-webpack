@@ -71,17 +71,6 @@ custom:
     excludeFiles: src/**/*.test.js # Provide a glob for files to ignore
 ```
 
-### Layers
-
-```yaml
-functions:
-  my-function:
-    layers:
-      - LAYER-ARN
-    handler: layer.handler
-    entrypoint: src/index.handler
-```
-
 ### Webpack configuration file
 
 By default the plugin will look for a `webpack.config.js` in the service directory. Alternatively, you can specify a different file or configuration in `serverless.yml`.
@@ -196,6 +185,23 @@ module.exports = {
   }, slsw.lib.entries),
   ...
 };
+```
+
+##### Optional entry overrides
+
+`serverless-webpack` generates Webpack entries from the `handler` value by default.
+
+If your handler is different from the webpack entry, e.g. provided by a layer, 
+you may override the generated entry at function level via the `entrypoint` 
+option in `serverless.yml`.
+
+```yaml
+functions:
+  my-function:
+    layers:
+      - LAYER-ARN
+    handler: layer.handler
+    entrypoint: src/index.handler
 ```
 
 #### Full customization (for experts)
