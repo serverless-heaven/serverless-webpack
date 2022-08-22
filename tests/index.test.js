@@ -23,11 +23,21 @@ describe('ServerlessWebpack', () => {
     };
     serverless.pluginManager.spawn = jest.fn().mockReturnValue(BbPromise.resolve());
     serverless.service.getFunction = jest.fn().mockReturnValue({ runtime: 'nodejs12.x' });
+    serverless.configSchemaHandler.defineFunctionProperties = jest.fn();
   });
 
   it('should expose a lib object', () => {
     const lib = ServerlessWebpack.lib;
     expect(lib).toEqual({ entries: {}, webpack: { isLocal: false } });
+  });
+
+  it('should extend serverless', () => {
+    new ServerlessWebpack(serverless, {});
+    expect(serverless.configSchemaHandler.defineFunctionProperties).toHaveBeenCalledWith('aws', {
+      properties: {
+        entrypoint: { type: 'string' }
+      }
+    });
   });
 
   describe('with a TS webpack configuration', () => {

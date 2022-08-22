@@ -187,6 +187,23 @@ module.exports = {
 };
 ```
 
+##### Optional entry overrides
+
+`serverless-webpack` generates Webpack entries from the `handler` value by default.
+
+If your handler is different from the webpack entry, e.g. provided by a layer, 
+you may override the generated entry at function level via the `entrypoint` 
+option in `serverless.yml`.
+
+```yaml
+functions:
+  my-function:
+    layers:
+      - LAYER-ARN
+    handler: layer.handler
+    entrypoint: src/index.handler
+```
+
 #### Full customization (for experts)
 
 The lib export also provides the `serverless` and `options` properties, through
