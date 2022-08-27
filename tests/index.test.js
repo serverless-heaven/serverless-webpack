@@ -5,6 +5,7 @@
 
 const _ = require('lodash');
 const BbPromise = require('bluebird');
+const semver = require('semver');
 const Serverless = require('serverless');
 const ServerlessWebpack = require('../index');
 
@@ -23,7 +24,9 @@ describe('ServerlessWebpack', () => {
     };
     serverless.pluginManager.spawn = jest.fn().mockReturnValue(BbPromise.resolve());
     serverless.service.getFunction = jest.fn().mockReturnValue({ runtime: 'nodejs12.x' });
-    serverless.configSchemaHandler.defineFunctionProperties = jest.fn();
+    if (semver.gte(serverless.getVersion(), '2.10.0')) {
+      serverless.configSchemaHandler.defineFunctionProperties = jest.fn();
+    }
   });
 
   it('should expose a lib object', () => {
@@ -33,11 +36,15 @@ describe('ServerlessWebpack', () => {
 
   it('should extend serverless', () => {
     new ServerlessWebpack(serverless, {});
-    expect(serverless.configSchemaHandler.defineFunctionProperties).toHaveBeenCalledWith('aws', {
-      properties: {
-        entrypoint: { type: 'string' }
-      }
-    });
+    if (semver.gte(serverless.getVersion(), '2.10.0')) {
+      expect(serverless.configSchemaHandler.defineFunctionProperties).toHaveBeenCalledWith('aws', {
+        properties: {
+          entrypoint: { type: 'string' }
+        }
+      });
+    } else {
+      expect(serverless.configSchemaHandler.defineFunctionProperties).toBeUndefined();
+    }
   });
 
   describe('with a TS webpack configuration', () => {
