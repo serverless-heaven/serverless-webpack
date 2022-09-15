@@ -43,7 +43,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.19.0",
-    "@babel/eslint-parser": "^7.18.9",
+    "@babel/eslint-parser": "^7.19.1",
     "@serverless/test": "^11.0.1",
     "coveralls": "^3.1.1",
     "eslint": "^8.23.1",
