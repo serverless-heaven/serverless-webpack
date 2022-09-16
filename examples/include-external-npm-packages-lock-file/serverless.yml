@@ -3,6 +3,7 @@ service: include-external-npm-packages-lock-file
 # Add the serverless-webpack plugin
 plugins:
   - serverless-webpack
+  - serverless-offline
 
 provider:
   name: aws
