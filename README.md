@@ -425,6 +425,7 @@ The yarn packager supports the following `packagerOptions`:
 | ------------------ | ---- | ------- | --------------------------------------------------- |
 | ignoreScripts      | bool | false   | Do not execute package.json hook scripts on install |
 | noInstall          | bool | false   | Do not run `yarn install` (assume install completed)|
+| noNonInteractive   | bool | false   | Disable interactive mode when using Yarn 2 or above |
 | noFrozenLockfile   | bool | false   | Do not require an up-to-date yarn.lock              |
 | networkConcurrency | int  |         | Specify number of concurrent network requests       |
 
