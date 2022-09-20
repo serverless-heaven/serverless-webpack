@@ -213,6 +213,23 @@ describe('yarn', () => {
         });
     });
 
+    it('should use noNonInteractive option', () => {
+      Utils.spawnProcess.mockReturnValue(BbPromise.resolve({ stdout: 'installed successfully', stderr: '' }));
+      return expect(yarnModule.install('myPath', { noNonInteractive: true }))
+        .resolves.toBeUndefined()
+        .then(() => {
+          expect(Utils.spawnProcess).toHaveBeenCalledTimes(1);
+          expect(Utils.spawnProcess).toHaveBeenCalledWith(
+            expect.stringMatching(/^yarn/),
+            ['install', '--frozen-lockfile'],
+            {
+              cwd: 'myPath'
+            }
+          );
+          return null;
+        });
+    });
+
     it('should use ignoreScripts option', () => {
       Utils.spawnProcess.mockReturnValue(BbPromise.resolve({ stdout: 'installed successfully', stderr: '' }));
       return expect(yarnModule.install('myPath', { ignoreScripts: true }))
