@@ -1,6 +1,6 @@
 {
   "name": "serverless-webpack",
-  "version": "5.9.1",
+  "version": "5.10.0",
   "description": "Serverless plugin to bundle your javascript with Webpack",
   "main": "index.js",
   "types": "index.d.ts",
