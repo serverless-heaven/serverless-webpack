@@ -125,4 +125,34 @@ describe('Utils', () => {
       expect(Utils.splitLines('a\r\nb\nc')).toEqual(['a', 'b', 'c']);
     });
   });
+
+  describe('isProviderGoogle', () => {
+    describe('when the provider is set to "google"', () => {
+      const mockServerless = {
+        service: {
+          provider: {
+            name: 'google'
+          }
+        }
+      };
+
+      it('should return true', () => {
+        expect(Utils.isProviderGoogle(mockServerless)).toBe(true);
+      });
+    });
+
+    describe('when the provider is set to "aws"', () => {
+      const mockServerless = {
+        service: {
+          provider: {
+            name: 'aws'
+          }
+        }
+      };
+
+      it('should return false', () => {
+        expect(Utils.isProviderGoogle(mockServerless)).toBe(false);
+      });
+    });
+  });
 });
