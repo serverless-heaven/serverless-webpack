@@ -21,6 +21,7 @@ jest.mock('../lib/packagers/index', () => {
     copyPackageSectionNames: ['section1', 'section2'],
     mustCopyModules: true,
     rebaseLockfile: jest.fn(),
+    getPackagerVersion: jest.fn(),
     getProdDependencies: jest.fn(),
     install: jest.fn(),
     prune: jest.fn(),
@@ -203,6 +204,7 @@ describe('packExternalModules', () => {
       fsExtraMock.pathExists.mockImplementation((p, cb) => cb(null, false));
       fsExtraMock.copy.mockImplementation((from, to, cb) => cb());
       packagerFactoryMock.get('npm').getProdDependencies.mockReturnValue(BbPromise.resolve({}));
+      packagerFactoryMock.get('npm').getPackagerVersion.mockReturnValue(BbPromise.resolve());
       packagerFactoryMock.get('npm').install.mockReturnValue(BbPromise.resolve());
       packagerFactoryMock.get('npm').prune.mockReturnValue(BbPromise.resolve());
       packagerFactoryMock.get('npm').runScripts.mockReturnValue(BbPromise.resolve());
@@ -219,6 +221,7 @@ describe('packExternalModules', () => {
             expect(fsExtraMock.copy).toHaveBeenCalledTimes(1),
             // npm ls and npm prune should have been called
             expect(packagerFactoryMock.get('npm').getProdDependencies).toHaveBeenCalledTimes(1),
+            expect(packagerFactoryMock.get('npm').getPackagerVersion).toHaveBeenCalledTimes(2),
             expect(packagerFactoryMock.get('npm').install).toHaveBeenCalledTimes(1),
             expect(packagerFactoryMock.get('npm').prune).toHaveBeenCalledTimes(1),
             expect(packagerFactoryMock.get('npm').runScripts).toHaveBeenCalledTimes(1)
@@ -256,6 +259,7 @@ describe('packExternalModules', () => {
       fsExtraMock.pathExists.mockImplementation((p, cb) => cb(null, false));
       fsExtraMock.copy.mockImplementation((from, to, cb) => cb());
       packagerFactoryMock.get('npm').getProdDependencies.mockReturnValue(BbPromise.resolve({}));
+      packagerFactoryMock.get('npm').getPackagerVersion.mockReturnValue(BbPromise.resolve());
       packagerFactoryMock.get('npm').install.mockReturnValue(BbPromise.resolve());
       packagerFactoryMock.get('npm').prune.mockReturnValue(BbPromise.resolve());
       packagerFactoryMock.get('npm').runScripts.mockReturnValue(BbPromise.resolve());
@@ -272,6 +276,7 @@ describe('packExternalModules', () => {
             expect(fsExtraMock.copy).toHaveBeenCalledTimes(1),
             // npm ls and npm prune should have been called
             expect(packagerFactoryMock.get('npm').getProdDependencies).toHaveBeenCalledTimes(1),
+            expect(packagerFactoryMock.get('npm').getPackagerVersion).toHaveBeenCalledTimes(2),
             expect(packagerFactoryMock.get('npm').install).toHaveBeenCalledTimes(1),
             expect(packagerFactoryMock.get('npm').prune).toHaveBeenCalledTimes(1),
             expect(packagerFactoryMock.get('npm').runScripts).toHaveBeenCalledTimes(1)
@@ -341,6 +346,7 @@ describe('packExternalModules', () => {
       fsExtraMock.copy.mockImplementation((from, to, cb) => cb());
       packagerFactoryMock.get('npm').getProdDependencies.mockReturnValue(BbPromise.resolve({}));
       packagerFactoryMock.get('npm').rebaseLockfile.mockImplementation((pathToPackageRoot, lockfile) => lockfile);
+      packagerFactoryMock.get('npm').getPackagerVersion.mockReturnValue(BbPromise.resolve());
       packagerFactoryMock.get('npm').install.mockReturnValue(BbPromise.resolve());
       packagerFactoryMock.get('npm').prune.mockReturnValue(BbPromise.resolve());
       packagerFactoryMock.get('npm').runScripts.mockReturnValue(BbPromise.resolve());
@@ -371,6 +377,7 @@ describe('packExternalModules', () => {
             ),
             // npm ls and npm prune should have been called
             expect(packagerFactoryMock.get('npm').getProdDependencies).toHaveBeenCalledTimes(1),
+            expect(packagerFactoryMock.get('npm').getPackagerVersion).toHaveBeenCalledTimes(2),
             expect(packagerFactoryMock.get('npm').install).toHaveBeenCalledTimes(1),
             expect(packagerFactoryMock.get('npm').prune).toHaveBeenCalledTimes(1),
             expect(packagerFactoryMock.get('npm').runScripts).toHaveBeenCalledTimes(1)
@@ -412,6 +419,7 @@ describe('packExternalModules', () => {
       fsExtraMock.pathExists.mockImplementation((p, cb) => cb(null, false));
       fsExtraMock.copy.mockImplementation((from, to, cb) => cb());
       packagerFactoryMock.get('npm').getProdDependencies.mockReturnValue(BbPromise.resolve({}));
+      packagerFactoryMock.get('npm').getPackagerVersion.mockReturnValue(BbPromise.resolve());
       packagerFactoryMock.get('npm').install.mockReturnValue(BbPromise.resolve());
       packagerFactoryMock.get('npm').prune.mockReturnValue(BbPromise.resolve());
       packagerFactoryMock.get('npm').runScripts.mockReturnValue(BbPromise.resolve());
@@ -428,6 +436,7 @@ describe('packExternalModules', () => {
             expect(fsExtraMock.copy).toHaveBeenCalledTimes(0),
             // npm ls and npm prune should have been called
             expect(packagerFactoryMock.get('npm').getProdDependencies).toHaveBeenCalledTimes(1),
+            expect(packagerFactoryMock.get('npm').getPackagerVersion).toHaveBeenCalledTimes(1),
             expect(packagerFactoryMock.get('npm').install).toHaveBeenCalledTimes(1),
             expect(packagerFactoryMock.get('npm').prune).toHaveBeenCalledTimes(0),
             expect(packagerFactoryMock.get('npm').runScripts).toHaveBeenCalledTimes(0)
@@ -440,6 +449,7 @@ describe('packExternalModules', () => {
       fsExtraMock.pathExists.mockImplementation((p, cb) => cb(null, false));
       fsExtraMock.copy.mockImplementation((from, to, cb) => cb());
       packagerFactoryMock.get('npm').getProdDependencies.mockReturnValue(BbPromise.resolve({}));
+      packagerFactoryMock.get('npm').getPackagerVersion.mockReturnValue(BbPromise.resolve());
       packagerFactoryMock
         .get('npm')
         .install.mockImplementation(() => BbPromise.reject(new Error('npm install failed')));
@@ -452,6 +462,7 @@ describe('packExternalModules', () => {
           BbPromise.all([
             // npm ls and npm install should have been called
             expect(packagerFactoryMock.get('npm').getProdDependencies).toHaveBeenCalledTimes(1),
+            expect(packagerFactoryMock.get('npm').getPackagerVersion).toHaveBeenCalledTimes(1),
             expect(packagerFactoryMock.get('npm').install).toHaveBeenCalledTimes(1),
             expect(packagerFactoryMock.get('npm').prune).toHaveBeenCalledTimes(0),
             expect(packagerFactoryMock.get('npm').runScripts).toHaveBeenCalledTimes(0)
