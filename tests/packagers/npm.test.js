@@ -38,6 +38,36 @@ describe('npm', () => {
     expect(npmModule.mustCopyModules).toBe(true);
   });
 
+  describe('getPackagerVersion', () => {
+    it('should use npm version 6.14.17', () => {
+      const npmVersion = '6.14.17';
+      Utils.spawnProcess.mockReturnValue(BbPromise.resolve({ stdout: npmVersion, stderr: '' }));
+      return expect(npmModule.getPackagerVersion('myPath', 1))
+        .resolves.toEqual(npmVersion)
+        .then(() => {
+          expect(Utils.spawnProcess).toHaveBeenCalledTimes(1);
+          expect(Utils.spawnProcess).toHaveBeenNthCalledWith(1, expect.stringMatching(/^npm/), ['-v'], {
+            cwd: 'myPath'
+          });
+          return null;
+        });
+    });
+
+    it('should use npm version 8.19.2', () => {
+      const npmVersion = '8.19.2';
+      Utils.spawnProcess.mockReturnValue(BbPromise.resolve({ stdout: npmVersion, stderr: '' }));
+      return expect(npmModule.getPackagerVersion('myPath', 1))
+        .resolves.toEqual(npmVersion)
+        .then(() => {
+          expect(Utils.spawnProcess).toHaveBeenCalledTimes(1);
+          expect(Utils.spawnProcess).toHaveBeenNthCalledWith(1, expect.stringMatching(/^npm/), ['-v'], {
+            cwd: 'myPath'
+          });
+          return null;
+        });
+    });
+  });
+
   describe('install', () => {
     it('should use npm install', () => {
       Utils.spawnProcess.mockReturnValue(BbPromise.resolve({ stdout: 'installed successfully', stderr: '' }));

@@ -28,6 +28,48 @@ describe('yarn', () => {
     expect(yarnModule.mustCopyModules).toBe(false);
   });
 
+  describe('isBerryVersion', () => {
+    it('Yarn version 1.22.19', () => {
+      const yarnVersion = '1.22.19';
+      expect(yarnModule.isBerryVersion(yarnVersion)).toBe(false);
+    });
+
+    it('Yarn version 3.2.3', () => {
+      const yarnVersion = '3.2.3';
+      expect(yarnModule.isBerryVersion(yarnVersion)).toBe(true);
+    });
+  });
+
+  describe('getPackagerVersion', () => {
+    it('should use yarn version 1.22.19', () => {
+      const yarnVersion = '1.22.19';
+      Utils.spawnProcess.mockReturnValue(BbPromise.resolve({ stdout: yarnVersion, stderr: '' }));
+      return expect(yarnModule.getPackagerVersion('myPath', 1))
+        .resolves.toEqual(yarnVersion)
+        .then(() => {
+          expect(Utils.spawnProcess).toHaveBeenCalledTimes(1);
+          expect(Utils.spawnProcess).toHaveBeenNthCalledWith(1, expect.stringMatching(/^yarn/), ['-v'], {
+            cwd: 'myPath'
+          });
+          return null;
+        });
+    });
+
+    it('should use yarn version 3.2.3', () => {
+      const yarnVersion = '3.2.3';
+      Utils.spawnProcess.mockReturnValue(BbPromise.resolve({ stdout: yarnVersion, stderr: '' }));
+      return expect(yarnModule.getPackagerVersion('myPath', 1))
+        .resolves.toEqual(yarnVersion)
+        .then(() => {
+          expect(Utils.spawnProcess).toHaveBeenCalledTimes(1);
+          expect(Utils.spawnProcess).toHaveBeenNthCalledWith(1, expect.stringMatching(/^yarn/), ['-v'], {
+            cwd: 'myPath'
+          });
+          return null;
+        });
+    });
+  });
+
   describe('getProdDependencies', () => {
     it('should use yarn list', () => {
       Utils.spawnProcess.mockReturnValue(BbPromise.resolve({ stdout: '{}', stderr: '' }));
@@ -198,7 +240,7 @@ describe('yarn', () => {
   describe('install', () => {
     it('should use yarn install', () => {
       Utils.spawnProcess.mockReturnValue(BbPromise.resolve({ stdout: 'installed successfully', stderr: '' }));
-      return expect(yarnModule.install('myPath', {}))
+      return expect(yarnModule.install('myPath', {}, '1.22.19'))
         .resolves.toBeUndefined()
         .then(() => {
           expect(Utils.spawnProcess).toHaveBeenCalledTimes(1);
@@ -215,7 +257,7 @@ describe('yarn', () => {
 
     it('should use noNonInteractive option', () => {
       Utils.spawnProcess.mockReturnValue(BbPromise.resolve({ stdout: 'installed successfully', stderr: '' }));
-      return expect(yarnModule.install('myPath', { noNonInteractive: true }))
+      return expect(yarnModule.install('myPath', { noNonInteractive: true }, '1.22.19'))
         .resolves.toBeUndefined()
         .then(() => {
           expect(Utils.spawnProcess).toHaveBeenCalledTimes(1);
@@ -232,7 +274,7 @@ describe('yarn', () => {
 
     it('should use ignoreScripts option', () => {
       Utils.spawnProcess.mockReturnValue(BbPromise.resolve({ stdout: 'installed successfully', stderr: '' }));
-      return expect(yarnModule.install('myPath', { ignoreScripts: true }))
+      return expect(yarnModule.install('myPath', { ignoreScripts: true }, '1.22.19'))
         .resolves.toBeUndefined()
         .then(() => {
           expect(Utils.spawnProcess).toHaveBeenCalledTimes(1);
@@ -249,7 +291,7 @@ describe('yarn', () => {
 
     it('should use noFrozenLockfile option', () => {
       Utils.spawnProcess.mockReturnValue(BbPromise.resolve({ stdout: 'installed successfully', stderr: '' }));
-      return expect(yarnModule.install('myPath', { noFrozenLockfile: true }))
+      return expect(yarnModule.install('myPath', { noFrozenLockfile: true }, '1.22.19'))
         .resolves.toBeUndefined()
         .then(() => {
           expect(Utils.spawnProcess).toHaveBeenCalledTimes(1);
@@ -266,7 +308,7 @@ describe('yarn', () => {
 
     it('should use networkConcurrency option', () => {
       Utils.spawnProcess.mockReturnValue(BbPromise.resolve({ stdout: 'installed successfully', stderr: '' }));
-      return expect(yarnModule.install('myPath', { networkConcurrency: 1 }))
+      return expect(yarnModule.install('myPath', { networkConcurrency: 1 }, '1.22.19'))
         .resolves.toBeUndefined()
         .then(() => {
           expect(Utils.spawnProcess).toHaveBeenCalledTimes(1);
@@ -291,7 +333,7 @@ describe('yarn', () => {
   describe('prune', () => {
     it('should call install', () => {
       Utils.spawnProcess.mockReturnValue(BbPromise.resolve({ stdout: 'success', stderr: '' }));
-      return expect(yarnModule.prune('myPath', {}))
+      return expect(yarnModule.prune('myPath', {}, '1.22.19'))
         .resolves.toBeUndefined()
         .then(() => {
           expect(Utils.spawnProcess).toHaveBeenCalledTimes(1);
