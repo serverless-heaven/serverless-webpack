@@ -1,0 +1,21 @@
+{
+  "name": "include-external-npm-packages-with-yarn-workspaces",
+  "version": "1.0.0",
+  "description": "Serverless webpack example",
+  "main": "handler.js",
+  "private": true,
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Tony Yuen <colsy2@gmail.com>",
+  "license": "MIT",
+  "workspaces": {
+    "packages": [
+      "./packages/*"
+    ]
+  },
+  "devDependencies": {
+  },
+  "dependencies": {
+  }
+}

@@ -117,4 +117,34 @@ describe('end-to-end testing', () => {
       expect(files.node_modules).toEqual(true);
     }, 300000);
   }
+
+  if (nodeVersion.major < 14 || slsMajor !== 3 || isWin) {
+    // Serverless v3 doesn't support node 12 or below
+    it.skip('should support include-external-npm-packages-lock-file example', _.noop);
+  } else {
+    it('should support include-external-npm-packages-with-yarn-workspaces example', async () => {
+      const fixture = 'include-external-npm-packages-with-yarn-workspaces';
+      const subproject = path.join('packages', 'project');
+
+      const result = await runServerless({ fixture, subproject });
+
+      const outputDir = path.join(result.servicePath, '.serverless');
+      const archivePath = path.join(outputDir, `${fixture}.zip`);
+      const files = await unzipArtifacts(archivePath);
+
+      expect(JSON.parse(files['package.json'])).toEqual({
+        name: fixture,
+        version: '1.0.0',
+        description: `Packaged externals for ${fixture}`,
+        private: true,
+        scripts: {},
+        dependencies: {
+          // We should use fix version to respect lock file
+          lodash: '^4.17.21'
+        }
+      });
+      expect(files['handler.js']).not.toHaveLength(0);
+      expect(files.node_modules).toEqual(true);
+    }, 300000);
+  }
 });

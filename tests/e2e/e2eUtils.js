@@ -34,11 +34,11 @@ async function runServerless(options) {
 
   const servicePath = await setupFixture(options.fixture);
 
-  runServerlessOptions.cwd = servicePath;
+  runServerlessOptions.cwd = path.join(servicePath, options.subproject || '');
   const SERVERLESS_DIR = path.join(servicePath, 'node_modules', 'serverless');
   try {
     const result = await originalRunServerless(SERVERLESS_DIR, runServerlessOptions);
-    result.servicePath = servicePath;
+    result.servicePath = runServerlessOptions.cwd;
     return result;
   } catch (error) {
     error.servicePath = servicePath;

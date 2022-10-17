@@ -1,0 +1,26 @@
+{
+  "name": "include-external-npm-packages-with-yarn-workspaces-subproject",
+  "version": "1.0.0",
+  "description": "Serverless webpack example",
+  "main": "handler.js",
+  "private": true,
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Tony Yuen <colsy2@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "aws-sdk": "^2.814.0",
+    "serverless": "^3.7.4",
+    "serverless-offline": "^8.8.1",
+    "serverless-webpack": "file:../..",
+    "webpack": "^5.74.0",
+    "webpack-node-externals": "^2.5.0"
+  },
+  "dependencies": {
+    "dotenv": "^16.0.0",
+    "fbgraph": "^1.4.4",
+    "lodash": "^4.17.21",
+    "lodash.isequal": "^4.5.0"
+  }
+}

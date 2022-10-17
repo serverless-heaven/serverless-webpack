@@ -35,6 +35,7 @@
   "dependencies": {
     "archiver": "^5.3.1",
     "bluebird": "^3.7.2",
+    "find-yarn-workspace-root": "^2.0.0",
     "fs-extra": "^9.1.0",
     "glob": "^7.2.3",
     "is-builtin-module": "^3.2.0",
