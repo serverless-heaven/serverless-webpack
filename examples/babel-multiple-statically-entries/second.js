@@ -1,8 +1,9 @@
-export const hello = (event, context, cb) => {
-  const p = new Promise((resolve, reject) => {
+/* eslint-disable promise/no-callback-in-promise */
+export const hello = (event, _, cb) => {
+  const p = new Promise(resolve => {
     resolve('success');
   });
-  p.then(r =>
+  p.then(() =>
     cb(null, {
       message: 'Go Serverless Webpack (Babel) v1.0! Second module!',
       event
