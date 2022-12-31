@@ -8,5 +8,5 @@ coverage
 .idea
 /.nyc_output
 .history
-.vscode
+/.vscode
 .DS_Store
