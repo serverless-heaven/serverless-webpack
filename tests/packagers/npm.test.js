@@ -31,7 +31,7 @@ describe('npm', () => {
   });
 
   it('should return no packager sections', () => {
-    expect(npmModule.copyPackageSectionNames).toEqual([]);
+    expect(npmModule.copyPackageSectionNames).toEqual(['type']);
   });
 
   it('requires to copy modules', () => {
