@@ -18,7 +18,7 @@ jest.mock('fs-extra');
 jest.mock('../lib/packagers/index', () => {
   const packagerMock = {
     lockfileName: 'mocked-lock.json',
-    copyPackageSectionNames: ['section1', 'section2'],
+    copyPackageSectionNames: jest.requireActual('../lib/packagers/npm').copyPackageSectionNames,
     mustCopyModules: true,
     rebaseLockfile: jest.fn(),
     getPackagerVersion: jest.fn(),
@@ -196,6 +196,15 @@ describe('packExternalModules', () => {
         section1: originalPackageJSON.section1
       };
 
+      module.configuration = new Configuration({
+        webpack: {
+          includeModules: true,
+          packager: 'npm',
+          packagerOptions: {
+            copyPackageSectionNames: ['section1', 'section2']
+          }
+        }
+      });
       module.webpackOutputPath = '/my/Service/Path/outputPath';
       readFileSyncStub.mockReturnValueOnce(originalPackageJSON);
       readFileSyncStub.mockImplementation(() => {
@@ -225,6 +234,79 @@ describe('packExternalModules', () => {
             expect(packagerFactoryMock.get('npm').install).toHaveBeenCalledTimes(1),
             expect(packagerFactoryMock.get('npm').prune).toHaveBeenCalledTimes(1),
             expect(packagerFactoryMock.get('npm').runScripts).toHaveBeenCalledTimes(1)
+          ])
+        );
+    });
+
+    it('should include ESM type from package.json according to packagerOptions', () => {
+      const originalPackageJSON = {
+        name: 'test-service',
+        version: '1.0.0',
+        description: 'Packaged externals for test-service',
+        private: true,
+        type: 'module',
+        dependencies: {
+          '@scoped/vendor': '1.0.0',
+          bluebird: '^3.4.0',
+          uuid: '^5.4.1'
+        }
+      };
+      const expectedCompositePackageJSON = {
+        name: 'test-service',
+        version: '1.0.0',
+        description: 'Packaged externals for test-service',
+        private: true,
+        scripts: {},
+        type: 'module',
+        dependencies: {
+          '@scoped/vendor': '1.0.0',
+          bluebird: '^3.4.0',
+          uuid: '^5.4.1'
+        }
+      };
+      const expectedPackageJSON = {
+        name: 'test-service',
+        version: '1.0.0',
+        description: 'Packaged externals for test-service',
+        private: true,
+        scripts: {},
+        dependencies: {
+          '@scoped/vendor': '1.0.0',
+          bluebird: '^3.4.0',
+          uuid: '^5.4.1'
+        },
+        type: 'module'
+      };
+      module.configuration = new Configuration({
+        webpack: {
+          includeModules: true,
+          packager: 'npm',
+          packagerOptions: {
+            copyPackageSectionNames: ['type']
+          }
+        }
+      });
+
+      module.webpackOutputPath = '/my/Service/Path/outputPath';
+      fsExtraMock.pathExists.mockImplementation((p, cb) => cb(null, true));
+      fsExtraMock.copy.mockImplementation((from, to, cb) => cb());
+      readFileSyncStub.mockReturnValueOnce(originalPackageJSON);
+      readFileSyncStub.mockImplementation(() => {
+        throw new Error('Unexpected call to readFileSync');
+      });
+      packagerFactoryMock.get('npm').rebaseLockfile.mockImplementation((pathToPackageRoot, lockfile) => lockfile);
+      packagerFactoryMock.get('npm').getProdDependencies.mockReturnValue(BbPromise.resolve({}));
+      packagerFactoryMock.get('npm').install.mockReturnValue(BbPromise.resolve());
+      packagerFactoryMock.get('npm').prune.mockReturnValue(BbPromise.resolve());
+      packagerFactoryMock.get('npm').runScripts.mockReturnValue(BbPromise.resolve());
+      module.compileStats = stats;
+      return expect(module.packExternalModules())
+        .resolves.toBeUndefined()
+        .then(() =>
+          BbPromise.all([
+            expect(writeFileSyncStub).toHaveBeenCalledTimes(2),
+            expect(writeFileSyncStub.mock.calls[0][1]).toEqual(JSON.stringify(expectedCompositePackageJSON, null, 2)),
+            expect(writeFileSyncStub.mock.calls[1][1]).toEqual(JSON.stringify(expectedPackageJSON, null, 2))
           ])
         );
     });
