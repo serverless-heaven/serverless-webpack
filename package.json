@@ -43,7 +43,7 @@
     "semver": "^7.3.8"
   },
   "devDependencies": {
-    "@babel/core": "^7.21.4",
+    "@babel/core": "^7.22.6",
     "@babel/eslint-parser": "^7.21.3",
     "@serverless/test": "^11.1.0",
     "@types/node": "*",
