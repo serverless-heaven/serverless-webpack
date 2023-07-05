@@ -25,6 +25,7 @@ class ServerlessWebpack {
 
   constructor(serverless, options, v3Utils) {
     this.serverless = serverless;
+
     extendFunctionProperties(this.serverless);
 
     this.options = options;
@@ -144,123 +145,138 @@ class ServerlessWebpack {
       }
     };
 
-    this.hooks = {
-      initialize: () => {
-        // serverless.processedInput does not exist in serverless@<2.0.0. This ensure the retrocompatibility with serverless v1
-        if (this.serverless.processedInput && this.serverless.processedInput.options) {
-          this.options = this.serverless.processedInput.options;
-        }
-      },
-      'before:package:createDeploymentArtifacts': () =>
-        BbPromise.bind(this)
-          .then(() => this.serverless.pluginManager.spawn('webpack:validate'))
-          .then(() => (this.skipCompile ? BbPromise.resolve() : this.serverless.pluginManager.spawn('webpack:compile')))
-          .then(() => this.serverless.pluginManager.spawn('webpack:package'))
-          .then(() => this.log && this.progress.get('webpack').remove()),
+    if (!this.isSkipWebpackOptionSet()) {
+      this.hooks = {
+        initialize: () => {
+          // serverless.processedInput does not exist in serverless@<2.0.0. This ensure the retrocompatibility with serverless v1
+          if (this.serverless.processedInput && this.serverless.processedInput.options) {
+            this.options = this.serverless.processedInput.options;
+          }
+        },
+        'before:package:createDeploymentArtifacts': () =>
+          BbPromise.bind(this)
+            .then(() => this.serverless.pluginManager.spawn('webpack:validate'))
+            .then(() =>
+              this.skipCompile ? BbPromise.resolve() : this.serverless.pluginManager.spawn('webpack:compile')
+            )
+            .then(() => this.serverless.pluginManager.spawn('webpack:package'))
+            .then(() => this.log && this.progress.get('webpack').remove()),
 
-      'after:package:createDeploymentArtifacts': () => BbPromise.bind(this).then(this.cleanup),
+        'after:package:createDeploymentArtifacts': () => BbPromise.bind(this).then(this.cleanup),
 
-      'before:deploy:function:packageFunction': () => {
-        const runtime =
-          this.serverless.service.getFunction(this.options.function).runtime ||
-          this.serverless.service.provider.runtime ||
-          'nodejs';
+        'before:deploy:function:packageFunction': () => {
+          const runtime =
+            this.serverless.service.getFunction(this.options.function).runtime ||
+            this.serverless.service.provider.runtime ||
+            'nodejs';
 
-        if (isNodeRuntime(runtime)) {
-          return BbPromise.bind(this)
+          if (isNodeRuntime(runtime)) {
+            return BbPromise.bind(this)
+              .then(() => this.serverless.pluginManager.spawn('webpack:validate'))
+              .then(() => this.serverless.pluginManager.spawn('webpack:compile'))
+              .then(() => this.serverless.pluginManager.spawn('webpack:package'));
+          }
+        },
+
+        'before:invoke:local:invoke': () =>
+          BbPromise.bind(this)
+            .then(() => {
+              lib.webpack.isLocal = true;
+
+              return this.serverless.pluginManager.spawn('webpack:validate');
+            })
+            .then(() =>
+              this.skipCompile ? BbPromise.resolve() : this.serverless.pluginManager.spawn('webpack:compile')
+            )
+            .then(this.prepareLocalInvoke),
+
+        'after:invoke:local:invoke': () =>
+          BbPromise.bind(this).then(() => {
+            if (this.options.watch && !this.isWatching) {
+              return this.watch('invoke:local');
+            }
+            return BbPromise.resolve();
+          }),
+
+        'before:run:run': () =>
+          BbPromise.bind(this)
+            .then(() => _.set(this.serverless, 'service.package.individually', false))
             .then(() => this.serverless.pluginManager.spawn('webpack:validate'))
             .then(() => this.serverless.pluginManager.spawn('webpack:compile'))
-            .then(() => this.serverless.pluginManager.spawn('webpack:package'));
-        }
-      },
+            .then(this.packExternalModules)
+            .then(this.prepareRun),
 
-      'before:invoke:local:invoke': () =>
-        BbPromise.bind(this)
-          .then(() => {
-            lib.webpack.isLocal = true;
-
-            return this.serverless.pluginManager.spawn('webpack:validate');
-          })
-          .then(() => (this.skipCompile ? BbPromise.resolve() : this.serverless.pluginManager.spawn('webpack:compile')))
-          .then(this.prepareLocalInvoke),
-
-      'after:invoke:local:invoke': () =>
-        BbPromise.bind(this).then(() => {
-          if (this.options.watch && !this.isWatching) {
-            return this.watch('invoke:local');
-          }
-          return BbPromise.resolve();
-        }),
-
-      'before:run:run': () =>
-        BbPromise.bind(this)
-          .then(() => _.set(this.serverless, 'service.package.individually', false))
-          .then(() => this.serverless.pluginManager.spawn('webpack:validate'))
-          .then(() => this.serverless.pluginManager.spawn('webpack:compile'))
-          .then(this.packExternalModules)
-          .then(this.prepareRun),
-
-      'after:run:run': () =>
-        BbPromise.bind(this).then(() => {
-          if (this.options.watch && !this.isWatching) {
-            return this.watch(this.watchRun.bind(this));
-          }
-          return BbPromise.resolve();
-        }),
-
-      'webpack:webpack': () =>
-        BbPromise.bind(this)
-          .then(() => this.serverless.pluginManager.spawn('webpack:validate'))
-          .then(() => this.serverless.pluginManager.spawn('webpack:compile'))
-          .then(() => this.serverless.pluginManager.spawn('webpack:package')),
-
-      /*
-       * Internal webpack events (can be hooked by plugins)
-       */
-      'webpack:validate:validate': () => BbPromise.bind(this).then(this.validate),
-
-      'webpack:compile:compile': () => BbPromise.bind(this).then(this.compile),
-
-      'webpack:compile:watch:compile': () => BbPromise.resolve(),
-
-      'webpack:package:packExternalModules': () => BbPromise.bind(this).then(this.packExternalModules),
-
-      'webpack:package:packageModules': () => BbPromise.bind(this).then(this.packageModules),
-
-      'webpack:package:copyExistingArtifacts': () => BbPromise.bind(this).then(this.copyExistingArtifacts),
-
-      'before:offline:start': () =>
-        BbPromise.bind(this)
-          .tap(() => {
-            lib.webpack.isLocal = true;
-            // --skip-build override
-            if (this.options['skip-build'] === false) {
-              this.skipCompile = true;
+        'after:run:run': () =>
+          BbPromise.bind(this).then(() => {
+            if (this.options.watch && !this.isWatching) {
+              return this.watch(this.watchRun.bind(this));
             }
-          })
-          .then(this.prepareOfflineInvoke)
-          .then(() => (this.skipCompile ? BbPromise.resolve() : this.wpwatch())),
+            return BbPromise.resolve();
+          }),
 
-      'before:offline:start:init': () =>
-        BbPromise.bind(this)
-          .tap(() => {
-            lib.webpack.isLocal = true;
-            // --skip-build override
-            if (this.options['skip-build'] === false) {
-              this.skipCompile = true;
-            }
-          })
-          .then(this.prepareOfflineInvoke)
-          .then(() => (this.skipCompile ? BbPromise.resolve() : this.wpwatch())),
+        'webpack:webpack': () =>
+          BbPromise.bind(this)
+            .then(() => this.serverless.pluginManager.spawn('webpack:validate'))
+            .then(() => this.serverless.pluginManager.spawn('webpack:compile'))
+            .then(() => this.serverless.pluginManager.spawn('webpack:package')),
 
-      'before:step-functions-offline:start': () =>
-        BbPromise.bind(this)
-          .tap(() => {
-            lib.webpack.isLocal = true;
-          })
-          .then(this.prepareStepOfflineInvoke)
-          .then(() => this.serverless.pluginManager.spawn('webpack:compile'))
-    };
+        /*
+         * Internal webpack events (can be hooked by plugins)
+         */
+        'webpack:validate:validate': () => BbPromise.bind(this).then(this.validate),
+
+        'webpack:compile:compile': () => BbPromise.bind(this).then(this.compile),
+
+        'webpack:compile:watch:compile': () => BbPromise.resolve(),
+
+        'webpack:package:packExternalModules': () => BbPromise.bind(this).then(this.packExternalModules),
+
+        'webpack:package:packageModules': () => BbPromise.bind(this).then(this.packageModules),
+
+        'webpack:package:copyExistingArtifacts': () => BbPromise.bind(this).then(this.copyExistingArtifacts),
+
+        'before:offline:start': () =>
+          BbPromise.bind(this)
+            .tap(() => {
+              lib.webpack.isLocal = true;
+              // --skip-build override
+              if (this.options['skip-build'] === false) {
+                this.skipCompile = true;
+              }
+            })
+            .then(this.prepareOfflineInvoke)
+            .then(() => (this.skipCompile ? BbPromise.resolve() : this.wpwatch())),
+
+        'before:offline:start:init': () =>
+          BbPromise.bind(this)
+            .tap(() => {
+              lib.webpack.isLocal = true;
+              // --skip-build override
+              if (this.options['skip-build'] === false) {
+                this.skipCompile = true;
+              }
+            })
+            .then(this.prepareOfflineInvoke)
+            .then(() => (this.skipCompile ? BbPromise.resolve() : this.wpwatch())),
+
+        'before:step-functions-offline:start': () =>
+          BbPromise.bind(this)
+            .tap(() => {
+              lib.webpack.isLocal = true;
+            })
+            .then(this.prepareStepOfflineInvoke)
+            .then(() => this.serverless.pluginManager.spawn('webpack:compile'))
+      };
+    }
+  }
+
+  isSkipWebpackOptionSet() {
+    const { param: optionParameters } = this.options;
+    return (
+      optionParameters &&
+      _.isArray(optionParameters) &&
+      _.some(optionParameters, optionParameter => _.includes(optionParameter, 'skipWebpack'))
+    );
   }
 }
 

@@ -1,13 +1,16 @@
 {
-  "name": "serverless-webpack",
-  "version": "5.11.0",
+  "name": "@fundmore/serverless-webpack",
+  "version": "5.12.0",
   "description": "Serverless plugin to bundle your javascript with Webpack",
   "main": "index.js",
   "types": "index.d.ts",
-  "author": "Frank Schmid <fschmid740@googlemail.com>",
+  "author": "adrian@fundmore.ai",
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/"
+  },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/serverless-heaven/serverless-webpack.git"
+    "url": "git+https://github.com/fundmore/serverless-webpack.git"
   },
   "keywords": [
     "serverless",
@@ -30,7 +33,8 @@
   "scripts": {
     "test": "jest --verbose",
     "test-coverage": "jest --coverage",
-    "eslint": "eslint ."
+    "eslint": "eslint .",
+    "eslint-fix": "eslint . --fix"
   },
   "dependencies": {
     "archiver": "^5.3.1",
