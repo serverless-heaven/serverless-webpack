@@ -19,21 +19,22 @@ jobs:
       matrix:
         os:
           - windows-latest
-          - ubuntu-18.04
+          - ubuntu-20.04
         node:
           - "10"
           - "12"
           - "14"
           - "16"
+          - "18"
 
     steps:
       - name: "Checkout"
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 2
 
       - name: "Install Node.js"
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
           node-version: "${{ matrix.node }}"
 
@@ -51,14 +52,14 @@ jobs:
 
     steps:
       - name: "Checkout"
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 2
 
       - name: "Install Node.js"
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
-          node-version: "12"
+          node-version: "16"
 
       - name: "Install dependencies"
         run: npm ci
@@ -84,12 +85,12 @@ jobs:
 
     steps:
       - name: "Checkout"
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 2
 
       - name: "Install Node.js"
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
           node-version: "${{ matrix.node }}"
 
@@ -115,12 +116,12 @@ jobs:
 
     steps:
       - name: "Checkout"
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 2
 
       - name: "Install Node.js"
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
           node-version: "${{ matrix.node }}"
 
