@@ -61,7 +61,7 @@
     "prettier": "^2.8.7",
     "serverless": "^3.33.0",
     "sinon": "^15.2.0",
-    "unzipper": "^0.10.11",
+    "unzipper": "^0.10.14",
     "webpack": "^5.88.2"
   },
   "peerDependencies": {
