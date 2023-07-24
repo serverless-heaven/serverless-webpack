@@ -8,9 +8,8 @@ __mocks__
 .github
 yarn.lock
 yarn-error.log
-.appveyor.yml
-.travis.yml
 .editorconfig
 .eslintrc.yml
 .huskyrc
 .lintstagedrc.yml
+jest.config.js
