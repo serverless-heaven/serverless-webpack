@@ -8,6 +8,10 @@ updates:
       timezone: Europe/Paris
     open-pull-requests-limit: 10
     versioning-strategy: increase
+    groups:
+      babel-dependencies:
+        patterns:
+          - "*babel*"
     ignore:
       - dependency-name: husky
         versions:
@@ -28,3 +32,7 @@ updates:
       - dependency-name: jest
         versions:
           - ">= 28.0.0"
+      # require node > 10
+      - dependency-name: glob
+        versions:
+          - ">= 8.0.0"

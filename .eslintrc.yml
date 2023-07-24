@@ -63,3 +63,5 @@ rules:
         trailingComma: 'none'
       }
     ]
+ignorePatterns:
+  - examples/
