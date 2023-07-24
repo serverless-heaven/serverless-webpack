@@ -30,4 +30,4 @@ jobs:
         run: npm ci
 
       - name: "Lint files"
-        run: "npm run eslint -- --ignore-pattern examples/"
+        run: "npm run eslint"
