@@ -406,14 +406,31 @@ you should use any version `<5.5 >=5.7.1` as the versions in-between have some n
 
 The NPM packager supports the following `packagerOptions`:
 
-| Option             | Type   | Default               | Description                                         |
-| ------------------ | ------ | --------------------- | --------------------------------------------------- |
-| ignoreScripts      | bool   | false                 | Do not execute package.json hook scripts on install |
-| noInstall          | bool   | false                 | Do not run `npm install` (assume install completed) |
-| lockFile           | string | ./package-lock.json   | Relative path to lock file to use                   |
+| Option                  | Type     | Default             | Description                                                         |
+|-------------------------|----------|---------------------|---------------------------------------------------------------------|
+| ignoreScripts           | bool     | false               | Do not execute package.json hook scripts on install                 |
+| noInstall               | bool     | false               | Do not run `npm install` (assume install completed)                 |
+| lockFile                | string   | ./package-lock.json | Relative path to lock file to use                                   |
+| copyPackageSectionNames | string[] | []                  | Entries in your `package.json` to copy to the output `package.json` (ie: ESM output) |
 
 When using NPM version `>= 7.0.0`, we will use the `package-lock.json` file instead of modules installed in `node_modules`. This improves the
 supports of NPM `>= 8.0.0` which installs `peer-dependencies` automatically. The plugin will be able to detect the correct version.
+
+###### ESM output
+
+If you need to generate ESM output, and you cannot safely produce a `.mjs` file
+(e.g. [because that breaks serverless-offline](https://github.com/serverless/serverless/issues/11308)),
+you can use `copyPackageSectionNames` to ensure the output `package.json` defaults to ESM.
+
+```yaml
+custom:
+  webpack:
+    packagerOptions:
+      copyPackageSectionNames:
+        - type
+        - exports
+        - main
+```
 
 ##### Yarn
 
@@ -421,13 +438,14 @@ Using yarn will switch the whole packaging pipeline to use yarn, so does it use 
 
 The yarn packager supports the following `packagerOptions`:
 
-| Option             | Type | Default | Description                                         |
-| ------------------ | ---- | ------- | --------------------------------------------------- |
-| ignoreScripts      | bool | false   | Do not execute package.json hook scripts on install |
-| noInstall          | bool | false   | Do not run `yarn install` (assume install completed)|
-| noNonInteractive   | bool | false   | Disable interactive mode when using Yarn 2 or above |
-| noFrozenLockfile   | bool | false   | Do not require an up-to-date yarn.lock              |
-| networkConcurrency | int  |         | Specify number of concurrent network requests       |
+| Option                  | Type     | Default         | Description                                                         |
+|-------------------------|----------|-----------------|---------------------------------------------------------------------|
+| ignoreScripts           | bool     | false           | Do not execute package.json hook scripts on install                 |
+| noInstall               | bool     | false           | Do not run `yarn install` (assume install completed)                |
+| noNonInteractive        | bool     | false           | Disable interactive mode when using Yarn 2 or above                 |
+| noFrozenLockfile        | bool     | false           | Do not require an up-to-date yarn.lock                              |
+| networkConcurrency      | int      |                 | Specify number of concurrent network requests                       |
+| copyPackageSectionNames | string[] | ['resolutions'] | Entries in your `package.json` to copy to the output `package.json` |
 
 ##### Common packager options
 

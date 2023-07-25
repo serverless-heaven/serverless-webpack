@@ -30,8 +30,12 @@ describe('npm', () => {
     expect(npmModule.lockfileName).toEqual('package-lock.json');
   });
 
-  it('should return no packager sections', () => {
-    expect(npmModule.copyPackageSectionNames).toEqual([]);
+  it('should return no packager sections by default', () => {
+    expect(npmModule.copyPackageSectionNames()).toEqual([]);
+  });
+
+  it('should return packager sections from config', () => {
+    expect(npmModule.copyPackageSectionNames({ copyPackageSectionNames: ['type'] })).toEqual(['type']);
   });
 
   it('requires to copy modules', () => {
