@@ -28,13 +28,6 @@ and much more!
 - Support NPM and Yarn for packaging
 - Support asynchronous webpack configuration
 
-## Recent improvements and important changes for 5.x
-
-- Support Yarn
-- Support Webpack 4 and 5
-- Cleaned up configuration. You should now use a `custom.webpack` object to configure everything relevant for the plugin. The old configuration still works but will be removed in the next major release. For details see below.
-- Added support for asynchronous webpack configuration
-
 For the complete release notes see the end of this document.
 
 ## Install
