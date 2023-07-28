@@ -10,6 +10,6 @@ yarn.lock
 yarn-error.log
 .editorconfig
 .eslintrc.yml
-.huskyrc
+.husky
 .lintstagedrc.yml
 jest.config.js
