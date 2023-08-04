@@ -60,7 +60,7 @@
     "jest": "^29.6.2",
     "lint-staged": "^13.2.3",
     "prettier": "^3.0.1",
-    "serverless": "^3.33.0",
+    "serverless": "^3.34.0",
     "sinon": "^15.2.0",
     "unzipper": "^0.10.14",
     "webpack": "^5.88.2"
