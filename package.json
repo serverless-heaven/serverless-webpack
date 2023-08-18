@@ -34,7 +34,7 @@
     "prepare": "husky install"
   },
   "dependencies": {
-    "archiver": "^5.3.1",
+    "archiver": "^5.3.2",
     "bluebird": "^3.7.2",
     "find-yarn-workspace-root": "^2.0.0",
     "fs-extra": "^11.1.1",
