@@ -50,7 +50,7 @@
     "@types/node": "^20.10.1",
     "coveralls": "^3.1.1",
     "eslint": "^8.54.0",
-    "eslint-config-prettier": "^9.0.0",
+    "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-import": "^2.29.0",
     "eslint-plugin-lodash": "^7.4.0",
     "eslint-plugin-prettier": "^5.0.1",
