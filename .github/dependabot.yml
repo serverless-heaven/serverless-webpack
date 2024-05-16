@@ -17,3 +17,10 @@ updates:
       - dependency-name: glob
         versions:
           - ">= 9.0.0"
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
+      time: "02:00"
+      timezone: Europe/Paris
+    open-pull-requests-limit: 10
