@@ -21,7 +21,6 @@ jobs:
           - windows-latest
           - ubuntu-20.04
         node:
-          - "14"
           - "16"
           - "18"
           - "20"
@@ -67,7 +66,7 @@ jobs:
         run: "npm run test-coverage"
 
       - name: "Upload to Coveralls"
-        uses: coverallsapp/github-action@master
+        uses: coverallsapp/github-action@v2
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -80,7 +79,7 @@ jobs:
         os:
           - ubuntu-20.04
         node:
-          - "14"
+          - "16"
 
     steps:
       - name: "Checkout"
@@ -111,7 +110,7 @@ jobs:
         os:
           - ubuntu-20.04
         node:
-          - "14"
+          - "16"
 
     steps:
       - name: "Checkout"
