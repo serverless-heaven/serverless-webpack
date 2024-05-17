@@ -24,6 +24,7 @@ jobs:
           - "16"
           - "18"
           - "20"
+          - "22"
 
     steps:
       - name: "Checkout"
