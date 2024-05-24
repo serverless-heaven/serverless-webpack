@@ -16,6 +16,15 @@ jest.mock('../../lib/utils', () => {
 });
 
 describe('yarn', () => {
+  const ENV = process.env;
+
+  beforeAll(() => {
+    process.env = { ...ENV, SLS_DEBUG: '*' };
+  });
+  afterAll(() => {
+    process.env = ENV;
+  });
+
   it('should return "yarn.lock" as lockfile name', () => {
     expect(yarnModule.lockfileName).toEqual('yarn.lock');
   });

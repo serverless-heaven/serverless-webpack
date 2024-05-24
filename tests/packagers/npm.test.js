@@ -22,8 +22,16 @@ jest.mock('../../lib/utils', () => {
 });
 
 describe('npm', () => {
+  const ENV = process.env;
+
+  beforeAll(() => {
+    process.env = { ...ENV, SLS_DEBUG: '*' };
+  });
   beforeEach(() => {
     fsMock.readFileSync.mockReturnValue(false);
+  });
+  afterAll(() => {
+    process.env = ENV;
   });
 
   it('should return "package-lock.json" as lockfile name', () => {
