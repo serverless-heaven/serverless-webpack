@@ -39,7 +39,7 @@
     "find-yarn-workspace-root": "^2.0.0",
     "fs-extra": "^11.2.0",
     "glob": "^8.1.0",
-    "is-builtin-module": "^3.2.1",
+    "is-builtin-module": "^4.0.0",
     "lodash": "^4.17.21",
     "semver": "^7.6.2"
   },
