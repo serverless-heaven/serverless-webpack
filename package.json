@@ -69,14 +69,10 @@
     "@types/node": "*",
     "serverless": "1 || 2 || 3",
     "ts-node": ">= 8.3.0",
-    "typescript": ">=2.0",
     "webpack": ">= 3.0.0 < 6"
   },
   "peerDependenciesMeta": {
     "@types/node": {
-      "optional": true
-    },
-    "typescript": {
       "optional": true
     },
     "ts-node": {
