@@ -68,6 +68,7 @@
   "peerDependencies": {
     "@types/node": "*",
     "serverless": "1 || 2 || 3",
+    "ts-node": ">= 8.3.0",
     "typescript": ">=2.0",
     "webpack": ">= 3.0.0 < 6"
   },
@@ -77,10 +78,10 @@
     },
     "typescript": {
       "optional": true
+    },
+    "ts-node": {
+      "optional": true
     }
-  },
-  "optionalDependencies": {
-    "ts-node": ">= 8.3.0"
   },
   "engines": {
     "node": ">= 16"
