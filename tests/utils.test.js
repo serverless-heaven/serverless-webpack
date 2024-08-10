@@ -126,6 +126,65 @@ describe('Utils', () => {
     });
   });
 
+  describe('getAllNodeFunctions', () => {
+    it('should return all functions with node runtime', () => {
+      const mockServerless = {
+        service: {
+          getAllFunctions: jest.fn(() => ['foo', 'bar', 'baz']),
+          getFunction: jest.fn(name => {
+            if (name === 'foo') {
+              return { runtime: 'nodejs6.10' };
+            }
+            if (name === 'bar') {
+              return { runtime: 'nodejs8.10' };
+            }
+            if (name === 'baz') {
+              return { runtime: 'python3.6' };
+            }
+          })
+        }
+      };
+
+      expect(Utils.getAllNodeFunctions.call({ serverless: mockServerless })).toEqual(['foo', 'bar']);
+    });
+
+    it('should ignore handlers with image.uri property', () => {
+      const mockServerless = {
+        service: {
+          getAllFunctions: jest.fn(() => ['foo', 'bar']),
+          getFunction: jest.fn(name => {
+            if (name === 'foo') {
+              return { runtime: 'nodejs6.10' };
+            }
+            if (name === 'bar') {
+              return { runtime: 'nodejs8.10', image: { uri: 'fake-image-uri' } };
+            }
+          })
+        }
+      };
+
+      expect(Utils.getAllNodeFunctions.call({ serverless: mockServerless })).toEqual(['foo']);
+    });
+
+    it('should ignore handlers with image.name property', () => {
+      const mockServerless = {
+        service: {
+          getAllFunctions: jest.fn(() => ['foo', 'bar']),
+          getFunction: jest.fn(name => {
+            if (name === 'foo') {
+              return { runtime: 'nodejs6.10' };
+            }
+            if (name === 'bar') {
+              return { runtime: 'nodejs8.10', image: { name: 'fake-image-name' } };
+            }
+          })
+        }
+      };
+
+      expect(Utils.getAllNodeFunctions.call({ serverless: mockServerless })).toEqual(['foo']);
+    });
+  });
+
   describe('isProviderGoogle', () => {
     describe('when the provider is set to "google"', () => {
       const mockServerless = {
