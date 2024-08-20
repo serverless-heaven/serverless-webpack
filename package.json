@@ -30,8 +30,7 @@
   "scripts": {
     "test": "jest --verbose",
     "test-coverage": "jest --coverage",
-    "eslint": "eslint .",
-    "prepare": "husky install"
+    "eslint": "eslint ."
   },
   "dependencies": {
     "archiver": "^7.0.1",
