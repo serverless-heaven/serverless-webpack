@@ -9,13 +9,24 @@ jobs:
   publish-npm:
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - name: "Checkout"
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: "Install Node.js"
+        uses: actions/setup-node@v4
         with:
           node-version: 20
           registry-url: https://registry.npmjs.org/
-      - run: npm ci
-      - run: npm test
-      - run: npm publish
+
+      - name: "Install dependencies"
+        run: npm ci
+
+      - name: "Run tests"
+        run: "npm run test"
+
+      - name: "Publish package"
+        run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
