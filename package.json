@@ -46,7 +46,7 @@
     "@babel/core": "^7.25.2",
     "@babel/eslint-parser": "^7.25.1",
     "@serverless/test": "^11.1.1",
-    "@types/node": "^22.5.3",
+    "@types/node": "^22.5.4",
     "coveralls": "^3.1.1",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.1.0",
