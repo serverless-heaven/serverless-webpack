@@ -56,10 +56,10 @@ async function unzipArtifacts(archivePath) {
   return files;
 }
 
+// We have an issue with Windows e2e tests
 describe('end-to-end testing', () => {
+  // Serverless v3 doesn't support node 10
   if (nodeVersion.major < 12 || slsMajor !== 3 || isWin) {
-    // Serverless v3 doesn't support node 10
-    // We have an issue with Windows e2e tests
     it.skip('should support include-external-npm-packages example', _.noop);
   } else {
     it('should support include-external-npm-packages example', async () => {
@@ -86,7 +86,6 @@ describe('end-to-end testing', () => {
   }
 
   // lock-file v2 is supported by Node16+
-  // We have an issue with Windows e2e tests
   if (nodeVersion.major < 16 || slsMajor !== 3 || isWin) {
     it.skip('should support include-external-npm-packages-lock-file example', _.noop);
   } else {
@@ -118,8 +117,8 @@ describe('end-to-end testing', () => {
     }, 300000);
   }
 
+  // Serverless v3 doesn't support node 12 or below
   if (nodeVersion.major < 14 || slsMajor !== 3 || isWin) {
-    // Serverless v3 doesn't support node 12 or below
     it.skip('should support include-external-npm-packages-lock-file example', _.noop);
   } else {
     it('should support include-external-npm-packages-with-yarn-workspaces example', async () => {

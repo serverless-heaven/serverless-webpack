@@ -10,11 +10,10 @@
   "license": "MIT",
   "devDependencies": {
     "aws-sdk": "^2.814.0",
-    "serverless": "3",
-    "serverless-offline": "^6.5.0",
+    "serverless": "^3.39.0",
     "serverless-webpack": "file:../..",
-    "webpack": "^4.44.1",
-    "webpack-node-externals": "^2.5.0"
+    "webpack": "^5.94.0",
+    "webpack-node-externals": "^3.0.0"
   },
   "dependencies": {
     "fbgraph": "^1.4.4"
