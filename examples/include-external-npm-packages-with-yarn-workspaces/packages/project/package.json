@@ -17,8 +17,8 @@
     "webpack-node-externals": "^3.0.0"
   },
   "dependencies": {
+    "cookie": "^0.6.0",
     "dotenv": "^16.0.0",
-    "fbgraph": "^1.4.4",
     "lodash": "^4.17.21",
     "lodash.isequal": "^4.5.0"
   }
