@@ -78,7 +78,7 @@ describe('end-to-end testing', () => {
         private: true,
         scripts: {},
         dependencies: {
-          fbgraph: '^1.4.4'
+          cookie: '^0.6.0'
         }
       });
       expect(files['handler.js']).not.toHaveLength(0);
@@ -97,7 +97,7 @@ describe('end-to-end testing', () => {
       const archivePath = path.join(outputDir, `${fixture}.zip`);
       const files = await unzipArtifacts(archivePath);
 
-      // fbgraph is not included because of tree-shaking
+      // cookie is not included because of tree-shaking
       expect(JSON.parse(files['package.json'])).toEqual({
         name: fixture,
         version: '1.0.0',
@@ -106,8 +106,8 @@ describe('end-to-end testing', () => {
         scripts: {},
         dependencies: {
           // We should use fix version to respect lock file
+          cookie: '^0.6.0',
           dotenv: '^16.0.0',
-          fbgraph: '^1.4.4',
           lodash: '^4.17.21',
           'lodash.isequal': '^4.5.0'
         }
