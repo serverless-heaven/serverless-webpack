@@ -1,0 +1,32 @@
+frameworkVersion: "^4.4.0"
+
+service: serverless-webpack-serverless-v4
+
+package:
+  individually: true
+
+# Add the serverless-webpack plugin
+plugins:
+  - serverless-webpack
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+
+build:
+  esbuild: false
+
+functions:
+  hello:
+    handler: handler.hello
+    events:
+      - http:
+          method: get
+          path: hello
+          integration: lambda
+
+custom:
+  webpack:
+    webpackConfig: 'webpack.config.js'
+    packager: 'yarn'
+    includeModules: true

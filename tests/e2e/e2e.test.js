@@ -13,9 +13,8 @@ jest.unmock('fs');
 jest.unmock('glob');
 jest.unmock('webpack');
 
-const slsVersion = semver.parse(pkg.dependencies.serverless);
-const slsMajor = slsVersion ? slsVersion.major : 3;
-const nodeVersion = semver.parse(process.version);
+const slsVersion = semver.coerce(pkg.devDependencies.serverless);
+const nodeVersion = semver.coerce(process.version);
 const isWin = /^win/.test(process.platform);
 
 async function unzipArtifacts(archivePath) {
@@ -57,16 +56,15 @@ async function unzipArtifacts(archivePath) {
 }
 
 // We have an issue with Windows e2e tests
-describe('end-to-end testing', () => {
-  // Serverless v3 doesn't support node 10
-  if (nodeVersion.major < 12 || slsMajor !== 3 || isWin) {
-    it.skip('should support include-external-npm-packages example', _.noop);
+describe(`end-to-end testing (node: ${nodeVersion.major}, sls: ${slsVersion.major})`, () => {
+  if (isWin || slsVersion.major === 4) {
+    it.skip('should support "include-external-npm-packages" example', _.noop);
   } else {
-    it('should support include-external-npm-packages example', async () => {
+    it('should support "include-external-npm-packages" example', async () => {
       const fixture = 'include-external-npm-packages';
-      const result = await runServerless({ fixture });
+      const servicePath = await runServerless({ fixture });
 
-      const outputDir = path.join(result.servicePath, '.serverless');
+      const outputDir = path.join(servicePath, '.serverless');
       const archivePath = path.join(outputDir, `${fixture}.zip`);
       const files = await unzipArtifacts(archivePath);
 
@@ -85,15 +83,14 @@ describe('end-to-end testing', () => {
     }, 300000);
   }
 
-  // lock-file v2 is supported by Node16+
-  if (nodeVersion.major < 16 || slsMajor !== 3 || isWin) {
-    it.skip('should support include-external-npm-packages-lock-file example', _.noop);
+  if (isWin || slsVersion.major === 4) {
+    it.skip('should support "include-external-npm-packages-lock-file" example', _.noop);
   } else {
-    it('should support include-external-npm-packages-lock-file example', async () => {
+    it('should support "include-external-npm-packages-lock-file" example', async () => {
       const fixture = 'include-external-npm-packages-lock-file';
-      const result = await runServerless({ fixture });
+      const servicePath = await runServerless({ fixture });
 
-      const outputDir = path.join(result.servicePath, '.serverless');
+      const outputDir = path.join(servicePath, '.serverless');
       const archivePath = path.join(outputDir, `${fixture}.zip`);
       const files = await unzipArtifacts(archivePath);
 
@@ -117,17 +114,16 @@ describe('end-to-end testing', () => {
     }, 300000);
   }
 
-  // Serverless v3 doesn't support node 12 or below
-  if (nodeVersion.major < 14 || slsMajor !== 3 || isWin) {
-    it.skip('should support include-external-npm-packages-lock-file example', _.noop);
+  if (isWin || slsVersion.major === 4) {
+    it.skip('should support "include-external-npm-packages-with-yarn-workspaces" example', _.noop);
   } else {
-    it('should support include-external-npm-packages-with-yarn-workspaces example', async () => {
+    it('should support "include-external-npm-packages-with-yarn-workspaces" example', async () => {
       const fixture = 'include-external-npm-packages-with-yarn-workspaces';
       const subproject = path.join('packages', 'project');
 
-      const result = await runServerless({ fixture, subproject });
+      const servicePath = await runServerless({ fixture, subproject });
 
-      const outputDir = path.join(result.servicePath, '.serverless');
+      const outputDir = path.join(servicePath, '.serverless');
       const archivePath = path.join(outputDir, `${fixture}.zip`);
       const files = await unzipArtifacts(archivePath);
 
@@ -140,6 +136,34 @@ describe('end-to-end testing', () => {
         dependencies: {
           // We should use fix version to respect lock file
           lodash: '^4.17.21'
+        }
+      });
+      expect(files['handler.js']).not.toHaveLength(0);
+      expect(files.node_modules).toEqual(true);
+    }, 300000);
+  }
+
+  // Serverless v4
+  if (slsVersion.major < 4) {
+    it.skip('should support "serverless-v4" example', _.noop);
+  } else {
+    it('should support "serverless-v4" example', async () => {
+      const fixture = 'serverless-v4';
+      const servicePath = await runServerless({ fixture, useSpawnProcess: true });
+
+      const outputDir = path.join(servicePath, '.serverless');
+      const archivePath = path.join(outputDir, 'hello.zip');
+      const files = await unzipArtifacts(archivePath);
+
+      expect(JSON.parse(files['package.json'])).toEqual({
+        name: 'serverless-webpack-serverless-v4',
+        version: '1.0.0',
+        description: 'Packaged externals for serverless-webpack-serverless-v4',
+        private: true,
+        scripts: {},
+        dependencies: {
+          // We should use fix version to respect lock file
+          cookie: '^0.7.0'
         }
       });
       expect(files['handler.js']).not.toHaveLength(0);

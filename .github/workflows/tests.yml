@@ -132,3 +132,39 @@ jobs:
 
       - name: 'Run tests'
         run: 'npm run test'
+
+  serverless-v4:
+    runs-on: ${{ matrix.os }}
+    name: Node.js ${{ matrix.node }} on ${{ matrix.os }} with Serverless v4
+
+    strategy:
+      matrix:
+        os:
+          - ubuntu-20.04
+        node:
+          - '20'
+
+    steps:
+      - name: 'Checkout'
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: 'Install Node.js'
+        uses: actions/setup-node@v4
+        with:
+          node-version: '${{ matrix.node }}'
+
+      - name: 'Install dependencies'
+        run: npm ci
+
+      - name: 'Install Serverless v4'
+        run: npm install serverless@4
+
+      - name: 'Run tests'
+        run: npm run test tests/e2e/e2e.test.js
+        env:
+          AWS_DEFAULT_REGION: eu-west-1
+          AWS_ACCESS_KEY_ID: ${{secrets.AWS_ACCESS_KEY_ID}}
+          AWS_SECRET_ACCESS_KEY: ${{secrets.AWS_SECRET_ACCESS_KEY}}
+          SERVERLESS_ACCESS_KEY: ${{secrets.SERVERLESS_ACCESS_KEY}}
