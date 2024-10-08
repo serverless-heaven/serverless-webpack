@@ -78,7 +78,7 @@ describe('end-to-end testing', () => {
         private: true,
         scripts: {},
         dependencies: {
-          cookie: '^0.6.0'
+          cookie: '^0.7.0'
         }
       });
       expect(files['handler.js']).not.toHaveLength(0);
@@ -106,7 +106,7 @@ describe('end-to-end testing', () => {
         scripts: {},
         dependencies: {
           // We should use fix version to respect lock file
-          cookie: '^0.6.0',
+          cookie: '^0.7.0',
           dotenv: '^16.0.0',
           lodash: '^4.17.21',
           'lodash.isequal': '^4.5.0'
