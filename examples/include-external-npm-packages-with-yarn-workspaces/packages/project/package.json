@@ -17,7 +17,7 @@
     "webpack-node-externals": "^3.0.0"
   },
   "dependencies": {
-    "cookie": "^0.6.0",
+    "cookie": "^0.7.0",
     "dotenv": "^16.0.0",
     "lodash": "^4.17.21",
     "lodash.isequal": "^4.5.0"

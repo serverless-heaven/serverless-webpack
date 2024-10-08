@@ -16,6 +16,6 @@
     "webpack-node-externals": "^3.0.0"
   },
   "dependencies": {
-    "cookie": "^0.6.0"
+    "cookie": "^0.7.0"
   }
 }
