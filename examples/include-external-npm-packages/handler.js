@@ -2,8 +2,8 @@
 'use strict';
 
 const AWS = require('aws-sdk');
-const fbgraph = require('fbgraph');
+const cookie = require('cookie');
 
 module.exports.hello = function (event, _, cb) {
-  cb(null, { message: 'hello fb & aws', event });
+  cb(null, { message: 'hello cookie & aws', event });
 };

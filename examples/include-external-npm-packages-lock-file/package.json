@@ -10,15 +10,14 @@
   "license": "MIT",
   "devDependencies": {
     "aws-sdk": "^2.1420.0",
-    "serverless": "^3.7.4",
-    "serverless-offline": "^8.8.1",
+    "serverless": "^3.39.0",
     "serverless-webpack": "file:../..",
-    "webpack": "^5.76.0",
-    "webpack-node-externals": "^2.5.0"
+    "webpack": "^5.94.0",
+    "webpack-node-externals": "^3.0.0"
   },
   "dependencies": {
+    "cookie": "^0.7.0",
     "dotenv": "^16.0.0",
-    "fbgraph": "^1.4.4",
     "lodash": "^4.17.21",
     "lodash.isequal": "^4.5.0"
   }
