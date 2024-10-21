@@ -215,7 +215,7 @@ describe('wpwatch', () => {
       cb(null, { call: 2, hash: '2' });
       watchCallbackCount++;
 
-      // eslint-disable-next-line promise/always-return,promise/catch-or-return
+      // eslint-disable-next-line promise/always-return
       beforeCompileCallbackPromise = beforeCompileCallback().then(() => {
         // eslint-disable-next-line promise/no-callback-in-promise
         cb(null, { call: 3, hash: '3' });
