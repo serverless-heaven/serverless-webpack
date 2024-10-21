@@ -16,6 +16,7 @@ jobs:
         with:
           github-token: '${{ secrets.GITHUB_TOKEN }}'
       - name: Approve and merge minor updates
+        # eslint-disable-next-line max-len
         if: ${{ steps.metadata.outputs.update-type == 'version-update:semver-minor' || steps.metadata.outputs.update-type == 'version-update:semver-patch' }}
         run: |
           gh pr review --approve "$PR_URL"

@@ -1,26 +1,26 @@
 version: 2
 updates:
-  - package-ecosystem: "npm"
-    directory: "/"
+  - package-ecosystem: 'npm'
+    directory: '/'
     schedule:
-      interval: "daily"
-      time: "02:00"
+      interval: 'daily'
+      time: '02:00'
       timezone: Europe/Paris
     open-pull-requests-limit: 10
     versioning-strategy: increase
     groups:
       babel-dependencies:
         patterns:
-          - "*babel*"
+          - '*babel*'
     ignore:
       # require node > 16
       - dependency-name: glob
         versions:
-          - ">= 9.0.0"
+          - '>= 9.0.0'
   - package-ecosystem: github-actions
-    directory: "/"
+    directory: '/'
     schedule:
       interval: weekly
-      time: "02:00"
+      time: '02:00'
       timezone: Europe/Paris
     open-pull-requests-limit: 10
