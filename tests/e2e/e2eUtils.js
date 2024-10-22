@@ -33,13 +33,16 @@ async function runServerless(options) {
   };
 
   const servicePath = await setupFixture(options.fixture);
-
   runServerlessOptions.cwd = path.join(servicePath, options.subproject || '');
-  const SERVERLESS_DIR = path.join(servicePath, 'node_modules', 'serverless');
+
   try {
-    const result = await originalRunServerless(SERVERLESS_DIR, runServerlessOptions);
-    result.servicePath = runServerlessOptions.cwd;
-    return result;
+    if (options.useSpawnProcess) {
+      await spawnProcess('yarn', ['serverless', 'package'], { cwd: servicePath });
+    } else {
+      await originalRunServerless(path.join(servicePath, 'node_modules', 'serverless'), runServerlessOptions);
+    }
+
+    return runServerlessOptions.cwd;
   } catch (error) {
     error.servicePath = servicePath;
     throw error;

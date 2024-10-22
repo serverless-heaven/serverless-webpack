@@ -49,6 +49,15 @@ plugins:
   - serverless-webpack
 ```
 
+## Serverless v4 requirement
+
+If you are using Serverless v4 you must disable the default builtin ESBuild support in your `serverless.yml` (because it conflicts with `serverless-webpack`):
+
+```yml
+build:
+  esbuild: false
+```
+
 ## Configure
 
 The configuration of the plugin is done by defining a `custom: webpack` object in your `serverless.yml` with your specific configuration. All settings are optional and will be set to reasonable defaults if missing.
@@ -184,8 +193,8 @@ module.exports = {
 
 `serverless-webpack` generates Webpack entries from the `handler` value by default.
 
-If your handler is different from the webpack entry, e.g. provided by a layer, 
-you may override the generated entry at function level via the `entrypoint` 
+If your handler is different from the webpack entry, e.g. provided by a layer,
+you may override the generated entry at function level via the `entrypoint`
 option in `serverless.yml`.
 
 ```yaml

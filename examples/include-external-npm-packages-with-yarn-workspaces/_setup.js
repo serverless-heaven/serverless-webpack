@@ -1,5 +1,7 @@
 'use strict';
 
+// That file is only used by the e2e tests
+
 const path = require('path');
 
 module.exports = async (originalFixturePath, fixturePath, utils) => {

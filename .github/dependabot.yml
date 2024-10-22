@@ -17,6 +17,10 @@ updates:
       - dependency-name: glob
         versions:
           - '>= 9.0.0'
+      # because tests aren't compatible
+      - dependency-name: serverless
+        versions:
+          - '>= 4.0.0'
   - package-ecosystem: github-actions
     directory: '/'
     schedule:
