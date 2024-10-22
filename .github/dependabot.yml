@@ -13,10 +13,10 @@ updates:
         patterns:
           - '*babel*'
     ignore:
-      # require node > 16
+      # require node >= 20
       - dependency-name: glob
         versions:
-          - '>= 9.0.0'
+          - '>= 11.0.0'
       # because tests aren't compatible
       - dependency-name: serverless
         versions:
