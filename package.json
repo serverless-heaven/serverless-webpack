@@ -43,7 +43,7 @@
     "semver": "^7.6.3"
   },
   "devDependencies": {
-    "@babel/core": "^7.25.9",
+    "@babel/core": "^7.26.0",
     "@babel/eslint-parser": "^7.25.9",
     "@eslint/compat": "^1.2.1",
     "@eslint/eslintrc": "^3.1.0",
