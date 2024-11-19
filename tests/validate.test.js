@@ -472,7 +472,7 @@ describe('validate', () => {
             }
           ]
         },
-        dockerfunc: {
+        dockerFuncNameOnly: {
           image: {
             name: 'some-docker-image',
             command: ['com.serverless.Handler']
@@ -486,7 +486,7 @@ describe('validate', () => {
             }
           ]
         },
-        dockerfuncuri: {
+        dockerFuncUri: {
           image: {
             name: 'some-image-with-uri',
             uri: 'http://hub.dock.er/image',
@@ -543,7 +543,6 @@ describe('validate', () => {
           .then(() => {
             const lib = require('../lib/index');
             const expectedLibEntries = {
-              'com.serverless': './com.serverless.js',
               module1: './module1.js',
               module2: './module2.js',
               'handlers/func3/module2': './handlers/func3/module2.js',
@@ -551,7 +550,7 @@ describe('validate', () => {
             };
 
             expect(lib.entries).toEqual(expectedLibEntries);
-            expect(globMock.sync).toHaveBeenCalledTimes(6);
+            expect(globMock.sync).toHaveBeenCalledTimes(5);
             expect(serverless.cli.log).toHaveBeenCalledTimes(0);
             return null;
           });
@@ -674,12 +673,11 @@ describe('validate', () => {
           .then(() => {
             const lib = require('../lib/index');
             const expectedLibEntries = {
-              module1: './module1.js',
-              module4: './module4.js'
+              module1: './module1.js'
             };
 
             expect(lib.entries).toEqual(expectedLibEntries);
-            expect(globMock.sync).toHaveBeenCalledTimes(2);
+            expect(globMock.sync).toHaveBeenCalledTimes(1);
             expect(serverless.cli.log).toHaveBeenCalledTimes(0);
             return null;
           });
@@ -749,7 +747,6 @@ describe('validate', () => {
               }
             ],
             image: {
-              name: 'custom-image',
               command: []
             }
           }
@@ -949,15 +946,6 @@ describe('validate', () => {
                     key: 'handlers/module2/func3/module2',
                     value: './handlers/module2/func3/module2.js'
                   }
-                },
-                {
-                  handlerFile: 'com.serverless',
-                  funcName: 'dockerfunc',
-                  func: testFunctionsConfig.dockerfunc,
-                  entry: {
-                    key: 'com.serverless',
-                    value: './com.serverless.js'
-                  }
                 }
               ]);
               return null;
@@ -971,13 +959,12 @@ describe('validate', () => {
           return expect(module.validate())
             .resolves.toBeUndefined()
             .then(() => {
-              expect(module.webpackConfig).toHaveLength(6);
+              expect(module.webpackConfig).toHaveLength(5);
               expect(module.webpackConfig[0].output.path).toEqual(path.join('output', 'func1'));
               expect(module.webpackConfig[1].output.path).toEqual(path.join('output', 'layerFunc'));
               expect(module.webpackConfig[2].output.path).toEqual(path.join('output', 'func2'));
               expect(module.webpackConfig[3].output.path).toEqual(path.join('output', 'func3'));
               expect(module.webpackConfig[4].output.path).toEqual(path.join('output', 'func4'));
-              expect(module.webpackConfig[5].output.path).toEqual(path.join('output', 'dockerfunc'));
 
               return null;
             });
@@ -1000,27 +987,24 @@ describe('validate', () => {
           return expect(module.validate())
             .resolves.toBeUndefined()
             .then(() => {
-              expect(module.webpackConfig).toHaveLength(6);
+              expect(module.webpackConfig).toHaveLength(5);
               expect(module.webpackConfig[0].devtool).toEqual('source-map');
               expect(module.webpackConfig[1].devtool).toEqual('source-map');
               expect(module.webpackConfig[2].devtool).toEqual('source-map');
               expect(module.webpackConfig[3].devtool).toEqual('source-map');
               expect(module.webpackConfig[4].devtool).toEqual('source-map');
-              expect(module.webpackConfig[5].devtool).toEqual('source-map');
 
               expect(module.webpackConfig[0].context).toEqual('some context');
               expect(module.webpackConfig[1].context).toEqual('some context');
               expect(module.webpackConfig[2].context).toEqual('some context');
               expect(module.webpackConfig[3].context).toEqual('some context');
               expect(module.webpackConfig[4].context).toEqual('some context');
-              expect(module.webpackConfig[5].context).toEqual('some context');
 
               expect(module.webpackConfig[0].output.libraryTarget).toEqual('commonjs');
               expect(module.webpackConfig[1].output.libraryTarget).toEqual('commonjs');
               expect(module.webpackConfig[2].output.libraryTarget).toEqual('commonjs');
               expect(module.webpackConfig[3].output.libraryTarget).toEqual('commonjs');
               expect(module.webpackConfig[4].output.libraryTarget).toEqual('commonjs');
-              expect(module.webpackConfig[5].output.libraryTarget).toEqual('commonjs');
 
               return null;
             });
