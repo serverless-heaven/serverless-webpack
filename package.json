@@ -65,7 +65,7 @@
     "sinon": "^19.0.2",
     "ts-node": "^10.9.2",
     "unzipper": "^0.12.3",
-    "webpack": "^5.97.1"
+    "webpack": "^5.98.0"
   },
   "peerDependencies": {
     "serverless": "1 || 2 || 3 || 4",
