@@ -49,7 +49,7 @@
     "@eslint/eslintrc": "^3.3.0",
     "@eslint/js": "^9.27.0",
     "@serverless/test": "^11.1.1",
-    "@types/node": "^22.15.21",
+    "@types/node": "^22.15.23",
     "eslint": "^9.27.0",
     "eslint-config-prettier": "^10.1.5",
     "eslint-plugin-import": "^2.31.0",
