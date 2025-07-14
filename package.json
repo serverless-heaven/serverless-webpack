@@ -50,7 +50,7 @@
     "@eslint/js": "^9.31.0",
     "@serverless/test": "^11.1.1",
     "@types/node": "^22.15.30",
-    "eslint": "^9.30.1",
+    "eslint": "^9.31.0",
     "eslint-config-prettier": "^10.1.5",
     "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-lodash": "^8.0.0",
