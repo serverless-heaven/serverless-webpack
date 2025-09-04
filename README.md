@@ -1,6 +1,5 @@
 # Serverless Webpack
 
-[![Serverless][ico-serverless]][link-serverless]
 [![License][ico-license]][link-license]
 [![NPM][ico-npm]][link-npm]
 [![Build Status][ico-build]][link-build]
@@ -924,7 +923,6 @@ me to take it over and continue working on the project. That helped to revive it
 
 See [the releases section](https://github.com/serverless-heaven/serverless-webpack/releases)
 
-[ico-serverless]: http://public.serverless.com/badges/v3.svg
 [ico-license]: https://img.shields.io/github/license/serverless-heaven/serverless-webpack.svg
 [ico-npm]: https://img.shields.io/npm/v/serverless-webpack.svg
 [ico-build]: https://github.com/serverless-heaven/serverless-webpack/actions/workflows/tests.yml/badge.svg

@@ -8,6 +8,9 @@ updates:
       timezone: Europe/Paris
     open-pull-requests-limit: 10
     versioning-strategy: increase
+    exclude-paths:
+      - "examples/**"
+      - "tests/**"
     groups:
       babel-dependencies:
         patterns:
