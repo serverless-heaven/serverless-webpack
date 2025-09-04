@@ -21,7 +21,6 @@ jobs:
           - windows-latest
           - ubuntu-latest
         node:
-          - '16'
           - '18'
           - '20'
           - '22'
@@ -80,7 +79,7 @@ jobs:
         os:
           - ubuntu-latest
         node:
-          - '16'
+          - 18
 
     steps:
       - name: 'Checkout'
@@ -111,7 +110,7 @@ jobs:
         os:
           - ubuntu-latest
         node:
-          - '16'
+          - 18
 
     steps:
       - name: 'Checkout'
@@ -142,7 +141,7 @@ jobs:
         os:
           - ubuntu-latest
         node:
-          - '20'
+          - 20
 
     steps:
       - name: 'Checkout'
