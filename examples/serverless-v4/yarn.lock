@@ -1541,19 +1541,20 @@ foreground-child@^3.1.0:
     signal-exit "^4.0.1"
 
 form-data@^4.0.0:
-  version "4.0.2"
-  resolved "https://registry.yarnpkg.com/form-data/-/form-data-4.0.2.tgz#35cabbdd30c3ce73deb2c42d3c8d3ed9ca51794c"
-  integrity sha512-hGfm/slu0ZabnNt4oaRZ6uREyfCj6P4fT/n6A1rGV+Z0VdGXjfOhVUpkn6qVQONHGIFwmveGXyDs75+nr6FM8w==
+  version "4.0.4"
+  resolved "https://registry.yarnpkg.com/form-data/-/form-data-4.0.4.tgz#784cdcce0669a9d68e94d11ac4eea98088edd2c4"
+  integrity sha512-KrGhL9Q4zjj0kiUt5OO4Mr/A/jlI2jDYs5eHBpYHPcBEVSiipAvn2Ko2HnPe20rmcuuvMHNdZFp+4IlGTMF0Ow==
   dependencies:
     asynckit "^0.4.0"
     combined-stream "^1.0.8"
     es-set-tostringtag "^2.1.0"
+    hasown "^2.0.2"
     mime-types "^2.1.12"
 
-fs-extra@^11.3.0:
-  version "11.3.0"
-  resolved "https://registry.yarnpkg.com/fs-extra/-/fs-extra-11.3.0.tgz#0daced136bbaf65a555a326719af931adc7a314d"
-  integrity sha512-Z4XaCL6dUDHfP/jT25jJKMmtxvuwbkrD1vNSMFlo9lNLY2c5FHYSQgHPRZUjAB26TpDEoW9HCOgplrdbaPV/ew==
+fs-extra@^11.3.2:
+  version "11.3.2"
+  resolved "https://registry.yarnpkg.com/fs-extra/-/fs-extra-11.3.2.tgz#c838aeddc6f4a8c74dd15f85e11fe5511bfe02a4"
+  integrity sha512-Xr9F6z6up6Ws+NjzMCZc6WXg2YFRlrLP9NQDO3VQrWrfiojdhS56TzueT88ze0uBdCTwEIhQ3ptnmKeWGFAe0A==
   dependencies:
     graceful-fs "^4.2.0"
     jsonfile "^6.0.1"
@@ -2076,10 +2077,10 @@ semver@^6.3.1:
   resolved "https://registry.yarnpkg.com/semver/-/semver-6.3.1.tgz#556d2ef8689146e46dcea4bfdd095f3434dffcb4"
   integrity sha512-BR7VvDCVHO+q2xBEWskxS6DJE1qRnb7DxzUrogb71CWoSficBxYsiAGd+Kl0mmq/MprG9yArRkyrQxTO6XjMzA==
 
-semver@^7.7.1:
-  version "7.7.1"
-  resolved "https://registry.yarnpkg.com/semver/-/semver-7.7.1.tgz#abd5098d82b18c6c81f6074ff2647fd3e7220c9f"
-  integrity sha512-hlq8tAfn0m/61p4BVRcPzIGr6LKiMwo4VM6dGi6pt4qcRkmNzTcWq6eCEjEh+qXjkMDvPlOFFSGwQjoEa6gyMA==
+semver@^7.7.3:
+  version "7.7.3"
+  resolved "https://registry.yarnpkg.com/semver/-/semver-7.7.3.tgz#4b5f4143d007633a8dc671cd0a6ef9147b8bb946"
+  integrity sha512-SdsKMrI9TdgjdweUSR9MweHA4EJ8YxHn8DFaDisvhVlUOe4BF1tLD7GAj0lIqWVl+dPb/rExr0Btby5loQm20Q==
 
 serialize-javascript@^6.0.2:
   version "6.0.2"
@@ -2089,16 +2090,16 @@ serialize-javascript@^6.0.2:
     randombytes "^2.1.0"
 
 "serverless-webpack@file:../..":
-  version "5.15.0"
+  version "5.15.3"
   dependencies:
     archiver "^7.0.1"
     bluebird "^3.7.2"
     find-yarn-workspace-root "^2.0.0"
-    fs-extra "^11.3.0"
+    fs-extra "^11.3.2"
     glob "^10.4.5"
     is-builtin-module "^3.2.1"
     lodash "^4.17.21"
-    semver "^7.7.1"
+    semver "^7.7.3"
 
 serverless@^4.4.6:
   version "4.7.0"
