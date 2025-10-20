@@ -47,7 +47,7 @@
     "@babel/eslint-parser": "^7.28.4",
     "@eslint/compat": "^1.4.0",
     "@eslint/eslintrc": "^3.3.0",
-    "@eslint/js": "^9.35.0",
+    "@eslint/js": "^9.38.0",
     "@serverless/test": "^11.1.1",
     "@types/node": "^24.8.0",
     "eslint": "^9.37.0",
