@@ -44,7 +44,7 @@
   "devDependencies": {
     "@babel/core": "^7.29.0",
     "@babel/eslint-parser": "^7.28.6",
-    "@eslint/compat": "^2.0.1",
+    "@eslint/compat": "^2.0.2",
     "@eslint/eslintrc": "^3.3.3",
     "@eslint/js": "^9.39.0",
     "@serverless/test": "^11.1.1",
