@@ -39,7 +39,7 @@
     "fs-extra": "^11.3.3",
     "glob": "^10.5.0",
     "lodash": "^4.17.23",
-    "semver": "^7.7.3"
+    "semver": "^7.7.4"
   },
   "devDependencies": {
     "@babel/core": "^7.29.0",
