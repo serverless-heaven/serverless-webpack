@@ -13,7 +13,7 @@
     "aws-sdk": "^2.814.0",
     "serverless": "^3.39.0",
     "serverless-webpack": "file:../..",
-    "webpack": "^5.94.0",
+    "webpack": "^5.104.1",
     "webpack-node-externals": "^3.0.0"
   },
   "dependencies": {
