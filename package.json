@@ -1,6 +1,6 @@
 {
   "name": "serverless-webpack",
-  "version": "5.15.3",
+  "version": "5.15.4",
   "description": "Serverless plugin to bundle your javascript with Webpack",
   "main": "index.js",
   "types": "index.d.ts",
@@ -50,7 +50,7 @@
     "husky": "^9.1.7",
     "jest": "^30.2.0",
     "lint-staged": "^16.3.2",
-    "serverless": "^3.40.0",
+    "serverless": "npm:osls@^3.62.1",
     "sinon": "^21.0.1",
     "ts-node": "^10.9.2",
     "unzipper": "^0.12.3",
