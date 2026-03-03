@@ -105,7 +105,7 @@ describe(`end-to-end testing (node: ${nodeVersion.major}, sls: ${slsVersion.majo
           // We should use fix version to respect lock file
           cookie: '^0.7.0',
           dotenv: '^16.0.0',
-          lodash: '^4.17.21',
+          lodash: '^4.17.23',
           'lodash.isequal': '^4.5.0'
         }
       });
@@ -135,7 +135,7 @@ describe(`end-to-end testing (node: ${nodeVersion.major}, sls: ${slsVersion.majo
         scripts: {},
         dependencies: {
           // We should use fix version to respect lock file
-          lodash: '^4.17.21'
+          lodash: '^4.17.23'
         }
       });
       expect(files['handler.js']).not.toHaveLength(0);
