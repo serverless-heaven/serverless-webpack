@@ -22,7 +22,7 @@ describe('ServerlessWebpack', () => {
       consoleLog: jest.fn()
     };
     serverless.pluginManager.spawn = jest.fn().mockReturnValue(BbPromise.resolve());
-    serverless.service.getFunction = jest.fn().mockReturnValue({ runtime: 'nodejs12.x' });
+    serverless.service.getFunction = jest.fn().mockReturnValue({ runtime: 'nodejs20.x' });
     if (semver.gte(serverless.getVersion(), '2.10.0')) {
       serverless.configSchemaHandler.defineFunctionProperties = jest.fn();
     }
