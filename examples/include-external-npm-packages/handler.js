@@ -1,4 +1,4 @@
-/* eslint-disable no-unused-vars */
+
 'use strict';
 
 const AWS = require('aws-sdk');

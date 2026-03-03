@@ -1,8 +1,6 @@
-'use strict';
-
 const _ = require('lodash');
 const BbPromise = require('bluebird');
-const path = require('path');
+const path = require('node:path');
 const Serverless = require('serverless');
 
 jest.mock('fs-extra');

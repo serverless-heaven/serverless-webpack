@@ -1,11 +1,9 @@
-'use strict';
-
 const BbPromise = require('bluebird');
 const _ = require('lodash');
-const path = require('path');
+const path = require('node:path');
 const Serverless = require('serverless');
 const Configuration = require('../lib/Configuration');
-const fsMock = require('fs');
+const fsMock = require('node:fs');
 const globMock = require('glob');
 const baseModule = require('../lib/packageModules');
 

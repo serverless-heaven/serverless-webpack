@@ -9,7 +9,7 @@ tests
 .editorconfig
 .lintstagedrc.yml
 .nyc_output
-eslint.config.mjs
+biome.jsonc
 jest.config.js
 yarn.lock
 yarn-error.log

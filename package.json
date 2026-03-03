@@ -30,7 +30,8 @@
   "scripts": {
     "test": "jest --verbose",
     "test-coverage": "jest --coverage",
-    "eslint": "eslint ."
+    "lint": "biome check",
+    "format": "biome check --write --unsafe"
   },
   "dependencies": {
     "archiver": "^7.0.1",
@@ -43,23 +44,12 @@
   },
   "devDependencies": {
     "@babel/core": "^7.29.0",
-    "@babel/eslint-parser": "^7.28.6",
-    "@eslint/compat": "^2.0.2",
-    "@eslint/eslintrc": "^3.3.4",
-    "@eslint/js": "^9.39.0",
+    "@biomejs/biome": "^2.4.5",
     "@serverless/test": "^11.1.1",
     "@types/node": "^25.3.3",
-    "eslint": "^9.39.2",
-    "eslint-config-prettier": "^10.1.8",
-    "eslint-plugin-import": "^2.32.0",
-    "eslint-plugin-lodash": "^8.0.0",
-    "eslint-plugin-prettier": "^5.5.5",
-    "eslint-plugin-promise": "^7.2.1",
-    "globals": "^17.4.0",
     "husky": "^9.1.7",
     "jest": "^30.2.0",
     "lint-staged": "^16.3.1",
-    "prettier": "^3.8.1",
     "serverless": "^3.40.0",
     "sinon": "^21.0.1",
     "ts-node": "^10.9.2",

@@ -1,5 +1,3 @@
-'use strict';
-
 const _ = require('lodash');
 const BbPromise = require('bluebird');
 const Serverless = require('serverless');

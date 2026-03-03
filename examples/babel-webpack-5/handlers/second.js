@@ -5,7 +5,7 @@ export const hello = (event, context, cb) => {
 
   // Do not return the promise as we use the callback
   // This resolved promise would be be in the application library code in a real-world application and provide the results
-  App.handleSecond(event) // eslint-disable-line promise/catch-or-return
+  App.handleSecond(event) 
     .then(result => ({
       statusCode: 200,
       headers: {

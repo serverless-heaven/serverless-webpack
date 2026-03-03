@@ -1,5 +1,3 @@
-'use strict';
-
 const BbPromise = require('bluebird');
 const _ = require('lodash');
 
@@ -44,7 +42,7 @@ class ServerlessWebpack {
     ) {
       try {
         require('ts-node/register');
-      } catch (e) {
+      } catch (_e) {
         throw new Error('If you want to use TypeScript with serverless-webpack, please add "ts-node" as dependency.');
       }
     }
@@ -147,7 +145,7 @@ class ServerlessWebpack {
     this.hooks = {
       initialize: () => {
         // serverless.processedInput does not exist in serverless@<2.0.0. This ensure the retrocompatibility with serverless v1
-        if (this.serverless.processedInput && this.serverless.processedInput.options) {
+        if (this.serverless.processedInput?.options) {
           this.options = this.serverless.processedInput.options;
         }
       },

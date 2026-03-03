@@ -1,4 +1,3 @@
-'use strict';
 /**
  * Unit tests for index.
  */
@@ -73,7 +72,7 @@ describe('ServerlessWebpack', () => {
         throw new Error('ts-node not found');
       });
 
-      const badDeps = function () {
+      const badDeps = () => {
         new ServerlessWebpack(serverless, {});
       };
 

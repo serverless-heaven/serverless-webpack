@@ -1,7 +1,5 @@
-'use strict';
-
 const fse = require('fs-extra');
-const path = require('path');
+const path = require('node:path');
 const _ = require('lodash');
 const provisionTmpDir = require('@serverless/test/provision-tmp-dir');
 const originalRunServerless = require('@serverless/test/run-serverless');

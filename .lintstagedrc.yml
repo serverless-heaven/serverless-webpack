@@ -1,2 +1,2 @@
-'*.js':
-  - 'eslint'
+'*.{js,mjs,cjs}':
+  - 'biome check --no-errors-on-unmatched'

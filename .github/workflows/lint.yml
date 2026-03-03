@@ -11,9 +11,9 @@ env:
   FORCE_COLOR: true
 
 jobs:
-  eslint:
+  biome:
     runs-on: ubuntu-latest
-    name: ESLint
+    name: Biome
 
     steps:
       - name: 'Checkout'
@@ -30,4 +30,4 @@ jobs:
         run: npm ci
 
       - name: 'Lint files'
-        run: 'npm run eslint'
+        run: 'npm run lint'

@@ -1,10 +1,9 @@
-'use strict';
 /**
  * Unit tests for Configuration.
  */
 
 const _ = require('lodash');
-const childProcess = require('child_process');
+const childProcess = require('node:child_process');
 const Utils = require('../lib/utils');
 
 jest.mock('child_process');
