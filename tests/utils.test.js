@@ -182,6 +182,33 @@ describe('Utils', () => {
 
       expect(Utils.getAllNodeFunctions.call({ serverless: mockServerless })).toEqual(['foo']);
     });
+
+    it('should not ignore handlers with image.name property if defined as ecr image', () => {
+      const mockServerless = {
+        service: {
+          getAllFunctions: jest.fn(() => ['foo', 'bar']),
+          getFunction: jest.fn(name => {
+            if (name === 'foo') {
+              return { runtime: 'nodejs20.x' };
+            }
+            if (name === 'bar') {
+              return { runtime: 'nodejs22.x', image: { name: 'fake-image-name' } };
+            }
+          }),
+          provider: {
+            ecr: {
+              images: {
+                'fake-image-name': {
+                  path: './'
+                }
+              }
+            }
+          }
+        }
+      };
+
+      expect(Utils.getAllNodeFunctions.call({ serverless: mockServerless })).toEqual(['foo', 'bar']);
+    });
   });
 
   describe('isProviderGoogle', () => {
