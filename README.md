@@ -48,6 +48,10 @@ plugins:
   - serverless-webpack
 ```
 
+## Node.js requirement
+
+`serverless-webpack` now requires Node.js `>= 20`.
+
 ## Serverless v4 requirement
 
 If you are using Serverless v4 you must disable the default builtin ESBuild support in your `serverless.yml` (because it conflicts with `serverless-webpack`):
@@ -101,7 +105,6 @@ Alternatively the Webpack configuration can export an asynchronous object (e.g. 
 A basic Webpack promise configuration might look like this:
 
 ```js
-// Version if the local Node.js version supports async/await
 // webpack.config.js
 
 const webpack = require('webpack')
@@ -647,12 +650,12 @@ In the following example `entrypoint` is inherited from the shared Docker image,
 functions:
   myFunction1:
     image:
-      name: public.ecr.aws/lambda/nodejs:12
+      name: public.ecr.aws/lambda/nodejs:20
       command:
         - app.handler1
   myFunction2:
     image:
-      name: public.ecr.aws/lambda/nodejs:12
+      name: public.ecr.aws/lambda/nodejs:20
       command:
         - app.handler2
 ```

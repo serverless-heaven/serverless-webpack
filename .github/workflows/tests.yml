@@ -21,9 +21,9 @@ jobs:
           - windows-latest
           - ubuntu-latest
         node:
-          - '18'
           - '20'
           - '22'
+          - '24'
 
     steps:
       - name: 'Checkout'
@@ -57,7 +57,7 @@ jobs:
       - name: 'Install Node.js'
         uses: actions/setup-node@v6
         with:
-          node-version: 18
+          node-version-file: '.nvmrc'
 
       - name: 'Install dependencies'
         run: npm ci
@@ -79,7 +79,7 @@ jobs:
         os:
           - ubuntu-latest
         node:
-          - 18
+          - 20
 
     steps:
       - name: 'Checkout'
@@ -110,7 +110,7 @@ jobs:
         os:
           - ubuntu-latest
         node:
-          - 18
+          - 20
 
     steps:
       - name: 'Checkout'

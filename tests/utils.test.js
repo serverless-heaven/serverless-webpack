@@ -132,10 +132,10 @@ describe('Utils', () => {
           getAllFunctions: jest.fn(() => ['foo', 'bar', 'baz']),
           getFunction: jest.fn(name => {
             if (name === 'foo') {
-              return { runtime: 'nodejs6.10' };
+              return { runtime: 'nodejs20.x' };
             }
             if (name === 'bar') {
-              return { runtime: 'nodejs8.10' };
+              return { runtime: 'nodejs22.x' };
             }
             if (name === 'baz') {
               return { runtime: 'python3.6' };
@@ -153,10 +153,10 @@ describe('Utils', () => {
           getAllFunctions: jest.fn(() => ['foo', 'bar']),
           getFunction: jest.fn(name => {
             if (name === 'foo') {
-              return { runtime: 'nodejs6.10' };
+              return { runtime: 'nodejs20.x' };
             }
             if (name === 'bar') {
-              return { runtime: 'nodejs8.10', image: { uri: 'fake-image-uri' } };
+              return { runtime: 'nodejs22.x', image: { uri: 'fake-image-uri' } };
             }
           })
         }
@@ -171,10 +171,10 @@ describe('Utils', () => {
           getAllFunctions: jest.fn(() => ['foo', 'bar']),
           getFunction: jest.fn(name => {
             if (name === 'foo') {
-              return { runtime: 'nodejs6.10' };
+              return { runtime: 'nodejs20.x' };
             }
             if (name === 'bar') {
-              return { runtime: 'nodejs8.10', image: { name: 'fake-image-name' } };
+              return { runtime: 'nodejs22.x', image: { name: 'fake-image-name' } };
             }
           })
         }
