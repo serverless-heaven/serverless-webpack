@@ -1,9 +1,8 @@
-'use strict';
 /**
  * Unit tests for Configuration.
  */
 
-const os = require('os');
+const os = require('node:os');
 const Configuration = require('../lib/Configuration');
 
 describe('Configuration', () => {

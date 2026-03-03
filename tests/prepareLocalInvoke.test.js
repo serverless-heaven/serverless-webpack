@@ -1,9 +1,7 @@
-'use strict';
-
 const _ = require('lodash');
 const sinon = require('sinon');
 const Serverless = require('serverless');
-const path = require('path');
+const path = require('node:path');
 const baseModule = require('../lib/prepareLocalInvoke');
 
 jest.mock('../lib/utils', () => {

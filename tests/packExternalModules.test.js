@@ -1,9 +1,7 @@
-'use strict';
-
 const BbPromise = require('bluebird');
 const sinon = require('sinon');
 const _ = require('lodash');
-const path = require('path');
+const path = require('node:path');
 const Serverless = require('serverless');
 const Configuration = require('../lib/Configuration');
 
@@ -210,8 +208,8 @@ describe('packExternalModules', () => {
       readFileSyncStub.mockImplementation(() => {
         throw new Error('Unexpected call to readFileSync');
       });
-      fsExtraMock.pathExists.mockImplementation((p, cb) => cb(null, false));
-      fsExtraMock.copy.mockImplementation((from, to, cb) => cb());
+      fsExtraMock.pathExists.mockImplementation((_p, cb) => cb(null, false));
+      fsExtraMock.copy.mockImplementation((_from, _to, cb) => cb());
       packagerFactoryMock.get('npm').getProdDependencies.mockReturnValue(BbPromise.resolve({}));
       packagerFactoryMock.get('npm').getPackagerVersion.mockReturnValue(BbPromise.resolve());
       packagerFactoryMock.get('npm').install.mockReturnValue(BbPromise.resolve());
@@ -288,13 +286,13 @@ describe('packExternalModules', () => {
       });
 
       module.webpackOutputPath = '/my/Service/Path/outputPath';
-      fsExtraMock.pathExists.mockImplementation((p, cb) => cb(null, true));
-      fsExtraMock.copy.mockImplementation((from, to, cb) => cb());
+      fsExtraMock.pathExists.mockImplementation((_p, cb) => cb(null, true));
+      fsExtraMock.copy.mockImplementation((_from, _to, cb) => cb());
       readFileSyncStub.mockReturnValueOnce(originalPackageJSON);
       readFileSyncStub.mockImplementation(() => {
         throw new Error('Unexpected call to readFileSync');
       });
-      packagerFactoryMock.get('npm').rebaseLockfile.mockImplementation((pathToPackageRoot, lockfile) => lockfile);
+      packagerFactoryMock.get('npm').rebaseLockfile.mockImplementation((_pathToPackageRoot, lockfile) => lockfile);
       packagerFactoryMock.get('npm').getProdDependencies.mockReturnValue(BbPromise.resolve({}));
       packagerFactoryMock.get('npm').install.mockReturnValue(BbPromise.resolve());
       packagerFactoryMock.get('npm').prune.mockReturnValue(BbPromise.resolve());
@@ -338,8 +336,8 @@ describe('packExternalModules', () => {
       };
 
       module.webpackOutputPath = '/my/Service/Path/outputPath';
-      fsExtraMock.pathExists.mockImplementation((p, cb) => cb(null, false));
-      fsExtraMock.copy.mockImplementation((from, to, cb) => cb());
+      fsExtraMock.pathExists.mockImplementation((_p, cb) => cb(null, false));
+      fsExtraMock.copy.mockImplementation((_from, _to, cb) => cb());
       packagerFactoryMock.get('npm').getProdDependencies.mockReturnValue(BbPromise.resolve({}));
       packagerFactoryMock.get('npm').getPackagerVersion.mockReturnValue(BbPromise.resolve());
       packagerFactoryMock.get('npm').install.mockReturnValue(BbPromise.resolve());
@@ -424,10 +422,10 @@ describe('packExternalModules', () => {
       module.webpackOutputPath = '/my/Service/Path/outputPath';
       readFileSyncStub.mockReturnValueOnce(packageLocalRefMock);
       readFileSyncStub.mockReturnValue(fakePackageLockJSON);
-      fsExtraMock.pathExists.mockImplementation((p, cb) => cb(null, true));
-      fsExtraMock.copy.mockImplementation((from, to, cb) => cb());
+      fsExtraMock.pathExists.mockImplementation((_p, cb) => cb(null, true));
+      fsExtraMock.copy.mockImplementation((_from, _to, cb) => cb());
       packagerFactoryMock.get('npm').getProdDependencies.mockReturnValue(BbPromise.resolve({}));
-      packagerFactoryMock.get('npm').rebaseLockfile.mockImplementation((pathToPackageRoot, lockfile) => lockfile);
+      packagerFactoryMock.get('npm').rebaseLockfile.mockImplementation((_pathToPackageRoot, lockfile) => lockfile);
       packagerFactoryMock.get('npm').getPackagerVersion.mockReturnValue(BbPromise.resolve());
       packagerFactoryMock.get('npm').install.mockReturnValue(BbPromise.resolve());
       packagerFactoryMock.get('npm').prune.mockReturnValue(BbPromise.resolve());
@@ -498,8 +496,8 @@ describe('packExternalModules', () => {
 
       _.set(serverless, 'service.provider.name', 'google');
       module.webpackOutputPath = '/my/Service/Path/outputPath';
-      fsExtraMock.pathExists.mockImplementation((p, cb) => cb(null, false));
-      fsExtraMock.copy.mockImplementation((from, to, cb) => cb());
+      fsExtraMock.pathExists.mockImplementation((_p, cb) => cb(null, false));
+      fsExtraMock.copy.mockImplementation((_from, _to, cb) => cb());
       packagerFactoryMock.get('npm').getProdDependencies.mockReturnValue(BbPromise.resolve({}));
       packagerFactoryMock.get('npm').getPackagerVersion.mockReturnValue(BbPromise.resolve());
       packagerFactoryMock.get('npm').install.mockReturnValue(BbPromise.resolve());
@@ -528,8 +526,8 @@ describe('packExternalModules', () => {
 
     it('should reject if packager install fails', () => {
       module.webpackOutputPath = '/my/Service/Path/outputPath';
-      fsExtraMock.pathExists.mockImplementation((p, cb) => cb(null, false));
-      fsExtraMock.copy.mockImplementation((from, to, cb) => cb());
+      fsExtraMock.pathExists.mockImplementation((_p, cb) => cb(null, false));
+      fsExtraMock.copy.mockImplementation((_from, _to, cb) => cb());
       packagerFactoryMock.get('npm').getProdDependencies.mockReturnValue(BbPromise.resolve({}));
       packagerFactoryMock.get('npm').getPackagerVersion.mockReturnValue(BbPromise.resolve());
       packagerFactoryMock
@@ -554,8 +552,8 @@ describe('packExternalModules', () => {
 
     it('should reject if packager returns a critical error', () => {
       module.webpackOutputPath = '/my/Service/Path/outputPath';
-      fsExtraMock.pathExists.mockImplementation((p, cb) => cb(null, false));
-      fsExtraMock.copy.mockImplementation((from, to, cb) => cb());
+      fsExtraMock.pathExists.mockImplementation((_p, cb) => cb(null, false));
+      fsExtraMock.copy.mockImplementation((_from, _to, cb) => cb());
       packagerFactoryMock
         .get('npm')
         .getProdDependencies.mockImplementation(() => BbPromise.reject(new Error('something went wrong')));
@@ -579,7 +577,7 @@ describe('packExternalModules', () => {
 
     it('should not install modules if no external modules are reported', () => {
       module.webpackOutputPath = '/my/Service/Path/outputPath';
-      fsExtraMock.copy.mockImplementation((from, to, cb) => cb());
+      fsExtraMock.copy.mockImplementation((_from, _to, cb) => cb());
       packagerFactoryMock.get('npm').getProdDependencies.mockReturnValue(BbPromise.resolve());
       module.compileStats = noExtStats;
       return expect(module.packExternalModules())
@@ -601,8 +599,8 @@ describe('packExternalModules', () => {
 
     it('should report ignored packager problems in verbose mode', () => {
       module.webpackOutputPath = '/my/Service/Path/outputPath';
-      fsExtraMock.pathExists.mockImplementation((p, cb) => cb(null, false));
-      fsExtraMock.copy.mockImplementation((from, to, cb) => cb());
+      fsExtraMock.pathExists.mockImplementation((_p, cb) => cb(null, false));
+      fsExtraMock.copy.mockImplementation((_from, _to, cb) => cb());
       packagerFactoryMock.get('npm').getProdDependencies.mockReturnValue(
         BbPromise.resolve({
           problems: ['Problem 1', 'Problem 2']
@@ -657,8 +655,8 @@ describe('packExternalModules', () => {
         }
       });
       module.webpackOutputPath = '/my/Service/Path/outputPath';
-      fsExtraMock.pathExists.mockImplementation((p, cb) => cb(null, false));
-      fsExtraMock.copy.mockImplementation((from, to, cb) => cb());
+      fsExtraMock.pathExists.mockImplementation((_p, cb) => cb(null, false));
+      fsExtraMock.copy.mockImplementation((_from, _to, cb) => cb());
       packagerFactoryMock.get('npm').getProdDependencies.mockReturnValue(BbPromise.resolve({}));
       packagerFactoryMock.get('npm').install.mockReturnValue(BbPromise.resolve());
       packagerFactoryMock.get('npm').prune.mockReturnValue(BbPromise.resolve());
@@ -718,8 +716,8 @@ describe('packExternalModules', () => {
         }
       });
       module.webpackOutputPath = '/my/Service/Path/outputPath';
-      fsExtraMock.pathExists.mockImplementation((p, cb) => cb(null, false));
-      fsExtraMock.copy.mockImplementation((from, to, cb) => cb());
+      fsExtraMock.pathExists.mockImplementation((_p, cb) => cb(null, false));
+      fsExtraMock.copy.mockImplementation((_from, _to, cb) => cb());
       packagerFactoryMock.get('npm').getProdDependencies.mockReturnValue(BbPromise.resolve({}));
       packagerFactoryMock.get('npm').install.mockReturnValue(BbPromise.resolve());
       packagerFactoryMock.get('npm').prune.mockReturnValue(BbPromise.resolve());
@@ -778,8 +776,8 @@ describe('packExternalModules', () => {
         }
       });
       module.webpackOutputPath = '/my/Service/Path/outputPath';
-      fsExtraMock.pathExists.mockImplementation((p, cb) => cb(null, false));
-      fsExtraMock.copy.mockImplementation((from, to, cb) => cb());
+      fsExtraMock.pathExists.mockImplementation((_p, cb) => cb(null, false));
+      fsExtraMock.copy.mockImplementation((_from, _to, cb) => cb());
       packagerFactoryMock.get('npm').getProdDependencies.mockReturnValue(BbPromise.resolve({}));
       packagerFactoryMock.get('npm').install.mockReturnValue(BbPromise.resolve());
       packagerFactoryMock.get('npm').prune.mockReturnValue(BbPromise.resolve());
@@ -806,8 +804,8 @@ describe('packExternalModules', () => {
 
     it('should reject if devDependency is required at runtime', () => {
       module.webpackOutputPath = '/my/Service/Path/outputPath';
-      fsExtraMock.pathExists.mockImplementation((p, cb) => cb(null, false));
-      fsExtraMock.copy.mockImplementation((from, to, cb) => cb());
+      fsExtraMock.pathExists.mockImplementation((_p, cb) => cb(null, false));
+      fsExtraMock.copy.mockImplementation((_from, _to, cb) => cb());
       packagerFactoryMock.get('npm').getProdDependencies.mockReturnValue(BbPromise.resolve({}));
       packagerFactoryMock.get('npm').install.mockReturnValue(BbPromise.resolve());
       packagerFactoryMock.get('npm').prune.mockReturnValue(BbPromise.resolve());
@@ -838,8 +836,8 @@ describe('packExternalModules', () => {
         }
       });
       module.webpackOutputPath = '/my/Service/Path/outputPath';
-      fsExtraMock.pathExists.mockImplementation((p, cb) => cb(null, false));
-      fsExtraMock.copy.mockImplementation((from, to, cb) => cb());
+      fsExtraMock.pathExists.mockImplementation((_p, cb) => cb(null, false));
+      fsExtraMock.copy.mockImplementation((_from, _to, cb) => cb());
       packagerFactoryMock.get('npm').getProdDependencies.mockReturnValue(BbPromise.resolve({}));
       packagerFactoryMock.get('npm').install.mockReturnValue(BbPromise.resolve());
       packagerFactoryMock.get('npm').prune.mockReturnValue(BbPromise.resolve());
@@ -875,8 +873,8 @@ describe('packExternalModules', () => {
         }
       });
       module.webpackOutputPath = '/my/Service/Path/outputPath';
-      fsExtraMock.pathExists.mockImplementation((p, cb) => cb(null, false));
-      fsExtraMock.copy.mockImplementation((from, to, cb) => cb());
+      fsExtraMock.pathExists.mockImplementation((_p, cb) => cb(null, false));
+      fsExtraMock.copy.mockImplementation((_from, _to, cb) => cb());
       packagerFactoryMock.get('npm').getProdDependencies.mockReturnValue(BbPromise.resolve({}));
       packagerFactoryMock.get('npm').install.mockReturnValue(BbPromise.resolve());
       packagerFactoryMock.get('npm').prune.mockReturnValue(BbPromise.resolve());
@@ -922,11 +920,11 @@ describe('packExternalModules', () => {
       };
 
       module.webpackOutputPath = '/my/Service/Path/outputPath';
-      fsExtraMock.pathExists.mockImplementation((p, cb) => cb(null, true));
-      fsExtraMock.copy.mockImplementation((from, to, cb) => cb());
+      fsExtraMock.pathExists.mockImplementation((_p, cb) => cb(null, true));
+      fsExtraMock.copy.mockImplementation((_from, _to, cb) => cb());
       readFileSyncStub.mockReturnValueOnce(packageMock);
       readFileSyncStub.mockReturnValue({ info: 'lockfile' });
-      packagerFactoryMock.get('npm').rebaseLockfile.mockImplementation((pathToPackageRoot, lockfile) => lockfile);
+      packagerFactoryMock.get('npm').rebaseLockfile.mockImplementation((_pathToPackageRoot, lockfile) => lockfile);
       packagerFactoryMock.get('npm').getProdDependencies.mockReturnValue(BbPromise.resolve({}));
       packagerFactoryMock.get('npm').install.mockReturnValue(BbPromise.resolve());
       packagerFactoryMock.get('npm').prune.mockReturnValue(BbPromise.resolve());
@@ -991,11 +989,11 @@ describe('packExternalModules', () => {
       });
 
       module.webpackOutputPath = '/my/Service/Path/outputPath';
-      fsExtraMock.pathExists.mockImplementation((p, cb) => cb(null, true));
-      fsExtraMock.copy.mockImplementation((from, to, cb) => cb());
+      fsExtraMock.pathExists.mockImplementation((_p, cb) => cb(null, true));
+      fsExtraMock.copy.mockImplementation((_from, _to, cb) => cb());
       readFileSyncStub.mockReturnValueOnce(packageMock);
       readFileSyncStub.mockReturnValue({ info: 'lockfile' });
-      packagerFactoryMock.get('npm').rebaseLockfile.mockImplementation((pathToPackageRoot, lockfile) => lockfile);
+      packagerFactoryMock.get('npm').rebaseLockfile.mockImplementation((_pathToPackageRoot, lockfile) => lockfile);
       packagerFactoryMock.get('npm').getProdDependencies.mockReturnValue(BbPromise.resolve({}));
       packagerFactoryMock.get('npm').install.mockReturnValue(BbPromise.resolve());
       packagerFactoryMock.get('npm').prune.mockReturnValue(BbPromise.resolve());
@@ -1055,8 +1053,8 @@ describe('packExternalModules', () => {
       readFileSyncStub.mockImplementation(() => {
         throw new Error('Failed to read package-lock.json');
       });
-      fsExtraMock.pathExists.mockImplementation((p, cb) => cb(null, true));
-      fsExtraMock.copy.mockImplementationOnce((from, to, cb) => cb());
+      fsExtraMock.pathExists.mockImplementation((_p, cb) => cb(null, true));
+      fsExtraMock.copy.mockImplementationOnce((_from, _to, cb) => cb());
       packagerFactoryMock.get('npm').getProdDependencies.mockReturnValue(BbPromise.resolve({}));
       packagerFactoryMock.get('npm').install.mockReturnValue(BbPromise.resolve());
       packagerFactoryMock.get('npm').prune.mockReturnValue(BbPromise.resolve());
@@ -1108,8 +1106,8 @@ describe('packExternalModules', () => {
       };
 
       module.webpackOutputPath = '/my/Service/Path/outputPath';
-      fsExtraMock.pathExists.mockImplementation((p, cb) => cb(null, false));
-      fsExtraMock.copy.mockImplementationOnce((from, to, cb) => {
+      fsExtraMock.pathExists.mockImplementation((_p, cb) => cb(null, false));
+      fsExtraMock.copy.mockImplementationOnce((_from, _to, cb) => {
         cb();
       });
       packagerFactoryMock.get('npm').getProdDependencies.mockReturnValue(BbPromise.resolve({}));
@@ -1187,8 +1185,8 @@ describe('packExternalModules', () => {
           const peerDepStats = createStatsMock(['bluebird', 'request-promise']);
 
           module.webpackOutputPath = '/my/Service/Path/outputPath';
-          fsExtraMock.pathExists.mockImplementation((p, cb) => cb(null, false));
-          fsExtraMock.copy.mockImplementation((from, to, cb) => cb());
+          fsExtraMock.pathExists.mockImplementation((_p, cb) => cb(null, false));
+          fsExtraMock.copy.mockImplementation((_from, _to, cb) => cb());
           packagerFactoryMock.get('npm').getProdDependencies.mockReturnValue(BbPromise.resolve(dependencyGraph));
           packagerFactoryMock.get('npm').install.mockReturnValue(BbPromise.resolve());
           packagerFactoryMock.get('npm').prune.mockReturnValue(BbPromise.resolve());
@@ -1259,8 +1257,8 @@ describe('packExternalModules', () => {
 
           it('should skip optional peer dependencies', () => {
             module.webpackOutputPath = '/my/Service/Path/outputPath';
-            fsExtraMock.pathExists.mockImplementation((p, cb) => cb(null, false));
-            fsExtraMock.copy.mockImplementation((from, to, cb) => cb());
+            fsExtraMock.pathExists.mockImplementation((_p, cb) => cb(null, false));
+            fsExtraMock.copy.mockImplementation((_from, _to, cb) => cb());
             packagerFactoryMock.get('npm').getProdDependencies.mockReturnValue(BbPromise.resolve(dependencyGraph));
             packagerFactoryMock.get('npm').install.mockReturnValue(BbPromise.resolve());
             packagerFactoryMock.get('npm').prune.mockReturnValue(BbPromise.resolve());
@@ -1310,9 +1308,9 @@ describe('packExternalModules', () => {
               }
             });
             module.webpackOutputPath = '/my/Service/Path/outputPath';
-            fsExtraMock.pathExists.mockImplementation((p, cb) => cb(null, false));
+            fsExtraMock.pathExists.mockImplementation((_p, cb) => cb(null, false));
             fsExtraMock.pathExistsSync.mockReturnValue(true);
-            fsExtraMock.copy.mockImplementation((from, to, cb) => cb());
+            fsExtraMock.copy.mockImplementation((_from, _to, cb) => cb());
             packagerFactoryMock.get('npm').getProdDependencies.mockReturnValue(BbPromise.resolve(dependencyGraph));
             packagerFactoryMock.get('npm').install.mockReturnValue(BbPromise.resolve());
             packagerFactoryMock.get('npm').prune.mockReturnValue(BbPromise.resolve());
@@ -1384,8 +1382,8 @@ describe('packExternalModules', () => {
         const transitiveDepStats = createStatsMock(['classnames']);
 
         module.webpackOutputPath = '/my/Service/Path/outputPath';
-        fsExtraMock.pathExists.mockImplementation((p, cb) => cb(null, false));
-        fsExtraMock.copy.mockImplementation((from, to, cb) => cb());
+        fsExtraMock.pathExists.mockImplementation((_p, cb) => cb(null, false));
+        fsExtraMock.copy.mockImplementation((_from, _to, cb) => cb());
         packagerFactoryMock.get('npm').getProdDependencies.mockReturnValue(BbPromise.resolve(dependencyGraph));
         packagerFactoryMock.get('npm').install.mockReturnValue(BbPromise.resolve());
         packagerFactoryMock.get('npm').prune.mockReturnValue(BbPromise.resolve());

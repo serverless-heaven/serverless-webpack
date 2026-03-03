@@ -1,4 +1,3 @@
-'use strict';
 /**
  * Unit tests for packagers/npm
  */
@@ -6,16 +5,15 @@
 const _ = require('lodash');
 const BbPromise = require('bluebird');
 const Utils = require('../../lib/utils');
-const { sep } = require('path');
+const { sep } = require('node:path');
 const npmModule = require('../../lib/packagers/npm');
 const fseMock = require('fs-extra');
-const fsMock = require('fs');
+const fsMock = require('node:fs');
 
 jest.mock('fs-extra');
 jest.mock('fs');
 jest.mock('../../lib/utils', () => {
   const original = jest.requireActual('../../lib/utils');
-  // eslint-disable-next-line lodash/prefer-lodash-method
   return Object.assign({}, original, {
     spawnProcess: jest.fn()
   });

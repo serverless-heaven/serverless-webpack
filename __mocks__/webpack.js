@@ -1,5 +1,3 @@
-'use strict';
-
 const statsMock = {
   compilation: {
     errors: [],
@@ -22,7 +20,7 @@ const compilerMock = {
       tapPromise: jest.fn()
     }
   },
-  plugin: jest.fn().mockImplementation((name, cb) => cb(null, {}))
+  plugin: jest.fn().mockImplementation((_name, cb) => cb(null, {}))
 };
 
 const mock = jest.fn().mockReturnValue(compilerMock);

@@ -1,5 +1,3 @@
-'use strict';
-
 const BbPromise = require('bluebird');
 const _ = require('lodash');
 const sinon = require('sinon');
@@ -66,7 +64,7 @@ describe('run', () => {
       module.isWatching = false;
       const watch = module.watch.bind(module);
       webpackMock.compilerMock.watch.mockReset();
-      webpackMock.compilerMock.watch.mockImplementation((options, cb) => cb(null, {}));
+      webpackMock.compilerMock.watch.mockImplementation((_options, cb) => cb(null, {}));
       _.set(module, 'options.function', 'myFunction');
 
       watch('invoke:local');
@@ -78,7 +76,7 @@ describe('run', () => {
       module.isWatching = false;
       const watch = module.watch.bind(module);
       webpackMock.compilerMock.watch.mockReset();
-      webpackMock.compilerMock.watch.mockImplementation((options, cb) => cb(null, {}));
+      webpackMock.compilerMock.watch.mockImplementation((_options, cb) => cb(null, {}));
       _.set(module, 'options.function', 'myFunction');
 
       watch('compile:watch:compile');
@@ -90,7 +88,7 @@ describe('run', () => {
       module.isWatching = false;
       const watch = module.watch.bind(module);
       webpackMock.compilerMock.watch.mockReset();
-      webpackMock.compilerMock.watch.mockImplementation((options, cb) => cb(null, {}));
+      webpackMock.compilerMock.watch.mockImplementation((_options, cb) => cb(null, {}));
       _.set(module, 'options.function', 'myFunction');
 
       watch('compile:watch:compile');
@@ -103,7 +101,7 @@ describe('run', () => {
       module.isWatching = true;
       const watch = module.watch.bind(module);
       webpackMock.compilerMock.watch.mockReset();
-      webpackMock.compilerMock.watch.mockImplementation((options, cb) => cb(null, {}));
+      webpackMock.compilerMock.watch.mockImplementation((_options, cb) => cb(null, {}));
 
       watch('invoke:local');
       expect(spawnStub).toHaveBeenCalledTimes(1);
@@ -116,7 +114,7 @@ describe('run', () => {
       const watch = module.watch.bind(module);
       const watchHandler = jest.fn().mockReturnValue(BbPromise.resolve());
       webpackMock.compilerMock.watch.mockReset();
-      webpackMock.compilerMock.watch.mockImplementation((options, cb) => cb(null, {}));
+      webpackMock.compilerMock.watch.mockImplementation((_options, cb) => cb(null, {}));
 
       watch(watchHandler);
       expect(spawnStub).toHaveBeenCalledTimes(0);
@@ -129,7 +127,7 @@ describe('run', () => {
       const watch = module.watch.bind(module);
       const watchHandler = jest.fn().mockReturnValue(BbPromise.resolve());
       webpackMock.compilerMock.watch.mockReset();
-      webpackMock.compilerMock.watch.mockImplementation((options, cb) => cb(null, {}));
+      webpackMock.compilerMock.watch.mockImplementation((_options, cb) => cb(null, {}));
 
       watch(watchHandler);
       expect(spawnStub).toHaveBeenCalledTimes(0);
@@ -142,7 +140,7 @@ describe('run', () => {
       module.originalServicePath = 'originalPath';
       const watch = module.watch.bind(module);
       webpackMock.compilerMock.watch.mockReset();
-      webpackMock.compilerMock.watch.mockImplementation((options, cb) => cb(null, {}));
+      webpackMock.compilerMock.watch.mockImplementation((_options, cb) => cb(null, {}));
 
       watch();
       expect(serverless.config.servicePath).toEqual('originalPath');
@@ -153,7 +151,7 @@ describe('run', () => {
       module.isWatching = false;
       const watch = module.watch.bind(module);
       webpackMock.compilerMock.watch.mockReset();
-      webpackMock.compilerMock.watch.mockImplementation((options, cb) => cb(null, {}));
+      webpackMock.compilerMock.watch.mockImplementation((_options, cb) => cb(null, {}));
       module.options['webpack-use-polling'] = true;
 
       watch();
@@ -169,7 +167,7 @@ describe('run', () => {
       module.isWatching = false;
       const watch = module.watch.bind(module);
       webpackMock.compilerMock.watch.mockReset();
-      webpackMock.compilerMock.watch.mockImplementation((options, cb) => cb(null, {}));
+      webpackMock.compilerMock.watch.mockImplementation((_options, cb) => cb(null, {}));
       const interval = (module.options['webpack-use-polling'] = _.now() % 10000);
 
       watch();

@@ -1,0 +1,92 @@
+{
+  "$schema": "https://biomejs.dev/schemas/2.4.5/schema.json",
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": true
+  },
+  "files": {
+    "ignoreUnknown": false,
+    "includes": ["**/*.js", "**/*.ts", "**/*.cjs", "**/*.mjs", "**/*.json", "**/*.jsonc", "**/*.yml"]
+  },
+  "formatter": {
+    "enabled": true,
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineEnding": "lf",
+    "lineWidth": 120
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "recommended": true,
+      "complexity": {
+        "noStaticOnlyClass": "off"
+      },
+      "style": {
+        "useConst": "error"
+      },
+      "suspicious": {
+        "noAssignInExpressions": "off",
+        "noThenProperty": "off",
+        "noVar": "error"
+      }
+    }
+  },
+  "javascript": {
+    "formatter": {
+      "arrowParentheses": "asNeeded",
+      "bracketSpacing": true,
+      "indentStyle": "space",
+      "indentWidth": 2,
+      "lineEnding": "lf",
+      "lineWidth": 120,
+      "quoteStyle": "single",
+      "semicolons": "always",
+      "trailingCommas": "none"
+    },
+    "globals": [
+      "__dirname",
+      "__filename",
+      "afterAll",
+      "afterEach",
+      "beforeAll",
+      "beforeEach",
+      "Buffer",
+      "clearImmediate",
+      "clearInterval",
+      "clearTimeout",
+      "console",
+      "describe",
+      "expect",
+      "exports",
+      "global",
+      "it",
+      "jest",
+      "module",
+      "process",
+      "require",
+      "setImmediate",
+      "setInterval",
+      "setTimeout",
+      "test"
+    ]
+  },
+  "assist": {
+    "enabled": false
+  },
+  "overrides": [
+    {
+      "includes": ["examples/**"],
+      "formatter": {
+        "enabled": false
+      },
+      "linter": {
+        "enabled": false
+      },
+      "assist": {
+        "enabled": false
+      }
+    }
+  ]
+}

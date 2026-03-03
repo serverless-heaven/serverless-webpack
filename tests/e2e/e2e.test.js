@@ -1,6 +1,6 @@
-const path = require('path');
-const stream = require('stream');
-const fs = require('fs');
+const path = require('node:path');
+const stream = require('node:stream');
+const fs = require('node:fs');
 const unzipper = require('unzipper');
 const { runServerless } = require('./e2eUtils');
 const semver = require('semver');
@@ -26,7 +26,7 @@ async function unzipArtifacts(archivePath) {
       .pipe(
         stream.Transform({
           objectMode: true,
-          transform: async function (entry, e, cb) {
+          transform: async (entry, _e, cb) => {
             if (entry.path.startsWith('node_modules/')) {
               files.node_modules = true;
               entry.autodrain();

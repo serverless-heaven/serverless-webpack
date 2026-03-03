@@ -1,5 +1,3 @@
-'use strict';
-
 const _ = require('lodash');
 const Serverless = require('serverless');
 const Configuration = require('../lib/Configuration');

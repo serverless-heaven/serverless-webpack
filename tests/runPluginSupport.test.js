@@ -1,10 +1,8 @@
-'use strict';
-
 const BbPromise = require('bluebird');
 const _ = require('lodash');
 const sinon = require('sinon');
 const Serverless = require('serverless');
-const path = require('path');
+const path = require('node:path');
 const baseModule = require('../lib/runPluginSupport');
 
 const pluginPath = path.join('plugins', 'run', 'utils');

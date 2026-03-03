@@ -1,4 +1,4 @@
-/* eslint-disable promise/no-callback-in-promise */
+
 export const hello = (event, _, cb) => {
   const p = new Promise(resolve => {
     resolve('success');
