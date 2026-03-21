@@ -51,7 +51,7 @@
     "jest": "^30.3.0",
     "lint-staged": "^16.4.0",
     "serverless": "npm:osls@^3.62.1",
-    "sinon": "^21.0.2",
+    "sinon": "^21.0.3",
     "ts-node": "^10.9.2",
     "unzipper": "^0.12.3",
     "webpack": "^5.105.4"
