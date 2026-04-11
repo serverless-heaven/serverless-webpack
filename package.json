@@ -46,7 +46,7 @@
     "@babel/core": "^7.29.0",
     "@biomejs/biome": "^2.4.10",
     "@serverless/test": "^11.1.1",
-    "@types/node": "^25.5.2",
+    "@types/node": "^25.6.0",
     "husky": "^9.1.7",
     "jest": "^30.3.0",
     "lint-staged": "^16.4.0",
