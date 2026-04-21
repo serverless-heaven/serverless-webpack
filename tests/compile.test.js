@@ -43,19 +43,15 @@ describe('compile', () => {
   });
 
   it('should fail if configuration is missing', () => {
-    expect.assertions(1);
     delete module.webpackConfig;
-    return module.compile().catch(e => {
-      expect(e).toEqual('Unable to find Webpack configuration');
-    });
+    return expect(module.compile()).rejects.toThrow('Unable to find Webpack configuration');
   });
 
   it('should fail if plugin configuration is missing', () => {
     const testWebpackConfig = 'testconfig';
     module.webpackConfig = testWebpackConfig;
     module.configuration = undefined;
-    expect.assertions(1);
-    return module.compile().catch(e => expect(e.toString()).toEqual('ServerlessError: Missing plugin configuration'));
+    return expect(module.compile()).rejects.toThrow('Missing plugin configuration');
   });
 
   it('should fail if there are compilation errors', () => {
