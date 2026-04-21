@@ -128,15 +128,14 @@ module.exports = (async () => {
 ```
 
 ```js
-// Version with promises
+// Version with native promises
 // webpack.config.js
 
 const webpack = require('webpack')
 const slsw = require('serverless-webpack');
-const BbPromise = require('bluebird');
 
-module.exports = BbPromise.try(() => {
-  return slsw.lib.serverless.providers.aws.getAccountId()
+module.exports = Promise.resolve()
+  .then(() => slsw.lib.serverless.providers.aws.getAccountId())
   .then(accountId => ({
     entry: './handler.js',
     target: 'node',
@@ -149,7 +148,6 @@ module.exports = BbPromise.try(() => {
       loaders: [ ... ]
     }
   }));
-});
 ```
 
 ### serverless-webpack lib export helper

@@ -203,7 +203,7 @@ describe('npm', () => {
               { cwd: 'myPath' }
             );
             expect(fseMock.pathExistsSync).toHaveBeenCalledWith(`myPath${sep}package-lock.json`);
-            expect(fsMock.readFileSync).toHaveBeenCalledWith(`myPath${sep}package-lock.json`);
+            expect(fsMock.readFileSync).toHaveBeenCalledWith(`myPath${sep}package-lock.json`, 'utf8');
             return null;
           });
       });
@@ -231,7 +231,7 @@ describe('npm', () => {
           .then(() => {
             expect(Utils.spawnProcess).toHaveBeenCalledTimes(0);
             expect(fseMock.pathExistsSync).toHaveBeenCalledWith(`myPath${sep}package-lock.json`);
-            expect(fsMock.readFileSync).toHaveBeenCalledWith(`myPath${sep}package-lock.json`);
+            expect(fsMock.readFileSync).toHaveBeenCalledWith(`myPath${sep}package-lock.json`, 'utf8');
             return null;
           });
       });
@@ -263,7 +263,7 @@ describe('npm', () => {
           .then(() => {
             expect(Utils.spawnProcess).toHaveBeenCalledTimes(0);
             expect(fseMock.pathExistsSync).toHaveBeenCalledWith(`root-workspace${sep}package-lock.json`);
-            expect(fsMock.readFileSync).toHaveBeenCalledWith(`root-workspace${sep}package-lock.json`);
+            expect(fsMock.readFileSync).toHaveBeenCalledWith(`root-workspace${sep}package-lock.json`, 'utf8');
             return null;
           });
       });
