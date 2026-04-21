@@ -3,7 +3,6 @@
  */
 
 const _ = require('lodash');
-const BbPromise = require('bluebird');
 const semver = require('semver');
 const Serverless = require('serverless');
 const ServerlessWebpack = require('../index');
@@ -21,7 +20,7 @@ describe('ServerlessWebpack', () => {
       log: jest.fn(),
       consoleLog: jest.fn()
     };
-    serverless.pluginManager.spawn = jest.fn().mockReturnValue(BbPromise.resolve());
+    serverless.pluginManager.spawn = jest.fn().mockReturnValue(Promise.resolve());
     serverless.service.getFunction = jest.fn().mockReturnValue({ runtime: 'nodejs20.x' });
     if (semver.gte(serverless.getVersion(), '2.10.0')) {
       serverless.configSchemaHandler.defineFunctionProperties = jest.fn();
@@ -121,19 +120,19 @@ describe('ServerlessWebpack', () => {
         // serverless.processedInput does not exist in serverless@<2.0.0
         serverless.processedInput.options = processedOptions;
       }
-      slsw.cleanup = jest.fn().mockReturnValue(BbPromise.resolve());
-      slsw.watch = jest.fn().mockReturnValue(BbPromise.resolve());
-      slsw.wpwatch = jest.fn().mockReturnValue(BbPromise.resolve());
-      slsw.packExternalModules = jest.fn().mockReturnValue(BbPromise.resolve());
-      slsw.copyExistingArtifacts = jest.fn().mockReturnValue(BbPromise.resolve());
-      slsw.prepareRun = jest.fn().mockReturnValue(BbPromise.resolve());
-      slsw.watchRun = jest.fn().mockReturnValue(BbPromise.resolve());
-      slsw.validate = jest.fn().mockReturnValue(BbPromise.resolve());
-      slsw.compile = jest.fn().mockReturnValue(BbPromise.resolve());
-      slsw.packageModules = jest.fn().mockReturnValue(BbPromise.resolve());
-      slsw.prepareLocalInvoke = jest.fn().mockReturnValue(BbPromise.resolve());
-      slsw.prepareOfflineInvoke = jest.fn().mockReturnValue(BbPromise.resolve());
-      slsw.prepareStepOfflineInvoke = jest.fn().mockReturnValue(BbPromise.resolve());
+      slsw.cleanup = jest.fn().mockReturnValue(Promise.resolve());
+      slsw.watch = jest.fn().mockReturnValue(Promise.resolve());
+      slsw.wpwatch = jest.fn().mockReturnValue(Promise.resolve());
+      slsw.packExternalModules = jest.fn().mockReturnValue(Promise.resolve());
+      slsw.copyExistingArtifacts = jest.fn().mockReturnValue(Promise.resolve());
+      slsw.prepareRun = jest.fn().mockReturnValue(Promise.resolve());
+      slsw.watchRun = jest.fn().mockReturnValue(Promise.resolve());
+      slsw.validate = jest.fn().mockReturnValue(Promise.resolve());
+      slsw.compile = jest.fn().mockReturnValue(Promise.resolve());
+      slsw.packageModules = jest.fn().mockReturnValue(Promise.resolve());
+      slsw.prepareLocalInvoke = jest.fn().mockReturnValue(Promise.resolve());
+      slsw.prepareOfflineInvoke = jest.fn().mockReturnValue(Promise.resolve());
+      slsw.prepareStepOfflineInvoke = jest.fn().mockReturnValue(Promise.resolve());
     });
 
     beforeEach(() => {

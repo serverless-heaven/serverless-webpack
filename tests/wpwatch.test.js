@@ -1,4 +1,3 @@
-const BbPromise = require('bluebird');
 const _ = require('lodash');
 const Serverless = require('serverless');
 
@@ -57,10 +56,10 @@ describe('wpwatch', () => {
     return expect(wpwatch())
       .resolves.toBeUndefined()
       .then(() =>
-        BbPromise.join(
+        Promise.all([
           expect(spawnStub).toHaveBeenCalledWith('webpack:compile'),
           expect(webpackMock.compilerMock.watch).toHaveBeenCalledTimes(0)
-        )
+        ])
       );
   });
 
@@ -73,10 +72,10 @@ describe('wpwatch', () => {
     return expect(wpwatch())
       .resolves.toBeUndefined()
       .then(() =>
-        BbPromise.join(
+        Promise.all([
           expect(spawnStub).toHaveBeenCalledTimes(0),
           expect(webpackMock.compilerMock.watch).toHaveBeenCalledTimes(1)
-        )
+        ])
       );
   });
 
@@ -88,11 +87,11 @@ describe('wpwatch', () => {
     return expect(wpwatch())
       .resolves.toBeUndefined()
       .then(() =>
-        BbPromise.join(
+        Promise.all([
           expect(spawnStub).toHaveBeenCalledTimes(0),
           expect(webpackMock.compilerMock.watch).toHaveBeenCalledTimes(1),
           expect(spawnStub).toHaveBeenCalledTimes(0)
-        )
+        ])
       );
   });
 
@@ -105,10 +104,10 @@ describe('wpwatch', () => {
     return expect(wpwatch())
       .resolves.toBeUndefined()
       .then(() =>
-        BbPromise.join(
+        Promise.all([
           expect(spawnStub).toHaveBeenCalledTimes(0),
           expect(webpackMock.compilerMock.watch).toHaveBeenCalledTimes(1)
-        )
+        ])
       );
   });
 
@@ -122,7 +121,7 @@ describe('wpwatch', () => {
     return expect(wpwatch())
       .resolves.toBeUndefined()
       .then(() =>
-        BbPromise.join(
+        Promise.all([
           expect(spawnStub).toHaveBeenCalledTimes(0),
           expect(webpackMock.compilerMock.watch).toHaveBeenCalledTimes(1),
           expect(webpackMock.compilerMock.watch).toHaveBeenCalledWith(
@@ -131,7 +130,7 @@ describe('wpwatch', () => {
             },
             expect.any(Function)
           )
-        )
+        ])
       );
   });
 
@@ -145,7 +144,7 @@ describe('wpwatch', () => {
     return expect(wpwatch())
       .resolves.toBeUndefined()
       .then(() =>
-        BbPromise.join(
+        Promise.all([
           expect(spawnStub).toHaveBeenCalledTimes(0),
           expect(webpackMock.compilerMock.watch).toHaveBeenCalledTimes(1),
           expect(webpackMock.compilerMock.watch).toHaveBeenCalledWith(
@@ -154,7 +153,7 @@ describe('wpwatch', () => {
             },
             expect.any(Function)
           )
-        )
+        ])
       );
   });
 
@@ -187,11 +186,11 @@ describe('wpwatch', () => {
     return expect(wpwatch())
       .resolves.toBeUndefined()
       .then(() =>
-        BbPromise.join(
+        Promise.all([
           expect(watchCallbackCount).toBe(4),
           expect(spawnStub).toHaveBeenCalledTimes(1),
           expect(spawnStub).toHaveBeenCalledWith('webpack:compile:watch')
-        )
+        ])
       );
   });
 
@@ -223,11 +222,11 @@ describe('wpwatch', () => {
       .resolves.toBeUndefined()
       .then(() => beforeCompileCallbackPromise)
       .then(() =>
-        BbPromise.join(
+        Promise.all([
           expect(watchCallbackCount).toBe(3),
           expect(spawnStub).toHaveBeenCalledTimes(2),
           expect(spawnStub).toHaveBeenCalledWith('webpack:compile:watch')
-        )
+        ])
       );
   });
 
@@ -245,7 +244,7 @@ describe('wpwatch', () => {
 
   it('should not resolve before compile if it has an error', () => {
     const wpwatch = module.wpwatch.bind(module);
-    spawnStub.mockReturnValue(BbPromise.reject(new Error('actual error')));
+    spawnStub.mockReturnValue(Promise.reject(new Error('actual error')));
 
     let beforeCompileCallback;
     webpackMock.compilerMock.hooks.beforeCompile.tapPromise.mockImplementation((_options, cb) => {

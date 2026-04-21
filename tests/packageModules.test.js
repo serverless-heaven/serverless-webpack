@@ -1,4 +1,3 @@
-const BbPromise = require('bluebird');
 const _ = require('lodash');
 const path = require('node:path');
 const Serverless = require('serverless');
@@ -58,7 +57,7 @@ describe('packageModules', () => {
       return expect(module.packageModules())
         .resolves.toEqual([])
         .then(() =>
-          BbPromise.all([
+          Promise.all([
             expect(writeFileDirStub).toHaveBeenCalledTimes(0),
             expect(fsMock.createWriteStream).toHaveBeenCalledTimes(0),
             expect(globMock.sync).toHaveBeenCalledTimes(0)
@@ -71,7 +70,7 @@ describe('packageModules', () => {
       return expect(module.packageModules())
         .resolves.toBeUndefined()
         .then(() =>
-          BbPromise.all([
+          Promise.all([
             expect(writeFileDirStub).toHaveBeenCalledTimes(0),
             expect(fsMock.createWriteStream).toHaveBeenCalledTimes(0),
             expect(globMock.sync).toHaveBeenCalledTimes(0)
@@ -130,7 +129,7 @@ describe('packageModules', () => {
         module.compileStats = stats;
         return expect(module.packageModules())
           .resolves.toEqual([path.join('.webpack', 'test-service.zip')])
-          .then(() => BbPromise.all([]));
+          .then(() => Promise.resolve());
       });
 
       describe('with the Google provider', () => {
@@ -236,19 +235,17 @@ describe('packageModules', () => {
         fsMock._statMock.isDirectory.mockReturnValue(false);
 
         module.compileStats = stats;
-        return BbPromise.each(['1.18.1', '2.17.0', '10.15.3'], version => {
-          getVersionStub.mockReturnValue(version);
-          return expect(module.packageModules())
-            .resolves.toEqual([path.join('.webpack', 'test-service.zip')])
-            .then(() => BbPromise.all([]));
-        }).then(() =>
-          BbPromise.each(['1.17.0', '1.16.0-alpha', '1.15.3'], version => {
+        return (async () => {
+          for (const version of ['1.18.1', '2.17.0', '10.15.3']) {
             getVersionStub.mockReturnValue(version);
-            return expect(module.packageModules())
-              .resolves.toEqual([path.join('.webpack', 'test-service.zip')])
-              .then(() => BbPromise.all([]));
-          })
-        );
+            await expect(module.packageModules()).resolves.toEqual([path.join('.webpack', 'test-service.zip')]);
+          }
+
+          for (const version of ['1.17.0', '1.16.0-alpha', '1.15.3']) {
+            getVersionStub.mockReturnValue(version);
+            await expect(module.packageModules()).resolves.toEqual([path.join('.webpack', 'test-service.zip')]);
+          }
+        })();
       });
 
       it('should reject if no files are found', () => {
@@ -537,7 +534,7 @@ describe('packageModules', () => {
         return expect(module.copyExistingArtifacts())
           .resolves.toBeUndefined()
           .then(() =>
-            BbPromise.all([
+            Promise.all([
               // Should copy the artifact into .serverless
               expect(fsMock.copyFileSync).toHaveBeenCalledTimes(1),
               expect(fsMock.copyFileSync).toHaveBeenCalledWith(expectedArtifactSource, expectedArtifactDestination),
@@ -592,31 +589,23 @@ describe('packageModules', () => {
         const expectedArtifactPath = path.join('.serverless', 'test-service.zip');
 
         module.compileStats = stats;
-        return BbPromise.each(['1.18.1', '2.17.0', '10.15.3'], version => {
-          getVersionStub.mockReturnValue(version);
-          return expect(module.copyExistingArtifacts())
-            .resolves.toBeUndefined()
-            .then(() =>
-              BbPromise.all([
-                expect(func1).toHaveProperty('package.artifact', expectedArtifactPath),
-                expect(func2).toHaveProperty('package.artifact', expectedArtifactPath)
-              ])
-            );
-        }).then(() =>
-          BbPromise.each(['1.17.0', '1.16.0-alpha', '1.15.3'], version => {
+        return (async () => {
+          for (const version of ['1.18.1', '2.17.0', '10.15.3']) {
             getVersionStub.mockReturnValue(version);
-            return expect(module.copyExistingArtifacts())
-              .resolves.toBeUndefined()
-              .then(() =>
-                BbPromise.all([
-                  expect(func1).toHaveProperty('artifact', expectedArtifactPath),
-                  expect(func2).toHaveProperty('artifact', expectedArtifactPath),
-                  expect(func1).toHaveProperty('package.disable', true),
-                  expect(func2).toHaveProperty('package.disable', true)
-                ])
-              );
-          })
-        );
+            await expect(module.copyExistingArtifacts()).resolves.toBeUndefined();
+            expect(func1).toHaveProperty('package.artifact', expectedArtifactPath);
+            expect(func2).toHaveProperty('package.artifact', expectedArtifactPath);
+          }
+
+          for (const version of ['1.17.0', '1.16.0-alpha', '1.15.3']) {
+            getVersionStub.mockReturnValue(version);
+            await expect(module.copyExistingArtifacts()).resolves.toBeUndefined();
+            expect(func1).toHaveProperty('artifact', expectedArtifactPath);
+            expect(func2).toHaveProperty('artifact', expectedArtifactPath);
+            expect(func1).toHaveProperty('package.disable', true);
+            expect(func2).toHaveProperty('package.disable', true);
+          }
+        })();
       });
 
       describe('with the Google provider', () => {
@@ -700,7 +689,7 @@ describe('packageModules', () => {
         return expect(module.copyExistingArtifacts())
           .resolves.toBeUndefined()
           .then(() =>
-            BbPromise.all([
+            Promise.all([
               // Should copy an artifact per function into .serverless
               expect(fsMock.copyFileSync).toHaveBeenCalledTimes(2),
               expect(fsMock.copyFileSync).toHaveBeenCalledWith(
@@ -726,7 +715,7 @@ describe('packageModules', () => {
         return expect(module.copyExistingArtifacts())
           .resolves.toBeUndefined()
           .then(() =>
-            BbPromise.all([
+            Promise.all([
               // Should copy an artifact per function into .serverless
               expect(fsMock.copyFileSync).toHaveBeenCalledTimes(1),
               expect(fsMock.copyFileSync).toHaveBeenCalledWith(

@@ -3,7 +3,6 @@
  */
 
 const _ = require('lodash');
-const BbPromise = require('bluebird');
 const Utils = require('../../lib/utils');
 const { sep } = require('node:path');
 const npmModule = require('../../lib/packagers/npm');
@@ -51,7 +50,7 @@ describe('npm', () => {
   describe('getPackagerVersion', () => {
     it('should use npm version 6.14.17', () => {
       const npmVersion = '6.14.17';
-      Utils.spawnProcess.mockReturnValue(BbPromise.resolve({ stdout: npmVersion, stderr: '' }));
+      Utils.spawnProcess.mockReturnValue(Promise.resolve({ stdout: npmVersion, stderr: '' }));
       return expect(npmModule.getPackagerVersion('myPath', 1))
         .resolves.toEqual(npmVersion)
         .then(() => {
@@ -65,7 +64,7 @@ describe('npm', () => {
 
     it('should use npm version 8.19.2', () => {
       const npmVersion = '8.19.2';
-      Utils.spawnProcess.mockReturnValue(BbPromise.resolve({ stdout: npmVersion, stderr: '' }));
+      Utils.spawnProcess.mockReturnValue(Promise.resolve({ stdout: npmVersion, stderr: '' }));
       return expect(npmModule.getPackagerVersion('myPath', 1))
         .resolves.toEqual(npmVersion)
         .then(() => {
@@ -80,7 +79,7 @@ describe('npm', () => {
 
   describe('install', () => {
     it('should use npm install', () => {
-      Utils.spawnProcess.mockReturnValue(BbPromise.resolve({ stdout: 'installed successfully', stderr: '' }));
+      Utils.spawnProcess.mockReturnValue(Promise.resolve({ stdout: 'installed successfully', stderr: '' }));
       return expect(npmModule.install('myPath', {}))
         .resolves.toBeUndefined()
         .then(() => {
@@ -93,7 +92,7 @@ describe('npm', () => {
     });
 
     it('should use ignoreScripts option', () => {
-      Utils.spawnProcess.mockReturnValue(BbPromise.resolve({ stdout: 'installed successfully', stderr: '' }));
+      Utils.spawnProcess.mockReturnValue(Promise.resolve({ stdout: 'installed successfully', stderr: '' }));
       return expect(npmModule.install('myPath', { ignoreScripts: true }))
         .resolves.toBeUndefined()
         .then(() => {
@@ -123,7 +122,7 @@ describe('npm', () => {
 
   describe('prune', () => {
     it('should use npm prune', () => {
-      Utils.spawnProcess.mockReturnValue(BbPromise.resolve({ stdout: 'success', stderr: '' }));
+      Utils.spawnProcess.mockReturnValue(Promise.resolve({ stdout: 'success', stderr: '' }));
       return expect(npmModule.prune('myPath'))
         .resolves.toBeUndefined()
         .then(() => {
@@ -138,7 +137,7 @@ describe('npm', () => {
 
   describe('runScripts', () => {
     it('should use npm run for the given scripts', () => {
-      Utils.spawnProcess.mockReturnValue(BbPromise.resolve({ stdout: 'success', stderr: '' }));
+      Utils.spawnProcess.mockReturnValue(Promise.resolve({ stdout: 'success', stderr: '' }));
       return expect(npmModule.runScripts('myPath', ['s1', 's2']))
         .resolves.toBeUndefined()
         .then(() => {
@@ -157,7 +156,7 @@ describe('npm', () => {
   describe('getProdDependencies', () => {
     describe('without lock file', () => {
       it('should use npm ls', () => {
-        Utils.spawnProcess.mockReturnValue(BbPromise.resolve({ stdout: '{}', stderr: '' }));
+        Utils.spawnProcess.mockReturnValue(Promise.resolve({ stdout: '{}', stderr: '' }));
         return expect(npmModule.getProdDependencies('myPath', 10))
           .resolves.toEqual({})
           .then(() => {
@@ -173,7 +172,7 @@ describe('npm', () => {
       });
 
       it('should default to depth 1', () => {
-        Utils.spawnProcess.mockReturnValue(BbPromise.resolve({ stdout: '{}', stderr: '' }));
+        Utils.spawnProcess.mockReturnValue(Promise.resolve({ stdout: '{}', stderr: '' }));
         return expect(npmModule.getProdDependencies('myPath'))
           .resolves.toEqual({})
           .then(() => {
@@ -193,7 +192,7 @@ describe('npm', () => {
       it('should use npm ls when lock file is not version 2', () => {
         fseMock.pathExistsSync.mockReturnValue(true);
         fsMock.readFileSync.mockReturnValue(JSON.stringify({ lockfileVersion: 1 }));
-        Utils.spawnProcess.mockReturnValue(BbPromise.resolve({ stdout: '{}', stderr: '' }));
+        Utils.spawnProcess.mockReturnValue(Promise.resolve({ stdout: '{}', stderr: '' }));
         return expect(npmModule.getProdDependencies('myPath'))
           .resolves.toEqual({})
           .then(() => {
@@ -274,9 +273,7 @@ describe('npm', () => {
   it('should reject if npm returns critical and minor errors', () => {
     const stderr =
       'ENOENT: No such file\nnpm ERR! extraneous: sinon@2.3.8 ./babel-dynamically-entries/node_modules/serverless-webpack/node_modules/sinon\n\n';
-    Utils.spawnProcess.mockReturnValue(
-      BbPromise.reject(new Utils.SpawnError('Command execution failed', '{}', stderr))
-    );
+    Utils.spawnProcess.mockReturnValue(Promise.reject(new Utils.SpawnError('Command execution failed', '{}', stderr)));
     return expect(npmModule.getProdDependencies('myPath', 1, {}))
       .rejects.toThrow('Command execution failed')
       .then(() => {
@@ -292,7 +289,7 @@ describe('npm', () => {
   });
 
   it('should reject if an error happens without any information in stdout', () => {
-    Utils.spawnProcess.mockReturnValue(BbPromise.reject(new Utils.SpawnError('Command execution failed', '', '')));
+    Utils.spawnProcess.mockReturnValue(Promise.reject(new Utils.SpawnError('Command execution failed', '', '')));
     return expect(npmModule.getProdDependencies('myPath', 1))
       .rejects.toThrow('Command execution failed')
       .then(() =>
@@ -332,7 +329,7 @@ describe('npm', () => {
     };
 
     Utils.spawnProcess.mockReturnValue(
-      BbPromise.reject(new Utils.SpawnError('Command execution failed', JSON.stringify(lsResult), stderr))
+      Promise.reject(new Utils.SpawnError('Command execution failed', JSON.stringify(lsResult), stderr))
     );
     return expect(npmModule.getProdDependencies('myPath', 1))
       .resolves.toEqual(lsResult)
@@ -381,7 +378,7 @@ describe('npm', () => {
     };
 
     Utils.spawnProcess.mockReturnValue(
-      BbPromise.reject(new Utils.SpawnError('Command execution failed', JSON.stringify(lsResult), stderr))
+      Promise.reject(new Utils.SpawnError('Command execution failed', JSON.stringify(lsResult), stderr))
     );
     return expect(npmModule.getProdDependencies('myPath', 1))
       .resolves.toEqual(lsResult)
