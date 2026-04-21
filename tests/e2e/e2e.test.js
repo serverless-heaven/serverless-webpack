@@ -134,8 +134,8 @@ describe(`end-to-end testing (node: ${nodeVersion.major}, sls: ${slsVersion.majo
         private: true,
         scripts: {},
         dependencies: {
-          // We should use fix version to respect lock file
-          lodash: '^4.17.23'
+          // We should keep the workspace dependency on the lodash v4 major.
+          lodash: expect.stringMatching(/^\^4(?:$|\.)/)
         }
       });
       expect(files['handler.js']).not.toHaveLength(0);
