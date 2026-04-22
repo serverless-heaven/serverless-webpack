@@ -107,6 +107,30 @@ describe('Utils', () => {
       });
       return expect(Utils.spawnProcess('cmd', [])).rejects.toThrow(Utils.SpawnError);
     });
+
+    it('should allow omitted args', () => {
+      childMock.stdout.on.mockReset();
+      childMock.stderr.on.mockReset();
+      childMock.on.mockReset();
+      childMock.on.mockImplementation((name, cb) => {
+        if (name === 'close') {
+          cb(0);
+        }
+      });
+
+      return expect(Utils.spawnProcess('cmd'))
+        .resolves.toEqual({ stderr: '', stdout: '' })
+        .then(() => {
+          expect(childProcess.spawn).toHaveBeenCalledWith(
+            'cmd',
+            [],
+            expect.objectContaining({
+              shell: expect.any(Boolean)
+            })
+          );
+          return null;
+        });
+    });
   });
 
   describe('safeJsonParse', () => {

@@ -116,6 +116,19 @@ describe('packExternalModules', () => {
       'aws-sdk'
     ]);
 
+    const mockSuccessfulPackaging = () => {
+      module.webpackOutputPath = '/my/Service/Path/outputPath';
+      readFileSyncStub.mockReturnValueOnce(packageMock);
+      readFileSyncStub.mockReturnValue({ info: 'lockfile' });
+      packagerFactoryMock.get('npm').rebaseLockfile.mockImplementation((_pathToPackageRoot, lockfile) => lockfile);
+      packagerFactoryMock.get('npm').getProdDependencies.mockReturnValue(Promise.resolve({}));
+      packagerFactoryMock.get('npm').getPackagerVersion.mockReturnValue(Promise.resolve());
+      packagerFactoryMock.get('npm').install.mockReturnValue(Promise.resolve());
+      packagerFactoryMock.get('npm').prune.mockReturnValue(Promise.resolve());
+      packagerFactoryMock.get('npm').runScripts.mockReturnValue(Promise.resolve());
+      module.compileStats = stats;
+    };
+
     it('should do nothing if webpackIncludeModules is not set', () => {
       module.configuration = new Configuration();
       module.compileStats = { stats: [] };
@@ -148,6 +161,53 @@ describe('packExternalModules', () => {
             expect(writeFileSyncStub).toHaveBeenCalledTimes(0)
           ])
         );
+    });
+
+    it('should support promise-based fs-extra helpers', () => {
+      mockSuccessfulPackaging();
+      fsExtraMock.pathExists.mockResolvedValue(true);
+      fsExtraMock.copy.mockResolvedValue();
+
+      return expect(module.packExternalModules())
+        .resolves.toBeUndefined()
+        .then(() =>
+          Promise.all([
+            expect(fsExtraMock.pathExists).toHaveBeenCalledTimes(1),
+            expect(fsExtraMock.copy).toHaveBeenCalledTimes(2)
+          ])
+        );
+    });
+
+    it('should support synchronous fs-extra helpers', () => {
+      mockSuccessfulPackaging();
+      fsExtraMock.pathExists.mockReturnValue(true);
+      fsExtraMock.copy.mockResolvedValue();
+
+      return expect(module.packExternalModules()).resolves.toBeUndefined();
+    });
+
+    it('should reject if a promise-based fs-extra helper rejects', () => {
+      mockSuccessfulPackaging();
+      fsExtraMock.pathExists.mockRejectedValue(new Error('pathExists failed'));
+
+      return expect(module.packExternalModules()).rejects.toThrow('pathExists failed');
+    });
+
+    it('should reject if an fs-extra helper throws synchronously', () => {
+      mockSuccessfulPackaging();
+      fsExtraMock.pathExists.mockImplementation(() => {
+        throw new Error('pathExists blew up');
+      });
+
+      return expect(module.packExternalModules()).rejects.toThrow('pathExists blew up');
+    });
+
+    it('should reject if a callback-based fs-extra helper fails', () => {
+      mockSuccessfulPackaging();
+      fsExtraMock.pathExists.mockReturnValue(false);
+      fsExtraMock.copy.mockImplementation((_from, _to, callback) => callback(new Error('copy failed')));
+
+      return expect(module.packExternalModules()).rejects.toThrow('copy failed');
     });
 
     it('should copy needed package sections if available', () => {

@@ -40,6 +40,15 @@ describe('packagers factory', () => {
     expect(() => module.get.call({ serverless }, 'unknown')).toThrow(/Could not find packager/);
   });
 
+  it('should use plugin logger on unknown packagers when available', () => {
+    const log = {
+      error: jest.fn()
+    };
+
+    expect(() => module.get.call({ serverless, log }, 'unknown')).toThrow(/Could not find packager/);
+    expect(log.error).toHaveBeenCalledWith('Could not find packager "unknown"');
+  });
+
   it('should return npm packager', () => {
     const npm = module.get.call(module, 'npm');
     expect(npm).toEqual({
