@@ -1,4 +1,3 @@
-const BbPromise = require('bluebird');
 const _ = require('lodash');
 const sinon = require('sinon');
 const Serverless = require('serverless');
@@ -112,7 +111,7 @@ describe('run', () => {
     it('should not call given handler function on first run', () => {
       module.isWatching = false;
       const watch = module.watch.bind(module);
-      const watchHandler = jest.fn().mockReturnValue(BbPromise.resolve());
+      const watchHandler = jest.fn().mockReturnValue(Promise.resolve());
       webpackMock.compilerMock.watch.mockReset();
       webpackMock.compilerMock.watch.mockImplementation((_options, cb) => cb(null, {}));
 
@@ -125,7 +124,7 @@ describe('run', () => {
     it('should call given handler function on subsequent runs', () => {
       module.isWatching = true;
       const watch = module.watch.bind(module);
-      const watchHandler = jest.fn().mockReturnValue(BbPromise.resolve());
+      const watchHandler = jest.fn().mockReturnValue(Promise.resolve());
       webpackMock.compilerMock.watch.mockReset();
       webpackMock.compilerMock.watch.mockImplementation((_options, cb) => cb(null, {}));
 

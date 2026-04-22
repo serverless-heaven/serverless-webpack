@@ -1,4 +1,3 @@
-const BbPromise = require('bluebird');
 const _ = require('lodash');
 const sinon = require('sinon');
 const Serverless = require('serverless');
@@ -65,13 +64,13 @@ describe('runPluginSupport', () => {
       return expect(prepareRun())
         .resolves.toBeUndefined()
         .then(() =>
-          BbPromise.join(
+          Promise.all([
             expect(module.originalServicePath).toEqual(servicePath),
             expect(module.originalWebpackOutputPath).toEqual(webpackOutputPath),
             expect(module.keepOutputDirectory).toBe(true),
             expect(serverless.config.servicePath).toEqual(path.join(webpackOutputPath, 'service')),
             expect(chdirStub.args[0]).toEqual([serverless.config.servicePath])
-          )
+          ])
         );
     });
   });
@@ -93,11 +92,11 @@ describe('runPluginSupport', () => {
       return expect(watchRun())
         .resolves.toBeUndefined()
         .then(() =>
-          BbPromise.join(
+          Promise.all([
             expect(deployFunctionsToLocalEmulatorStub).toHaveBeenCalledTimes(1),
             expect(getLocalRootUrlStub).toHaveBeenCalledTimes(1),
             expect(deployFunctionsToLocalEmulatorStub).toHaveBeenCalledWith(service, undefined, undefined)
-          )
+          ])
         );
     });
   });

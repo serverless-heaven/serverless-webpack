@@ -2,7 +2,6 @@
  * Unit tests for packagers/yarn
  */
 
-const BbPromise = require('bluebird');
 const Utils = require('../../lib/utils');
 const yarnModule = require('../../lib/packagers/yarn');
 
@@ -54,7 +53,7 @@ describe('yarn', () => {
   describe('getPackagerVersion', () => {
     it('should use yarn version 1.22.19', () => {
       const yarnVersion = '1.22.19';
-      Utils.spawnProcess.mockReturnValue(BbPromise.resolve({ stdout: yarnVersion, stderr: '' }));
+      Utils.spawnProcess.mockReturnValue(Promise.resolve({ stdout: yarnVersion, stderr: '' }));
       return expect(yarnModule.getPackagerVersion('myPath', 1))
         .resolves.toEqual(yarnVersion)
         .then(() => {
@@ -68,7 +67,7 @@ describe('yarn', () => {
 
     it('should use yarn version 3.2.3', () => {
       const yarnVersion = '3.2.3';
-      Utils.spawnProcess.mockReturnValue(BbPromise.resolve({ stdout: yarnVersion, stderr: '' }));
+      Utils.spawnProcess.mockReturnValue(Promise.resolve({ stdout: yarnVersion, stderr: '' }));
       return expect(yarnModule.getPackagerVersion('myPath', 1))
         .resolves.toEqual(yarnVersion)
         .then(() => {
@@ -83,7 +82,7 @@ describe('yarn', () => {
 
   describe('getProdDependencies', () => {
     it('should use yarn list', () => {
-      Utils.spawnProcess.mockReturnValue(BbPromise.resolve({ stdout: '{}', stderr: '' }));
+      Utils.spawnProcess.mockReturnValue(Promise.resolve({ stdout: '{}', stderr: '' }));
       return expect(yarnModule.getProdDependencies('myPath', 1))
         .resolves.toEqual({
           dependencies: {},
@@ -148,13 +147,13 @@ describe('yarn', () => {
           }
         }
       };
-      Utils.spawnProcess.mockReturnValue(BbPromise.resolve({ stdout: testYarnResult, stderr: '' }));
+      Utils.spawnProcess.mockReturnValue(Promise.resolve({ stdout: testYarnResult, stderr: '' }));
       return expect(yarnModule.getProdDependencies('myPath', 1)).resolves.toEqual(expectedResult);
     });
 
     it('should reject on critical yarn errors', () => {
       Utils.spawnProcess.mockReturnValue(
-        BbPromise.reject(new Utils.SpawnError('Exited with code 1', '', 'Yarn failed.\nerror Could not find module.'))
+        Promise.reject(new Utils.SpawnError('Exited with code 1', '', 'Yarn failed.\nerror Could not find module.'))
       );
       return expect(yarnModule.getProdDependencies('myPath', 1)).rejects.toThrow('Exited with code 1');
     });
@@ -250,7 +249,7 @@ describe('yarn', () => {
 
   describe('install', () => {
     it('should use yarn install', () => {
-      Utils.spawnProcess.mockReturnValue(BbPromise.resolve({ stdout: 'installed successfully', stderr: '' }));
+      Utils.spawnProcess.mockReturnValue(Promise.resolve({ stdout: 'installed successfully', stderr: '' }));
       return expect(yarnModule.install('myPath', {}, '1.22.19'))
         .resolves.toBeUndefined()
         .then(() => {
@@ -267,7 +266,7 @@ describe('yarn', () => {
     });
 
     it('should use noNonInteractive option', () => {
-      Utils.spawnProcess.mockReturnValue(BbPromise.resolve({ stdout: 'installed successfully', stderr: '' }));
+      Utils.spawnProcess.mockReturnValue(Promise.resolve({ stdout: 'installed successfully', stderr: '' }));
       return expect(yarnModule.install('myPath', { noNonInteractive: true }, '1.22.19'))
         .resolves.toBeUndefined()
         .then(() => {
@@ -284,7 +283,7 @@ describe('yarn', () => {
     });
 
     it('should use ignoreScripts option', () => {
-      Utils.spawnProcess.mockReturnValue(BbPromise.resolve({ stdout: 'installed successfully', stderr: '' }));
+      Utils.spawnProcess.mockReturnValue(Promise.resolve({ stdout: 'installed successfully', stderr: '' }));
       return expect(yarnModule.install('myPath', { ignoreScripts: true }, '1.22.19'))
         .resolves.toBeUndefined()
         .then(() => {
@@ -301,7 +300,7 @@ describe('yarn', () => {
     });
 
     it('should use noFrozenLockfile option', () => {
-      Utils.spawnProcess.mockReturnValue(BbPromise.resolve({ stdout: 'installed successfully', stderr: '' }));
+      Utils.spawnProcess.mockReturnValue(Promise.resolve({ stdout: 'installed successfully', stderr: '' }));
       return expect(yarnModule.install('myPath', { noFrozenLockfile: true }, '1.22.19'))
         .resolves.toBeUndefined()
         .then(() => {
@@ -318,7 +317,7 @@ describe('yarn', () => {
     });
 
     it('should use networkConcurrency option', () => {
-      Utils.spawnProcess.mockReturnValue(BbPromise.resolve({ stdout: 'installed successfully', stderr: '' }));
+      Utils.spawnProcess.mockReturnValue(Promise.resolve({ stdout: 'installed successfully', stderr: '' }));
       return expect(yarnModule.install('myPath', { networkConcurrency: 1 }, '1.22.19'))
         .resolves.toBeUndefined()
         .then(() => {
@@ -343,7 +342,7 @@ describe('yarn', () => {
 
   describe('prune', () => {
     it('should call install', () => {
-      Utils.spawnProcess.mockReturnValue(BbPromise.resolve({ stdout: 'success', stderr: '' }));
+      Utils.spawnProcess.mockReturnValue(Promise.resolve({ stdout: 'success', stderr: '' }));
       return expect(yarnModule.prune('myPath', {}, '1.22.19'))
         .resolves.toBeUndefined()
         .then(() => {
@@ -363,7 +362,7 @@ describe('yarn', () => {
 
   describe('runScripts', () => {
     it('should use yarn run for the given scripts', () => {
-      Utils.spawnProcess.mockReturnValue(BbPromise.resolve({ stdout: 'success', stderr: '' }));
+      Utils.spawnProcess.mockReturnValue(Promise.resolve({ stdout: 'success', stderr: '' }));
       return expect(yarnModule.runScripts('myPath', ['s1', 's2']))
         .resolves.toBeUndefined()
         .then(() => {

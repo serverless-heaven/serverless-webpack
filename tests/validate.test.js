@@ -1,5 +1,4 @@
 const _ = require('lodash');
-const BbPromise = require('bluebird');
 const path = require('node:path');
 const Serverless = require('serverless');
 
@@ -237,7 +236,7 @@ describe('validate', () => {
       const loadedConfig = {
         entry: 'testentry'
       };
-      jest.doMock(path.join('testServicePath', 'testconfig'), () => BbPromise.resolve(loadedConfig), { virtual: true });
+      jest.doMock(path.join('testServicePath', 'testconfig'), () => Promise.resolve(loadedConfig), { virtual: true });
       module.serverless.config.servicePath = 'testServicePath';
       module.serverless.service.custom.webpack = 'testconfig';
       serverless.utils.fileExistsSync = jest.fn().mockReturnValue(true);
@@ -279,7 +278,7 @@ describe('validate', () => {
       module.serverless.config.servicePath = testServicePath;
       module.serverless.service.custom.webpack = testConfig;
       serverless.utils.fileExistsSync = jest.fn().mockReturnValue(true);
-      const loadedConfigPromise = BbPromise.reject('config failed to load');
+      const loadedConfigPromise = Promise.reject('config failed to load');
       jest.doMock(requiredPath, () => loadedConfigPromise, { virtual: true });
       return expect(module.validate())
         .rejects.toEqual('config failed to load')

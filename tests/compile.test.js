@@ -43,19 +43,15 @@ describe('compile', () => {
   });
 
   it('should fail if configuration is missing', () => {
-    expect.assertions(1);
     delete module.webpackConfig;
-    return module.compile().catch(e => {
-      expect(e).toEqual('Unable to find Webpack configuration');
-    });
+    return expect(module.compile()).rejects.toThrow('Unable to find Webpack configuration');
   });
 
   it('should fail if plugin configuration is missing', () => {
     const testWebpackConfig = 'testconfig';
     module.webpackConfig = testWebpackConfig;
     module.configuration = undefined;
-    expect.assertions(1);
-    return module.compile().catch(e => expect(e.toString()).toEqual('ServerlessError: Missing plugin configuration'));
+    return expect(module.compile()).rejects.toThrow('Missing plugin configuration');
   });
 
   it('should fail if there are compilation errors', () => {
@@ -64,6 +60,13 @@ describe('compile', () => {
     webpackMock.statsMock.compilation.errors = ['error'];
     expect.assertions(1);
     return expect(module.compile()).rejects.toThrow(/compilation error/);
+  });
+
+  it('should fail if webpack run returns an error', () => {
+    module.webpackConfig = 'testconfig';
+    module.configuration = { concurrency: 1 };
+    webpackMock.compilerMock.run.mockImplementation(cb => cb(new Error('Webpack exploded')));
+    return expect(module.compile()).rejects.toThrow('Webpack exploded');
   });
 
   it('should work with multi compile', () => {
@@ -189,6 +192,57 @@ describe('compile', () => {
         expect(webpackMock.compilerMock.run).toHaveBeenCalledTimes(2);
         return null;
       });
+  });
+
+  it('should aggregate concurrent webpack errors without logger', () => {
+    module.webpackConfig = ['testconfig', 'testconfig2'];
+    module.configuration = { concurrency: 2 };
+    webpackMock.compilerMock.run.mockImplementation(cb => cb(new Error('Webpack exploded')));
+    return expect(module.compile()).rejects.toThrow('Webpack compilation errors, see stats above');
+  });
+
+  it('should aggregate concurrent webpack errors with logger output', () => {
+    const log = jest.fn();
+    log.verbose = jest.fn();
+    const progress = {
+      update: jest.fn(),
+      remove: jest.fn()
+    };
+
+    module.log = log;
+    module.progress = {
+      get: jest.fn().mockReturnValue(progress)
+    };
+    module.webpackConfig = [
+      {
+        cache: {
+          type: 'filesystem'
+        },
+        entry: {
+          'function-name/handler': './function-name/handler.js'
+        }
+      }
+    ];
+    module.configuration = { concurrency: 1 };
+    module.serverless.service.package = {
+      individually: true
+    };
+    module.entryFunctions = [
+      {
+        handlerFile: 'function-name/handler',
+        funcName: 'function-name',
+        func: {
+          handler: 'function-name/handler.handler',
+          name: 'service-stage-function-name'
+        },
+        entry: {
+          key: 'function-name/handler',
+          value: './function-name/handler.js'
+        }
+      }
+    ];
+    webpackMock.compilerMock.run.mockImplementation(cb => cb(new Error('Webpack exploded')));
+    return expect(module.compile()).rejects.toThrow(/Webpack compilation failed:\n\nWebpack exploded/);
   });
 
   it('should concurrently work with individual compile and webpack filesystem cache', () => {

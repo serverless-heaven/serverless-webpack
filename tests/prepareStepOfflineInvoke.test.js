@@ -1,5 +1,4 @@
 const _ = require('lodash');
-const BbPromise = require('bluebird');
 const Serverless = require('serverless');
 const baseModule = require('../lib/prepareStepOfflineInvoke');
 
@@ -67,7 +66,7 @@ describe('prepareStepOfflineInvoke', () => {
   });
 
   it('should reject if spawn rejects', () => {
-    serverless.pluginManager.spawn.mockReturnValue(BbPromise.reject(new Error('spawn failed')));
+    serverless.pluginManager.spawn.mockReturnValue(Promise.reject(new Error('spawn failed')));
     serverless.config.servicePath = 'myPath';
     module.webpackOutputPath = '.';
 
