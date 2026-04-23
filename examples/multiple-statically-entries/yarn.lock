@@ -4938,7 +4938,6 @@ serialize-javascript@^6.0.2:
   version "5.15.4"
   dependencies:
     archiver "^7.0.1"
-    bluebird "^3.7.2"
     find-yarn-workspace-root "^2.0.0"
     fs-extra "^11.3.4"
     glob "^13.0.6"
