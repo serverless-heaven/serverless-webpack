@@ -43,7 +43,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.29.0",
-    "@biomejs/biome": "^2.4.14",
+    "@biomejs/biome": "^2.4.15",
     "@serverless/test": "^11.1.1",
     "@types/node": "^25.6.2",
     "husky": "^9.1.7",
