@@ -47,7 +47,7 @@
     "@serverless/test": "^11.1.1",
     "@types/node": "^25.6.2",
     "husky": "^9.1.7",
-    "jest": "^30.4.1",
+    "jest": "^30.4.2",
     "lint-staged": "^17.0.3",
     "serverless": "npm:osls@^3.62.1",
     "sinon": "^22.0.0",
