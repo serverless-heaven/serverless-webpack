@@ -34,7 +34,7 @@
     "format": "biome check --write --unsafe"
   },
   "dependencies": {
-    "archiver": "^7.0.1",
+    "archiver": "^8.0.0",
     "find-yarn-workspace-root": "^2.0.0",
     "fs-extra": "^11.3.5",
     "glob": "^13.0.6",
