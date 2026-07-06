@@ -1097,29 +1097,12 @@ describe('validate', () => {
 
             expect(lib.entries).toEqual(expectedLibEntries);
 
-            // handle different stub in case of serverless version
-            if (serverless.version.match(/^1/)) {
-              expect(globMock.sync).toHaveBeenCalledTimes(1);
-              expect(globMock.sync).toHaveBeenCalledWith('module1.*', {
-                ignore: '**/*.ts',
-                cwd: null,
-                nodir: true
-              });
-            } else if (serverless.version.match(/^3/)) {
-              expect(globMock.sync).toHaveBeenCalledTimes(1);
-              expect(globMock.sync).toHaveBeenCalledWith('module1.*', {
-                cwd: null,
-                nodir: true,
-                ignore: '**/*.ts'
-              });
-            } else {
-              expect(globMock.sync).toHaveBeenCalledTimes(1);
-              expect(globMock.sync).toHaveBeenCalledWith('module1.*', {
-                ignore: '**/*.ts',
-                cwd: undefined,
-                nodir: true
-              });
-            }
+            expect(globMock.sync).toHaveBeenCalledTimes(1);
+            expect(globMock.sync).toHaveBeenCalledWith('module1.*', {
+              ignore: '**/*.ts',
+              cwd: undefined,
+              nodir: true
+            });
 
             expect(serverless.cli.log).toHaveBeenCalledTimes(0);
             return null;
@@ -1142,7 +1125,7 @@ describe('validate', () => {
         globMock.sync.mockReturnValue([]);
         expect(() => {
           module.validate();
-        }).toThrow(/No matching handler found for/);
+        }).toThrow(`No matching handler found for 'module1' in '${process.cwd()}'. Check your service definition.`);
       });
 
       it('should throw an exception if `options.function` is defined but not found in entries from serverless.yml', () => {

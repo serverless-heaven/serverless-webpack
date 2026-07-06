@@ -168,3 +168,65 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{secrets.AWS_ACCESS_KEY_ID}}
           AWS_SECRET_ACCESS_KEY: ${{secrets.AWS_SECRET_ACCESS_KEY}}
           SERVERLESS_ACCESS_KEY: ${{secrets.SERVERLESS_ACCESS_KEY}}
+
+  osls-v3:
+    runs-on: ${{ matrix.os }}
+    name: Node.js ${{ matrix.node }} on ${{ matrix.os }} with osls v3
+
+    strategy:
+      matrix:
+        os:
+          - ubuntu-latest
+        node:
+          - 20
+
+    steps:
+      - name: 'Checkout'
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 2
+
+      - name: 'Install Node.js'
+        uses: actions/setup-node@v6
+        with:
+          node-version: '${{ matrix.node }}'
+
+      - name: 'Install dependencies'
+        run: npm ci
+
+      - name: "Install osls v3"
+        run: npm install --no-save --package-lock=false serverless@npm:osls@3
+
+      - name: 'Run tests'
+        run: 'npm run test'
+
+  osls-v4:
+    runs-on: ${{ matrix.os }}
+    name: Node.js ${{ matrix.node }} on ${{ matrix.os }} with osls v4
+
+    strategy:
+      matrix:
+        os:
+          - ubuntu-latest
+        node:
+          - 20
+
+    steps:
+      - name: 'Checkout'
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 2
+
+      - name: 'Install Node.js'
+        uses: actions/setup-node@v6
+        with:
+          node-version: '${{ matrix.node }}'
+
+      - name: 'Install dependencies'
+        run: npm ci
+
+      - name: "Install osls v4"
+        run: npm install --no-save --package-lock=false serverless@npm:osls@4
+
+      - name: 'Run tests'
+        run: 'npm run test'
