@@ -52,7 +52,7 @@
     "serverless": "npm:osls@^3.62.1",
     "sinon": "^22.0.0",
     "ts-node": "^10.9.2",
-    "unzipper": "^0.12.3",
+    "unzipper": "^0.12.5",
     "webpack": "^5.108.3"
   },
   "peerDependencies": {
