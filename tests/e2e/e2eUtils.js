@@ -1,8 +1,7 @@
 const fse = require('fs-extra');
 const path = require('node:path');
+const os = require('node:os');
 const _ = require('lodash');
-const provisionTmpDir = require('@serverless/test/provision-tmp-dir');
-const originalRunServerless = require('@serverless/test/run-serverless');
 const { spawnProcess } = require('../../lib/utils');
 
 const FIXTURES_DIR = path.resolve(__dirname, '..', '..', 'examples');
@@ -23,7 +22,7 @@ async function replaceInJson(path, updater) {
 
 async function setupFixture(name) {
   const fixturePath = path.join(FIXTURES_DIR, name);
-  const setupFixturePath = await provisionTmpDir();
+  const setupFixturePath = await fse.mkdtemp(path.join(os.tmpdir(), 'serverless-webpack-'));
   const pluginPackagePath = await getPluginPackagePath();
   await fse.copy(fixturePath, setupFixturePath);
 
@@ -42,7 +41,7 @@ async function setupFixture(name) {
 async function getPluginPackagePath() {
   if (!pluginPackagePathPromise) {
     pluginPackagePathPromise = (async () => {
-      const packageDir = await provisionTmpDir();
+      const packageDir = await fse.mkdtemp(path.join(os.tmpdir(), 'serverless-webpack-'));
       const npmCommand = /^win/.test(process.platform) ? 'npm.cmd' : 'npm';
       const { stdout } = await spawnProcess(
         npmCommand,
@@ -63,21 +62,12 @@ async function getPluginPackagePath() {
 }
 
 async function runServerless(options) {
-  const runServerlessOptions = {
-    command: 'package'
-  };
-
   const servicePath = await setupFixture(options.fixture);
-  runServerlessOptions.cwd = path.join(servicePath, options.subproject || '');
+  const cwd = path.join(servicePath, options.subproject || '');
 
   try {
-    if (options.useSpawnProcess) {
-      await spawnProcess('yarn', ['serverless', 'package'], { cwd: runServerlessOptions.cwd });
-    } else {
-      await originalRunServerless(path.join(servicePath, 'node_modules', 'serverless'), runServerlessOptions);
-    }
-
-    return runServerlessOptions.cwd;
+    await spawnProcess('yarn', ['serverless', 'package'], { cwd });
+    return cwd;
   } catch (error) {
     error.servicePath = servicePath;
     throw error;
