@@ -3,11 +3,11 @@ const path = require('node:path');
 const Serverless = require('serverless');
 const Configuration = require('../lib/Configuration');
 const fsMock = require('node:fs');
-const globMock = require('glob');
+const tinyglobbyMock = require('tinyglobby');
 const baseModule = require('../lib/packageModules');
 
 jest.mock('fs');
-jest.mock('glob');
+jest.mock('tinyglobby');
 jest.mock('archiver');
 
 describe('packageModules', () => {
@@ -61,7 +61,7 @@ describe('packageModules', () => {
           Promise.all([
             expect(writeFileDirStub).toHaveBeenCalledTimes(0),
             expect(fsMock.createWriteStream).toHaveBeenCalledTimes(0),
-            expect(globMock.sync).toHaveBeenCalledTimes(0)
+            expect(tinyglobbyMock.globSync).toHaveBeenCalledTimes(0)
           ])
         );
     });
@@ -74,7 +74,7 @@ describe('packageModules', () => {
           Promise.all([
             expect(writeFileDirStub).toHaveBeenCalledTimes(0),
             expect(fsMock.createWriteStream).toHaveBeenCalledTimes(0),
-            expect(globMock.sync).toHaveBeenCalledTimes(0)
+            expect(tinyglobbyMock.globSync).toHaveBeenCalledTimes(0)
           ])
         );
     });
@@ -119,7 +119,7 @@ describe('packageModules', () => {
           }
         });
         // Mock behavior
-        globMock.sync.mockReturnValue(files);
+        tinyglobbyMock.globSync.mockReturnValue(files);
         fsMock._streamMock.on.mockImplementation((evt, cb) => {
           if (evt === 'open' || evt === 'close') {
             cb();
@@ -182,7 +182,7 @@ describe('packageModules', () => {
             }
           });
           // Mock behavior
-          globMock.sync.mockReturnValue(files);
+          tinyglobbyMock.globSync.mockReturnValue(files);
           fsMock._streamMock.on.mockImplementation((evt, cb) => {
             if (evt === 'open' || evt === 'close') {
               cb();
@@ -227,7 +227,7 @@ describe('packageModules', () => {
           }
         });
         // Mock behavior
-        globMock.sync.mockReturnValue(files);
+        tinyglobbyMock.globSync.mockReturnValue(files);
         fsMock._streamMock.on.mockImplementation((evt, cb) => {
           if (evt === 'open' || evt === 'close') {
             cb();
@@ -282,7 +282,7 @@ describe('packageModules', () => {
           }
         });
         // Mock behavior
-        globMock.sync.mockReturnValue(files);
+        tinyglobbyMock.globSync.mockReturnValue(files);
         fsMock._streamMock.on.mockImplementation((evt, cb) => {
           if (evt === 'open' || evt === 'close') {
             cb();
@@ -333,7 +333,7 @@ describe('packageModules', () => {
           }
         });
         // Mock behavior
-        globMock.sync.mockReturnValue(files);
+        tinyglobbyMock.globSync.mockReturnValue(files);
         fsMock._streamMock.on.mockImplementation((evt, cb) => {
           if (evt === 'open' || evt === 'close') {
             cb();
@@ -385,7 +385,7 @@ describe('packageModules', () => {
           }
         });
         // Mock behavior
-        globMock.sync.mockReturnValue(files);
+        tinyglobbyMock.globSync.mockReturnValue(files);
         fsMock._streamMock.on.mockImplementation((evt, cb) => {
           if (evt === 'open' || evt === 'close') {
             cb();
@@ -454,7 +454,7 @@ describe('packageModules', () => {
           }
         });
         // Mock behavior
-        globMock.sync.mockReturnValue(files);
+        tinyglobbyMock.globSync.mockReturnValue(files);
         fsMock._streamMock.on.mockImplementation((evt, cb) => {
           if (evt === 'open' || evt === 'close') {
             cb();
@@ -579,7 +579,7 @@ describe('packageModules', () => {
           }
         });
         // Mock behavior
-        globMock.sync.mockReturnValue(files);
+        tinyglobbyMock.globSync.mockReturnValue(files);
         fsMock._streamMock.on.mockImplementation((evt, cb) => {
           if (evt === 'open' || evt === 'close') {
             cb();

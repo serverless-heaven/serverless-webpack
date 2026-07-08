@@ -3,19 +3,19 @@ const path = require('node:path');
 const Serverless = require('serverless');
 
 jest.mock('fs-extra');
-jest.mock('glob');
+jest.mock('tinyglobby');
 
 describe('validate', () => {
   let module;
   let serverless;
   let baseModule;
   let fsExtraMock;
-  let globMock;
+  let tinyglobbyMock;
 
   beforeEach(() => {
     jest.resetModules();
     fsExtraMock = require('fs-extra');
-    globMock = require('glob');
+    tinyglobbyMock = require('tinyglobby');
     jest.doMock(path.join('..', 'lib', 'index'), () => ({
       entries: {},
       webpack: {
@@ -534,7 +534,7 @@ describe('validate', () => {
 
         _.set(module.serverless.service, 'custom.webpack.config', testConfig);
         module.serverless.service.functions = testFunctionsConfig;
-        globMock.sync.mockImplementation(filename => [_.replace(filename, '*', 'js')]);
+        tinyglobbyMock.globSync.mockImplementation(filename => [_.replace(filename, '*', 'js')]);
         return expect(module.validate())
           .resolves.toBeUndefined()
           .then(() => {
@@ -547,7 +547,7 @@ describe('validate', () => {
             };
 
             expect(lib.entries).toEqual(expectedLibEntries);
-            expect(globMock.sync).toHaveBeenCalledTimes(5);
+            expect(tinyglobbyMock.globSync).toHaveBeenCalledTimes(5);
             expect(serverless.cli.log).toHaveBeenCalledTimes(0);
             return null;
           });
@@ -566,7 +566,7 @@ describe('validate', () => {
         _.set(module.serverless.service, 'custom.webpack.config', testConfig);
         module.serverless.service.functions = testFunctionsConfig;
         module.options.function = testFunction;
-        globMock.sync.mockImplementation(filename => [_.replace(filename, '*', 'js')]);
+        tinyglobbyMock.globSync.mockImplementation(filename => [_.replace(filename, '*', 'js')]);
         return expect(module.validate())
           .resolves.toBeUndefined()
           .then(() => {
@@ -576,7 +576,7 @@ describe('validate', () => {
             };
 
             expect(lib.entries).toEqual(expectedLibEntries);
-            expect(globMock.sync).toHaveBeenCalledTimes(1);
+            expect(tinyglobbyMock.globSync).toHaveBeenCalledTimes(1);
             expect(serverless.cli.log).toHaveBeenCalledTimes(0);
             return null;
           });
@@ -664,7 +664,7 @@ describe('validate', () => {
 
         _.set(module.serverless.service, 'custom.webpack.config', testConfig);
         module.serverless.service.functions = testFunctionsConfig;
-        globMock.sync.mockImplementation(filename => [_.replace(filename, '*', 'js')]);
+        tinyglobbyMock.globSync.mockImplementation(filename => [_.replace(filename, '*', 'js')]);
         return expect(module.validate())
           .resolves.toBeUndefined()
           .then(() => {
@@ -674,7 +674,7 @@ describe('validate', () => {
             };
 
             expect(lib.entries).toEqual(expectedLibEntries);
-            expect(globMock.sync).toHaveBeenCalledTimes(1);
+            expect(tinyglobbyMock.globSync).toHaveBeenCalledTimes(1);
             expect(serverless.cli.log).toHaveBeenCalledTimes(0);
             return null;
           });
@@ -713,7 +713,7 @@ describe('validate', () => {
 
         _.set(module.serverless.service, 'custom.webpack.config', testConfig);
         module.serverless.service.functions = testFunctionsConfig;
-        globMock.sync.mockImplementation(filename => [_.replace(filename, '*', 'js')]);
+        tinyglobbyMock.globSync.mockImplementation(filename => [_.replace(filename, '*', 'js')]);
         return expect(module.validate())
           .resolves.toBeUndefined()
           .then(() => {
@@ -721,7 +721,7 @@ describe('validate', () => {
             const expectedLibEntries = {};
 
             expect(lib.entries).toEqual(expectedLibEntries);
-            expect(globMock.sync).toHaveBeenCalledTimes(0);
+            expect(tinyglobbyMock.globSync).toHaveBeenCalledTimes(0);
             expect(serverless.cli.log).toHaveBeenCalledTimes(0);
             return null;
           });
@@ -762,7 +762,7 @@ describe('validate', () => {
 
         _.set(module.serverless.service, 'custom.webpack.config', testConfig);
         module.serverless.service.functions = testFunctionsConfig;
-        globMock.sync.mockImplementation(filename => [_.replace(filename, '*', 'js')]);
+        tinyglobbyMock.globSync.mockImplementation(filename => [_.replace(filename, '*', 'js')]);
         expect(() => {
           module.validate();
         }).toThrow(/Either function.handler or function.image must be defined/);
@@ -801,7 +801,7 @@ describe('validate', () => {
 
         _.set(module.serverless.service, 'custom.webpack.config', testConfig);
         module.serverless.service.functions = testFunctionsConfig;
-        globMock.sync.mockImplementation(filename => [_.replace(filename, '*', 'js')]);
+        tinyglobbyMock.globSync.mockImplementation(filename => [_.replace(filename, '*', 'js')]);
 
         return expect(module.validate())
           .resolves.toBeUndefined()
@@ -810,7 +810,7 @@ describe('validate', () => {
             const expectedLibEntries = {};
 
             expect(lib.entries).toEqual(expectedLibEntries);
-            expect(globMock.sync).toHaveBeenCalledTimes(0);
+            expect(tinyglobbyMock.globSync).toHaveBeenCalledTimes(0);
             expect(serverless.cli.log).toHaveBeenCalledTimes(0);
             return null;
           });
@@ -839,14 +839,14 @@ describe('validate', () => {
           _.set(module.serverless.service, 'custom.webpack.config', testConfig);
           module.serverless.service.functions = testFunctionsGoogleConfig;
           module.options.function = testFunction;
-          globMock.sync.mockReturnValue([]);
+          tinyglobbyMock.globSync.mockReturnValue([]);
           return expect(module.validate())
             .resolves.toBeUndefined()
             .then(() => {
               const lib = require('../lib/index');
 
               expect(lib.entries).toEqual({});
-              expect(globMock.sync).toHaveBeenCalledTimes(0);
+              expect(tinyglobbyMock.globSync).toHaveBeenCalledTimes(0);
               expect(serverless.cli.log).toHaveBeenCalledTimes(0);
               return null;
             });
@@ -880,7 +880,7 @@ describe('validate', () => {
             })
           );
           module.serverless.service.functions = testFunctionsConfig;
-          globMock.sync.mockImplementation(filename => [_.replace(filename, '*', 'js')]);
+          tinyglobbyMock.globSync.mockImplementation(filename => [_.replace(filename, '*', 'js')]);
           return expect(module.validate()).rejects.toThrow(
             /Webpack entry must be automatically resolved when package.individually is set to true/
           );
@@ -896,14 +896,14 @@ describe('validate', () => {
             })
           );
           module.serverless.service.functions = testFunctionsConfig;
-          globMock.sync.mockImplementation(filename => [_.replace(filename, '*', 'js')]);
+          tinyglobbyMock.globSync.mockImplementation(filename => [_.replace(filename, '*', 'js')]);
           return expect(module.validate()).resolves.toBeUndefined();
         });
 
         it('should expose all functions details in entryFunctions property', () => {
           _.set(module.serverless.service, 'custom.webpack.config', testConfig);
           module.serverless.service.functions = testFunctionsConfig;
-          globMock.sync.mockImplementation(filename => [_.replace(filename, '*', 'js')]);
+          tinyglobbyMock.globSync.mockImplementation(filename => [_.replace(filename, '*', 'js')]);
           return expect(module.validate())
             .resolves.toBeUndefined()
             .then(() => {
@@ -952,7 +952,7 @@ describe('validate', () => {
         it('should set webpackConfig output path for every functions', () => {
           _.set(module.serverless.service, 'custom.webpack.config', testConfig);
           module.serverless.service.functions = testFunctionsConfig;
-          globMock.sync.mockImplementation(filename => [_.replace(filename, '*', 'js')]);
+          tinyglobbyMock.globSync.mockImplementation(filename => [_.replace(filename, '*', 'js')]);
           return expect(module.validate())
             .resolves.toBeUndefined()
             .then(() => {
@@ -980,7 +980,7 @@ describe('validate', () => {
             })
           );
           module.serverless.service.functions = testFunctionsConfig;
-          globMock.sync.mockImplementation(filename => [_.replace(filename, '*', 'js')]);
+          tinyglobbyMock.globSync.mockImplementation(filename => [_.replace(filename, '*', 'js')]);
           return expect(module.validate())
             .resolves.toBeUndefined()
             .then(() => {
@@ -1021,7 +1021,7 @@ describe('validate', () => {
         _.set(module.serverless.service, 'custom.webpack.config', testConfig);
         module.serverless.service.functions = testFunctionsConfig;
         module.options.function = testFunction;
-        globMock.sync.mockReturnValue(['module1.ts', 'module1.js']);
+        tinyglobbyMock.globSync.mockReturnValue(['module1.ts', 'module1.js']);
         return expect(module.validate())
           .resolves.toBeUndefined()
           .then(() => {
@@ -1031,7 +1031,7 @@ describe('validate', () => {
             };
 
             expect(lib.entries).toEqual(expectedLibEntries);
-            expect(globMock.sync).toHaveBeenCalledTimes(1);
+            expect(tinyglobbyMock.globSync).toHaveBeenCalledTimes(1);
             expect(serverless.cli.log).toHaveBeenCalledTimes(1);
             expect(serverless.cli.log).toHaveBeenCalledWith(
               "WARNING: More than one matching handlers found for 'module1'. Using 'module1.ts'."
@@ -1053,7 +1053,13 @@ describe('validate', () => {
         _.set(module.serverless.service, 'custom.webpack.config', testConfig);
         module.serverless.service.functions = testFunctionsConfig;
         module.options.function = testFunction;
-        globMock.sync.mockReturnValue(['module1.doc', 'module1.json', 'module1.test.js', 'module1.ts', 'module1.js']);
+        tinyglobbyMock.globSync.mockReturnValue([
+          'module1.doc',
+          'module1.json',
+          'module1.test.js',
+          'module1.ts',
+          'module1.js'
+        ]);
         return expect(module.validate())
           .resolves.toBeUndefined()
           .then(() => {
@@ -1063,7 +1069,7 @@ describe('validate', () => {
             };
 
             expect(lib.entries).toEqual(expectedLibEntries);
-            expect(globMock.sync).toHaveBeenCalledTimes(1);
+            expect(tinyglobbyMock.globSync).toHaveBeenCalledTimes(1);
             expect(serverless.cli.log).toHaveBeenCalledTimes(1);
             expect(serverless.cli.log).toHaveBeenCalledWith(
               "WARNING: More than one matching handlers found for 'module1'. Using 'module1.ts'."
@@ -1072,7 +1078,7 @@ describe('validate', () => {
           });
       });
 
-      it('should call glob with ignore parameter if there is an excludeFiles config', () => {
+      it('should call tinyglobby with ignore parameter if there is an excludeFiles config', () => {
         const testOutPath = 'test';
         const testFunction = 'func1';
         const testConfig = {
@@ -1086,7 +1092,7 @@ describe('validate', () => {
         _.set(module.serverless.service, 'custom.webpack.excludeFiles', '**/*.ts');
         module.serverless.service.functions = testFunctionsConfig;
         module.options.function = testFunction;
-        globMock.sync.mockReturnValue(['module1.js']);
+        tinyglobbyMock.globSync.mockReturnValue(['module1.js']);
         return expect(module.validate())
           .resolves.toBeUndefined()
           .then(() => {
@@ -1097,11 +1103,11 @@ describe('validate', () => {
 
             expect(lib.entries).toEqual(expectedLibEntries);
 
-            expect(globMock.sync).toHaveBeenCalledTimes(1);
-            expect(globMock.sync).toHaveBeenCalledWith('module1.*', {
+            expect(tinyglobbyMock.globSync).toHaveBeenCalledTimes(1);
+            expect(tinyglobbyMock.globSync).toHaveBeenCalledWith('module1.*', {
               ignore: '**/*.ts',
               cwd: undefined,
-              nodir: true
+              onlyFiles: true
             });
 
             expect(serverless.cli.log).toHaveBeenCalledTimes(0);
@@ -1122,7 +1128,7 @@ describe('validate', () => {
         _.set(module.serverless.service, 'custom.webpack.config', testConfig);
         module.serverless.service.functions = testFunctionsConfig;
         module.options.function = testFunction;
-        globMock.sync.mockReturnValue([]);
+        tinyglobbyMock.globSync.mockReturnValue([]);
         expect(() => {
           module.validate();
         }).toThrow(`No matching handler found for 'module1' in '${process.cwd()}'. Check your service definition.`);
