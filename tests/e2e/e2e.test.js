@@ -62,7 +62,7 @@ describe(`end-to-end testing (node: ${nodeVersion.major}, sls: ${slsVersion.majo
   } else {
     it('should support "include-external-npm-packages" example', async () => {
       const fixture = 'include-external-npm-packages';
-      const servicePath = await runServerless({ fixture, useSpawnProcess: true });
+      const servicePath = await runServerless({ fixture });
 
       const outputDir = path.join(servicePath, '.serverless');
       const archivePath = path.join(outputDir, `${fixture}.zip`);
@@ -88,7 +88,7 @@ describe(`end-to-end testing (node: ${nodeVersion.major}, sls: ${slsVersion.majo
   } else {
     it('should support "include-external-npm-packages-lock-file" example', async () => {
       const fixture = 'include-external-npm-packages-lock-file';
-      const servicePath = await runServerless({ fixture, useSpawnProcess: true });
+      const servicePath = await runServerless({ fixture });
 
       const outputDir = path.join(servicePath, '.serverless');
       const archivePath = path.join(outputDir, `${fixture}.zip`);
@@ -121,7 +121,7 @@ describe(`end-to-end testing (node: ${nodeVersion.major}, sls: ${slsVersion.majo
       const fixture = 'include-external-npm-packages-with-yarn-workspaces';
       const subproject = path.join('packages', 'project');
 
-      const servicePath = await runServerless({ fixture, subproject, useSpawnProcess: true });
+      const servicePath = await runServerless({ fixture, subproject });
 
       const outputDir = path.join(servicePath, '.serverless');
       const archivePath = path.join(outputDir, `${fixture}.zip`);
@@ -149,7 +149,7 @@ describe(`end-to-end testing (node: ${nodeVersion.major}, sls: ${slsVersion.majo
   } else {
     it('should support "serverless-v4" example', async () => {
       const fixture = 'serverless-v4';
-      const servicePath = await runServerless({ fixture, useSpawnProcess: true });
+      const servicePath = await runServerless({ fixture });
 
       const outputDir = path.join(servicePath, '.serverless');
       const archivePath = path.join(outputDir, 'hello.zip');
