@@ -5,13 +5,12 @@ const Serverless = require('serverless');
 const Configuration = require('../lib/Configuration');
 
 // Mocks
-const fsExtraMock = require('fs-extra');
+const fs = require('node:fs');
 const packageMock = require('./mocks/package.mock.json');
 const packageLocalRefMock = require('./mocks/packageLocalRef.mock.json');
 const baseModule = require('../lib/packExternalModules');
 const packagerFactoryMock = require('../lib/packagers/index');
 
-jest.mock('fs-extra');
 jest.mock('../lib/packagers/index', () => {
   const packagerMock = {
     lockfileName: 'mocked-lock.json',
@@ -55,6 +54,9 @@ describe('packExternalModules', () => {
   let serverless;
   let module;
   let sandbox;
+  let accessStub;
+  let cpStub;
+  let existsSyncStub;
 
   // Serverless stubs
   let writeFileSyncStub;
@@ -62,6 +64,9 @@ describe('packExternalModules', () => {
 
   beforeEach(() => {
     sandbox = sinon.createSandbox();
+    accessStub = jest.spyOn(fs.promises, 'access').mockRejectedValue(new Error('ENOENT'));
+    cpStub = jest.spyOn(fs.promises, 'cp').mockResolvedValue();
+    existsSyncStub = jest.spyOn(fs, 'existsSync').mockReturnValue(false);
 
     serverless = new Serverless({ commands: ['print'], options: {}, serviceDir: null });
     serverless.cli = {
@@ -94,6 +99,7 @@ describe('packExternalModules', () => {
 
   afterEach(() => {
     sandbox.reset();
+    jest.restoreAllMocks();
   });
 
   describe('packExternalModules()', () => {
@@ -136,7 +142,7 @@ describe('packExternalModules', () => {
         .resolves.toBeUndefined()
         .then(() =>
           Promise.all([
-            expect(fsExtraMock.copy).toHaveBeenCalledTimes(0),
+            expect(cpStub).toHaveBeenCalledTimes(0),
             expect(packagerFactoryMock.get).toHaveBeenCalledTimes(0),
             expect(writeFileSyncStub).toHaveBeenCalledTimes(0)
           ])
@@ -156,56 +162,39 @@ describe('packExternalModules', () => {
         .resolves.toBeUndefined()
         .then(() =>
           Promise.all([
-            expect(fsExtraMock.copy).toHaveBeenCalledTimes(0),
+            expect(cpStub).toHaveBeenCalledTimes(0),
             expect(packagerFactoryMock.get).toHaveBeenCalledTimes(0),
             expect(writeFileSyncStub).toHaveBeenCalledTimes(0)
           ])
         );
     });
 
-    it('should support promise-based fs-extra helpers', () => {
+    it('should copy modules and lock files with native fs helpers', () => {
       mockSuccessfulPackaging();
-      fsExtraMock.pathExists.mockResolvedValue(true);
-      fsExtraMock.copy.mockResolvedValue();
+      accessStub.mockResolvedValue();
+      cpStub.mockResolvedValue();
 
       return expect(module.packExternalModules())
         .resolves.toBeUndefined()
         .then(() =>
-          Promise.all([
-            expect(fsExtraMock.pathExists).toHaveBeenCalledTimes(1),
-            expect(fsExtraMock.copy).toHaveBeenCalledTimes(2)
-          ])
+          Promise.all([expect(accessStub).toHaveBeenCalledTimes(1), expect(cpStub).toHaveBeenCalledTimes(2)])
         );
     });
 
-    it('should support synchronous fs-extra helpers', () => {
+    it('should skip lock file copy if native access rejects', () => {
       mockSuccessfulPackaging();
-      fsExtraMock.pathExists.mockReturnValue(true);
-      fsExtraMock.copy.mockResolvedValue();
+      accessStub.mockRejectedValue(new Error('ENOENT'));
+      cpStub.mockResolvedValue();
 
-      return expect(module.packExternalModules()).resolves.toBeUndefined();
+      return expect(module.packExternalModules())
+        .resolves.toBeUndefined()
+        .then(() => expect(cpStub).toHaveBeenCalledTimes(1));
     });
 
-    it('should reject if a promise-based fs-extra helper rejects', () => {
+    it('should reject if native copy fails', () => {
       mockSuccessfulPackaging();
-      fsExtraMock.pathExists.mockRejectedValue(new Error('pathExists failed'));
-
-      return expect(module.packExternalModules()).rejects.toThrow('pathExists failed');
-    });
-
-    it('should reject if an fs-extra helper throws synchronously', () => {
-      mockSuccessfulPackaging();
-      fsExtraMock.pathExists.mockImplementation(() => {
-        throw new Error('pathExists blew up');
-      });
-
-      return expect(module.packExternalModules()).rejects.toThrow('pathExists blew up');
-    });
-
-    it('should reject if a callback-based fs-extra helper fails', () => {
-      mockSuccessfulPackaging();
-      fsExtraMock.pathExists.mockReturnValue(false);
-      fsExtraMock.copy.mockImplementation((_from, _to, callback) => callback(new Error('copy failed')));
+      accessStub.mockRejectedValue(new Error('ENOENT'));
+      cpStub.mockRejectedValue(new Error('copy failed'));
 
       return expect(module.packExternalModules()).rejects.toThrow('copy failed');
     });
@@ -267,8 +256,8 @@ describe('packExternalModules', () => {
       readFileSyncStub.mockImplementation(() => {
         throw new Error('Unexpected call to readFileSync');
       });
-      fsExtraMock.pathExists.mockImplementation((_p, cb) => cb(null, false));
-      fsExtraMock.copy.mockImplementation((_from, _to, cb) => cb());
+      accessStub.mockRejectedValue(new Error('ENOENT'));
+      cpStub.mockResolvedValue();
       packagerFactoryMock.get('npm').getProdDependencies.mockReturnValue(Promise.resolve({}));
       packagerFactoryMock.get('npm').getPackagerVersion.mockReturnValue(Promise.resolve());
       packagerFactoryMock.get('npm').install.mockReturnValue(Promise.resolve());
@@ -284,7 +273,7 @@ describe('packExternalModules', () => {
             expect(writeFileSyncStub.mock.calls[0][1]).toEqual(JSON.stringify(expectedCompositePackageJSON, null, 2)),
             expect(writeFileSyncStub.mock.calls[1][1]).toEqual(JSON.stringify(expectedPackageJSON, null, 2)),
             // The modules should have been copied
-            expect(fsExtraMock.copy).toHaveBeenCalledTimes(1),
+            expect(cpStub).toHaveBeenCalledTimes(1),
             // npm ls and npm prune should have been called
             expect(packagerFactoryMock.get('npm').getProdDependencies).toHaveBeenCalledTimes(1),
             expect(packagerFactoryMock.get('npm').getPackagerVersion).toHaveBeenCalledTimes(2),
@@ -345,8 +334,8 @@ describe('packExternalModules', () => {
       });
 
       module.webpackOutputPath = '/my/Service/Path/outputPath';
-      fsExtraMock.pathExists.mockImplementation((_p, cb) => cb(null, true));
-      fsExtraMock.copy.mockImplementation((_from, _to, cb) => cb());
+      accessStub.mockResolvedValue();
+      cpStub.mockResolvedValue();
       readFileSyncStub.mockReturnValueOnce(originalPackageJSON);
       readFileSyncStub.mockImplementation(() => {
         throw new Error('Unexpected call to readFileSync');
@@ -395,8 +384,8 @@ describe('packExternalModules', () => {
       };
 
       module.webpackOutputPath = '/my/Service/Path/outputPath';
-      fsExtraMock.pathExists.mockImplementation((_p, cb) => cb(null, false));
-      fsExtraMock.copy.mockImplementation((_from, _to, cb) => cb());
+      accessStub.mockRejectedValue(new Error('ENOENT'));
+      cpStub.mockResolvedValue();
       packagerFactoryMock.get('npm').getProdDependencies.mockReturnValue(Promise.resolve({}));
       packagerFactoryMock.get('npm').getPackagerVersion.mockReturnValue(Promise.resolve());
       packagerFactoryMock.get('npm').install.mockReturnValue(Promise.resolve());
@@ -412,7 +401,7 @@ describe('packExternalModules', () => {
             expect(writeFileSyncStub.mock.calls[0][1]).toEqual(JSON.stringify(expectedCompositePackageJSON, null, 2)),
             expect(writeFileSyncStub.mock.calls[1][1]).toEqual(JSON.stringify(expectedPackageJSON, null, 2)),
             // The modules should have been copied
-            expect(fsExtraMock.copy).toHaveBeenCalledTimes(1),
+            expect(cpStub).toHaveBeenCalledTimes(1),
             // npm ls and npm prune should have been called
             expect(packagerFactoryMock.get('npm').getProdDependencies).toHaveBeenCalledTimes(1),
             expect(packagerFactoryMock.get('npm').getPackagerVersion).toHaveBeenCalledTimes(2),
@@ -481,8 +470,8 @@ describe('packExternalModules', () => {
       module.webpackOutputPath = '/my/Service/Path/outputPath';
       readFileSyncStub.mockReturnValueOnce(packageLocalRefMock);
       readFileSyncStub.mockReturnValue(fakePackageLockJSON);
-      fsExtraMock.pathExists.mockImplementation((_p, cb) => cb(null, true));
-      fsExtraMock.copy.mockImplementation((_from, _to, cb) => cb());
+      accessStub.mockResolvedValue();
+      cpStub.mockResolvedValue();
       packagerFactoryMock.get('npm').getProdDependencies.mockReturnValue(Promise.resolve({}));
       packagerFactoryMock.get('npm').rebaseLockfile.mockImplementation((_pathToPackageRoot, lockfile) => lockfile);
       packagerFactoryMock.get('npm').getPackagerVersion.mockReturnValue(Promise.resolve());
@@ -507,7 +496,7 @@ describe('packExternalModules', () => {
             expect(writeFileSyncStub.mock.calls[0][1]).toEqual(JSON.stringify(expectedCompositePackageJSON, null, 2)),
             expect(writeFileSyncStub.mock.calls[2][1]).toEqual(JSON.stringify(expectedPackageJSON, null, 2)),
             // The modules and the lock file should have been copied
-            expect(fsExtraMock.copy).toHaveBeenCalledTimes(2),
+            expect(cpStub).toHaveBeenCalledTimes(2),
             // Lock file rebase should have been called
             expect(packagerFactoryMock.get('npm').rebaseLockfile).toHaveBeenCalledTimes(1),
             expect(packagerFactoryMock.get('npm').rebaseLockfile).toHaveBeenCalledWith(
@@ -555,8 +544,8 @@ describe('packExternalModules', () => {
 
       _.set(serverless, 'service.provider.name', 'google');
       module.webpackOutputPath = '/my/Service/Path/outputPath';
-      fsExtraMock.pathExists.mockImplementation((_p, cb) => cb(null, false));
-      fsExtraMock.copy.mockImplementation((_from, _to, cb) => cb());
+      accessStub.mockRejectedValue(new Error('ENOENT'));
+      cpStub.mockResolvedValue();
       packagerFactoryMock.get('npm').getProdDependencies.mockReturnValue(Promise.resolve({}));
       packagerFactoryMock.get('npm').getPackagerVersion.mockReturnValue(Promise.resolve());
       packagerFactoryMock.get('npm').install.mockReturnValue(Promise.resolve());
@@ -572,7 +561,7 @@ describe('packExternalModules', () => {
             expect(writeFileSyncStub.mock.calls[0][1]).toEqual(JSON.stringify(expectedCompositePackageJSON, null, 2)),
             expect(writeFileSyncStub.mock.calls[1][1]).toEqual(JSON.stringify(expectedPackageJSON, null, 2)),
             // The modules should have been copied
-            expect(fsExtraMock.copy).toHaveBeenCalledTimes(0),
+            expect(cpStub).toHaveBeenCalledTimes(0),
             // npm ls and npm prune should have been called
             expect(packagerFactoryMock.get('npm').getProdDependencies).toHaveBeenCalledTimes(1),
             expect(packagerFactoryMock.get('npm').getPackagerVersion).toHaveBeenCalledTimes(1),
@@ -585,8 +574,8 @@ describe('packExternalModules', () => {
 
     it('should reject if packager install fails', () => {
       module.webpackOutputPath = '/my/Service/Path/outputPath';
-      fsExtraMock.pathExists.mockImplementation((_p, cb) => cb(null, false));
-      fsExtraMock.copy.mockImplementation((_from, _to, cb) => cb());
+      accessStub.mockRejectedValue(new Error('ENOENT'));
+      cpStub.mockResolvedValue();
       packagerFactoryMock.get('npm').getProdDependencies.mockReturnValue(Promise.resolve({}));
       packagerFactoryMock.get('npm').getPackagerVersion.mockReturnValue(Promise.resolve());
       packagerFactoryMock.get('npm').install.mockImplementation(() => Promise.reject(new Error('npm install failed')));
@@ -609,8 +598,8 @@ describe('packExternalModules', () => {
 
     it('should reject if packager returns a critical error', () => {
       module.webpackOutputPath = '/my/Service/Path/outputPath';
-      fsExtraMock.pathExists.mockImplementation((_p, cb) => cb(null, false));
-      fsExtraMock.copy.mockImplementation((_from, _to, cb) => cb());
+      accessStub.mockRejectedValue(new Error('ENOENT'));
+      cpStub.mockResolvedValue();
       packagerFactoryMock
         .get('npm')
         .getProdDependencies.mockImplementation(() => Promise.reject(new Error('something went wrong')));
@@ -622,7 +611,7 @@ describe('packExternalModules', () => {
             // The module package JSON and the composite one should have been stored
             expect(writeFileSyncStub).toHaveBeenCalledTimes(0),
             // The modules should have been copied
-            expect(fsExtraMock.copy).toHaveBeenCalledTimes(0),
+            expect(cpStub).toHaveBeenCalledTimes(0),
             // npm ls and npm prune should have been called
             expect(packagerFactoryMock.get('npm').getProdDependencies).toHaveBeenCalledTimes(1),
             expect(packagerFactoryMock.get('npm').install).toHaveBeenCalledTimes(0),
@@ -634,7 +623,7 @@ describe('packExternalModules', () => {
 
     it('should not install modules if no external modules are reported', () => {
       module.webpackOutputPath = '/my/Service/Path/outputPath';
-      fsExtraMock.copy.mockImplementation((_from, _to, cb) => cb());
+      cpStub.mockResolvedValue();
       packagerFactoryMock.get('npm').getProdDependencies.mockReturnValue(Promise.resolve());
       module.compileStats = noExtStats;
       return expect(module.packExternalModules())
@@ -644,7 +633,7 @@ describe('packExternalModules', () => {
             // The module package JSON and the composite one should have been stored
             expect(writeFileSyncStub).toHaveBeenCalledTimes(0),
             // The modules should have been copied
-            expect(fsExtraMock.copy).toHaveBeenCalledTimes(0),
+            expect(cpStub).toHaveBeenCalledTimes(0),
             // npm install and npm prune should not have been called
             expect(packagerFactoryMock.get('npm').getProdDependencies).toHaveBeenCalledTimes(1),
             expect(packagerFactoryMock.get('npm').install).toHaveBeenCalledTimes(0),
@@ -656,8 +645,8 @@ describe('packExternalModules', () => {
 
     it('should report ignored packager problems in verbose mode', () => {
       module.webpackOutputPath = '/my/Service/Path/outputPath';
-      fsExtraMock.pathExists.mockImplementation((_p, cb) => cb(null, false));
-      fsExtraMock.copy.mockImplementation((_from, _to, cb) => cb());
+      accessStub.mockRejectedValue(new Error('ENOENT'));
+      cpStub.mockResolvedValue();
       packagerFactoryMock.get('npm').getProdDependencies.mockReturnValue(
         Promise.resolve({
           problems: ['Problem 1', 'Problem 2']
@@ -712,8 +701,8 @@ describe('packExternalModules', () => {
         }
       });
       module.webpackOutputPath = '/my/Service/Path/outputPath';
-      fsExtraMock.pathExists.mockImplementation((_p, cb) => cb(null, false));
-      fsExtraMock.copy.mockImplementation((_from, _to, cb) => cb());
+      accessStub.mockRejectedValue(new Error('ENOENT'));
+      cpStub.mockResolvedValue();
       packagerFactoryMock.get('npm').getProdDependencies.mockReturnValue(Promise.resolve({}));
       packagerFactoryMock.get('npm').install.mockReturnValue(Promise.resolve());
       packagerFactoryMock.get('npm').prune.mockReturnValue(Promise.resolve());
@@ -728,7 +717,7 @@ describe('packExternalModules', () => {
             expect(writeFileSyncStub.mock.calls[0][1]).toEqual(JSON.stringify(expectedCompositePackageJSON, null, 2)),
             expect(writeFileSyncStub.mock.calls[1][1]).toEqual(JSON.stringify(expectedPackageJSON, null, 2)),
             // The modules should have been copied
-            expect(fsExtraMock.copy).toHaveBeenCalledTimes(1),
+            expect(cpStub).toHaveBeenCalledTimes(1),
             // npm ls and npm prune should have been called
             expect(packagerFactoryMock.get('npm').getProdDependencies).toHaveBeenCalledTimes(1),
             expect(packagerFactoryMock.get('npm').install).toHaveBeenCalledTimes(1),
@@ -773,8 +762,8 @@ describe('packExternalModules', () => {
         }
       });
       module.webpackOutputPath = '/my/Service/Path/outputPath';
-      fsExtraMock.pathExists.mockImplementation((_p, cb) => cb(null, false));
-      fsExtraMock.copy.mockImplementation((_from, _to, cb) => cb());
+      accessStub.mockRejectedValue(new Error('ENOENT'));
+      cpStub.mockResolvedValue();
       packagerFactoryMock.get('npm').getProdDependencies.mockReturnValue(Promise.resolve({}));
       packagerFactoryMock.get('npm').install.mockReturnValue(Promise.resolve());
       packagerFactoryMock.get('npm').prune.mockReturnValue(Promise.resolve());
@@ -789,7 +778,7 @@ describe('packExternalModules', () => {
             expect(writeFileSyncStub.mock.calls[0][1]).toEqual(JSON.stringify(expectedCompositePackageJSON, null, 2)),
             expect(writeFileSyncStub.mock.calls[1][1]).toEqual(JSON.stringify(expectedPackageJSON, null, 2)),
             // The modules should have been copied
-            expect(fsExtraMock.copy).toHaveBeenCalledTimes(1),
+            expect(cpStub).toHaveBeenCalledTimes(1),
             // npm ls and npm prune should have been called
             expect(packagerFactoryMock.get('npm').getProdDependencies).toHaveBeenCalledTimes(1),
             expect(packagerFactoryMock.get('npm').install).toHaveBeenCalledTimes(1),
@@ -833,8 +822,8 @@ describe('packExternalModules', () => {
         }
       });
       module.webpackOutputPath = '/my/Service/Path/outputPath';
-      fsExtraMock.pathExists.mockImplementation((_p, cb) => cb(null, false));
-      fsExtraMock.copy.mockImplementation((_from, _to, cb) => cb());
+      accessStub.mockRejectedValue(new Error('ENOENT'));
+      cpStub.mockResolvedValue();
       packagerFactoryMock.get('npm').getProdDependencies.mockReturnValue(Promise.resolve({}));
       packagerFactoryMock.get('npm').install.mockReturnValue(Promise.resolve());
       packagerFactoryMock.get('npm').prune.mockReturnValue(Promise.resolve());
@@ -849,7 +838,7 @@ describe('packExternalModules', () => {
             expect(writeFileSyncStub.mock.calls[0][1]).toEqual(JSON.stringify(expectedCompositePackageJSON, null, 2)),
             expect(writeFileSyncStub.mock.calls[1][1]).toEqual(JSON.stringify(expectedPackageJSON, null, 2)),
             // The modules should have been copied
-            expect(fsExtraMock.copy).toHaveBeenCalledTimes(1),
+            expect(cpStub).toHaveBeenCalledTimes(1),
             // npm ls and npm prune should have been called
             expect(packagerFactoryMock.get('npm').getProdDependencies).toHaveBeenCalledTimes(1),
             expect(packagerFactoryMock.get('npm').install).toHaveBeenCalledTimes(1),
@@ -861,8 +850,8 @@ describe('packExternalModules', () => {
 
     it('should reject if devDependency is required at runtime', () => {
       module.webpackOutputPath = '/my/Service/Path/outputPath';
-      fsExtraMock.pathExists.mockImplementation((_p, cb) => cb(null, false));
-      fsExtraMock.copy.mockImplementation((_from, _to, cb) => cb());
+      accessStub.mockRejectedValue(new Error('ENOENT'));
+      cpStub.mockResolvedValue();
       packagerFactoryMock.get('npm').getProdDependencies.mockReturnValue(Promise.resolve({}));
       packagerFactoryMock.get('npm').install.mockReturnValue(Promise.resolve());
       packagerFactoryMock.get('npm').prune.mockReturnValue(Promise.resolve());
@@ -893,8 +882,8 @@ describe('packExternalModules', () => {
         }
       });
       module.webpackOutputPath = '/my/Service/Path/outputPath';
-      fsExtraMock.pathExists.mockImplementation((_p, cb) => cb(null, false));
-      fsExtraMock.copy.mockImplementation((_from, _to, cb) => cb());
+      accessStub.mockRejectedValue(new Error('ENOENT'));
+      cpStub.mockResolvedValue();
       packagerFactoryMock.get('npm').getProdDependencies.mockReturnValue(Promise.resolve({}));
       packagerFactoryMock.get('npm').install.mockReturnValue(Promise.resolve());
       packagerFactoryMock.get('npm').prune.mockReturnValue(Promise.resolve());
@@ -930,8 +919,8 @@ describe('packExternalModules', () => {
         }
       });
       module.webpackOutputPath = '/my/Service/Path/outputPath';
-      fsExtraMock.pathExists.mockImplementation((_p, cb) => cb(null, false));
-      fsExtraMock.copy.mockImplementation((_from, _to, cb) => cb());
+      accessStub.mockRejectedValue(new Error('ENOENT'));
+      cpStub.mockResolvedValue();
       packagerFactoryMock.get('npm').getProdDependencies.mockReturnValue(Promise.resolve({}));
       packagerFactoryMock.get('npm').install.mockReturnValue(Promise.resolve());
       packagerFactoryMock.get('npm').prune.mockReturnValue(Promise.resolve());
@@ -977,8 +966,8 @@ describe('packExternalModules', () => {
       };
 
       module.webpackOutputPath = '/my/Service/Path/outputPath';
-      fsExtraMock.pathExists.mockImplementation((_p, cb) => cb(null, true));
-      fsExtraMock.copy.mockImplementation((_from, _to, cb) => cb());
+      accessStub.mockResolvedValue();
+      cpStub.mockResolvedValue();
       readFileSyncStub.mockReturnValueOnce(packageMock);
       readFileSyncStub.mockReturnValue({ info: 'lockfile' });
       packagerFactoryMock.get('npm').rebaseLockfile.mockImplementation((_pathToPackageRoot, lockfile) => lockfile);
@@ -1000,7 +989,7 @@ describe('packExternalModules', () => {
             expect(writeFileSyncStub.mock.calls[1][1]).toEqual(JSON.stringify({ info: 'lockfile' }, null, 2)),
             expect(writeFileSyncStub.mock.calls[2][1]).toEqual(JSON.stringify(expectedPackageJSON, null, 2)),
             // The modules and the lock file should have been copied
-            expect(fsExtraMock.copy).toHaveBeenCalledTimes(2),
+            expect(cpStub).toHaveBeenCalledTimes(2),
             // npm ls and npm prune should have been called
             expect(packagerFactoryMock.get('npm').getProdDependencies).toHaveBeenCalledTimes(1),
             expect(packagerFactoryMock.get('npm').install).toHaveBeenCalledTimes(1),
@@ -1046,8 +1035,8 @@ describe('packExternalModules', () => {
       });
 
       module.webpackOutputPath = '/my/Service/Path/outputPath';
-      fsExtraMock.pathExists.mockImplementation((_p, cb) => cb(null, true));
-      fsExtraMock.copy.mockImplementation((_from, _to, cb) => cb());
+      accessStub.mockResolvedValue();
+      cpStub.mockResolvedValue();
       readFileSyncStub.mockReturnValueOnce(packageMock);
       readFileSyncStub.mockReturnValue({ info: 'lockfile' });
       packagerFactoryMock.get('npm').rebaseLockfile.mockImplementation((_pathToPackageRoot, lockfile) => lockfile);
@@ -1069,7 +1058,7 @@ describe('packExternalModules', () => {
             expect(writeFileSyncStub.mock.calls[1][1]).toEqual(JSON.stringify({ info: 'lockfile' }, null, 2)),
             expect(writeFileSyncStub.mock.calls[2][1]).toEqual(JSON.stringify(expectedPackageJSON, null, 2)),
             // The modules and the lock file should have been copied
-            expect(fsExtraMock.copy).toHaveBeenCalledTimes(2),
+            expect(cpStub).toHaveBeenCalledTimes(2),
             // npm ls and npm prune should have been called
             expect(packagerFactoryMock.get('npm').getProdDependencies).toHaveBeenCalledTimes(1),
             expect(packagerFactoryMock.get('npm').install).toHaveBeenCalledTimes(1),
@@ -1110,8 +1099,8 @@ describe('packExternalModules', () => {
       readFileSyncStub.mockImplementation(() => {
         throw new Error('Failed to read package-lock.json');
       });
-      fsExtraMock.pathExists.mockImplementation((_p, cb) => cb(null, true));
-      fsExtraMock.copy.mockImplementationOnce((_from, _to, cb) => cb());
+      accessStub.mockResolvedValue();
+      cpStub.mockResolvedValueOnce();
       packagerFactoryMock.get('npm').getProdDependencies.mockReturnValue(Promise.resolve({}));
       packagerFactoryMock.get('npm').install.mockReturnValue(Promise.resolve());
       packagerFactoryMock.get('npm').prune.mockReturnValue(Promise.resolve());
@@ -1126,7 +1115,7 @@ describe('packExternalModules', () => {
             expect(writeFileSyncStub.mock.calls[0][1]).toEqual(JSON.stringify(expectedCompositePackageJSON, null, 2)),
             expect(writeFileSyncStub.mock.calls[1][1]).toEqual(JSON.stringify(expectedPackageJSON, null, 2)),
             // The modules should have been copied
-            expect(fsExtraMock.copy).toHaveBeenCalledTimes(1),
+            expect(cpStub).toHaveBeenCalledTimes(1),
             // npm ls and npm prune should have been called
             expect(packagerFactoryMock.get('npm').getProdDependencies).toHaveBeenCalledTimes(1),
             expect(packagerFactoryMock.get('npm').install).toHaveBeenCalledTimes(1),
@@ -1163,10 +1152,8 @@ describe('packExternalModules', () => {
       };
 
       module.webpackOutputPath = '/my/Service/Path/outputPath';
-      fsExtraMock.pathExists.mockImplementation((_p, cb) => cb(null, false));
-      fsExtraMock.copy.mockImplementationOnce((_from, _to, cb) => {
-        cb();
-      });
+      accessStub.mockRejectedValue(new Error('ENOENT'));
+      cpStub.mockResolvedValueOnce();
       packagerFactoryMock.get('npm').getProdDependencies.mockReturnValue(Promise.resolve({}));
       packagerFactoryMock.get('npm').install.mockReturnValue(Promise.resolve());
       packagerFactoryMock.get('npm').prune.mockReturnValue(Promise.resolve());
@@ -1182,7 +1169,7 @@ describe('packExternalModules', () => {
             expect(writeFileSyncStub.mock.calls[0][1]).toEqual(JSON.stringify(expectedCompositePackageJSON, null, 2)),
             expect(writeFileSyncStub.mock.calls[1][1]).toEqual(JSON.stringify(expectedPackageJSON, null, 2)),
             // The modules should not have been copied
-            expect(fsExtraMock.copy).toHaveBeenCalledTimes(0),
+            expect(cpStub).toHaveBeenCalledTimes(0),
             // npm ls and npm prune should have been called
             expect(packagerFactoryMock.get('npm').getProdDependencies).toHaveBeenCalledTimes(1),
             expect(packagerFactoryMock.get('npm').install).toHaveBeenCalledTimes(1),
@@ -1242,8 +1229,8 @@ describe('packExternalModules', () => {
           const peerDepStats = createStatsMock(['bluebird', 'request-promise']);
 
           module.webpackOutputPath = '/my/Service/Path/outputPath';
-          fsExtraMock.pathExists.mockImplementation((_p, cb) => cb(null, false));
-          fsExtraMock.copy.mockImplementation((_from, _to, cb) => cb());
+          accessStub.mockRejectedValue(new Error('ENOENT'));
+          cpStub.mockResolvedValue();
           packagerFactoryMock.get('npm').getProdDependencies.mockReturnValue(Promise.resolve(dependencyGraph));
           packagerFactoryMock.get('npm').install.mockReturnValue(Promise.resolve());
           packagerFactoryMock.get('npm').prune.mockReturnValue(Promise.resolve());
@@ -1260,7 +1247,7 @@ describe('packExternalModules', () => {
                 ),
                 expect(writeFileSyncStub.mock.calls[1][1]).toEqual(JSON.stringify(expectedPackageJSON, null, 2)),
                 // The modules should have been copied
-                expect(fsExtraMock.copy).toHaveBeenCalledTimes(1),
+                expect(cpStub).toHaveBeenCalledTimes(1),
                 // npm ls and npm prune should have been called
                 expect(packagerFactoryMock.get('npm').getProdDependencies).toHaveBeenCalledTimes(1),
                 expect(packagerFactoryMock.get('npm').install).toHaveBeenCalledTimes(1),
@@ -1314,8 +1301,8 @@ describe('packExternalModules', () => {
 
           it('should skip optional peer dependencies', () => {
             module.webpackOutputPath = '/my/Service/Path/outputPath';
-            fsExtraMock.pathExists.mockImplementation((_p, cb) => cb(null, false));
-            fsExtraMock.copy.mockImplementation((_from, _to, cb) => cb());
+            accessStub.mockRejectedValue(new Error('ENOENT'));
+            cpStub.mockResolvedValue();
             packagerFactoryMock.get('npm').getProdDependencies.mockReturnValue(Promise.resolve(dependencyGraph));
             packagerFactoryMock.get('npm').install.mockReturnValue(Promise.resolve());
             packagerFactoryMock.get('npm').prune.mockReturnValue(Promise.resolve());
@@ -1332,7 +1319,7 @@ describe('packExternalModules', () => {
                   ),
                   expect(writeFileSyncStub.mock.calls[1][1]).toEqual(JSON.stringify(expectedPackageJSON, null, 2)),
                   // The modules should have been copied
-                  expect(fsExtraMock.copy).toHaveBeenCalledTimes(1),
+                  expect(cpStub).toHaveBeenCalledTimes(1),
                   // npm ls and npm prune should have been called
                   expect(packagerFactoryMock.get('npm').getProdDependencies).toHaveBeenCalledTimes(1),
                   expect(packagerFactoryMock.get('npm').install).toHaveBeenCalledTimes(1),
@@ -1365,9 +1352,9 @@ describe('packExternalModules', () => {
               }
             });
             module.webpackOutputPath = '/my/Service/Path/outputPath';
-            fsExtraMock.pathExists.mockImplementation((_p, cb) => cb(null, false));
-            fsExtraMock.pathExistsSync.mockReturnValue(true);
-            fsExtraMock.copy.mockImplementation((_from, _to, cb) => cb());
+            accessStub.mockRejectedValue(new Error('ENOENT'));
+            existsSyncStub.mockImplementation(filePath => filePath.endsWith(`${path.sep}node_modules`));
+            cpStub.mockResolvedValue();
             packagerFactoryMock.get('npm').getProdDependencies.mockReturnValue(Promise.resolve(dependencyGraph));
             packagerFactoryMock.get('npm').install.mockReturnValue(Promise.resolve());
             packagerFactoryMock.get('npm').prune.mockReturnValue(Promise.resolve());
@@ -1384,7 +1371,7 @@ describe('packExternalModules', () => {
                   ),
                   expect(writeFileSyncStub.mock.calls[1][1]).toEqual(JSON.stringify(expectedPackageJSON, null, 2)),
                   // The modules should have been copied
-                  expect(fsExtraMock.copy).toHaveBeenCalledTimes(1),
+                  expect(cpStub).toHaveBeenCalledTimes(1),
                   // npm ls and npm prune should have been called
                   expect(packagerFactoryMock.get('npm').getProdDependencies).toHaveBeenCalledTimes(1),
                   expect(packagerFactoryMock.get('npm').install).toHaveBeenCalledTimes(1),
@@ -1439,8 +1426,8 @@ describe('packExternalModules', () => {
         const transitiveDepStats = createStatsMock(['classnames']);
 
         module.webpackOutputPath = '/my/Service/Path/outputPath';
-        fsExtraMock.pathExists.mockImplementation((_p, cb) => cb(null, false));
-        fsExtraMock.copy.mockImplementation((_from, _to, cb) => cb());
+        accessStub.mockRejectedValue(new Error('ENOENT'));
+        cpStub.mockResolvedValue();
         packagerFactoryMock.get('npm').getProdDependencies.mockReturnValue(Promise.resolve(dependencyGraph));
         packagerFactoryMock.get('npm').install.mockReturnValue(Promise.resolve());
         packagerFactoryMock.get('npm').prune.mockReturnValue(Promise.resolve());
@@ -1455,7 +1442,7 @@ describe('packExternalModules', () => {
               expect(writeFileSyncStub.mock.calls[0][1]).toEqual(JSON.stringify(expectedCompositePackageJSON, null, 2)),
               expect(writeFileSyncStub.mock.calls[1][1]).toEqual(JSON.stringify(expectedPackageJSON, null, 2)),
               // The modules should have been copied
-              expect(fsExtraMock.copy).toHaveBeenCalledTimes(1),
+              expect(cpStub).toHaveBeenCalledTimes(1),
               // npm ls and npm prune should have been called
               expect(packagerFactoryMock.get('npm').getProdDependencies).toHaveBeenCalledTimes(1),
               expect(packagerFactoryMock.get('npm').install).toHaveBeenCalledTimes(1),

@@ -1,15 +1,14 @@
 const _ = require('lodash');
+const fs = require('node:fs');
 const Serverless = require('serverless');
 const Configuration = require('../lib/Configuration');
-const fseMock = require('fs-extra');
 const baseModule = require('../lib/cleanup');
-
-jest.mock('fs-extra');
 
 describe('cleanup', () => {
   let serverless;
   let module;
   let dirExistsSyncStub;
+  let rmStub;
 
   beforeEach(() => {
     serverless = new Serverless({ commands: ['print'], options: {}, serviceDir: null });
@@ -21,6 +20,7 @@ describe('cleanup', () => {
 
     dirExistsSyncStub = jest.fn();
     serverless.utils.dirExistsSync = dirExistsSyncStub;
+    rmStub = jest.spyOn(fs.promises, 'rm').mockResolvedValue();
 
     module = _.assign(
       {
@@ -35,16 +35,20 @@ describe('cleanup', () => {
     );
   });
 
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
   it('should remove output dir if it exists', () => {
     dirExistsSyncStub.mockReturnValue(true);
-    fseMock.remove.mockResolvedValue(true);
+    rmStub.mockResolvedValue(true);
 
     return expect(module.cleanup())
       .resolves.toBeUndefined()
       .then(() => {
         expect(dirExistsSyncStub).toHaveBeenCalledTimes(1);
         expect(dirExistsSyncStub).toHaveBeenCalledWith('my/Output/Path');
-        expect(fseMock.remove).toHaveBeenCalledTimes(1);
+        expect(rmStub).toHaveBeenCalledTimes(1);
         expect(serverless.cli.log).toHaveBeenCalledWith('Removing my/Output/Path done');
         return null;
       });
@@ -52,7 +56,7 @@ describe('cleanup', () => {
 
   it('should log nothing is verbose is false', () => {
     dirExistsSyncStub.mockReturnValue(true);
-    fseMock.remove.mockResolvedValue(true);
+    rmStub.mockResolvedValue(true);
 
     module = _.assign({}, module, { options: { verbose: false } });
 
@@ -61,7 +65,7 @@ describe('cleanup', () => {
       .then(() => {
         expect(dirExistsSyncStub).toHaveBeenCalledTimes(1);
         expect(dirExistsSyncStub).toHaveBeenCalledWith('my/Output/Path');
-        expect(fseMock.remove).toHaveBeenCalledTimes(1);
+        expect(rmStub).toHaveBeenCalledTimes(1);
         expect(serverless.cli.log).toHaveBeenCalledTimes(0);
         return null;
       });
@@ -69,7 +73,7 @@ describe('cleanup', () => {
 
   it('should log an error if it occurs', () => {
     dirExistsSyncStub.mockReturnValue(true);
-    fseMock.remove.mockRejectedValue('remove error');
+    rmStub.mockRejectedValue('remove error');
 
     return expect(module.cleanup())
       .resolves.toBeUndefined()
@@ -88,7 +92,7 @@ describe('cleanup', () => {
       .then(() => {
         expect(dirExistsSyncStub).toHaveBeenCalledTimes(1);
         expect(dirExistsSyncStub).toHaveBeenCalledWith('my/Output/Path');
-        expect(fseMock.remove).toHaveBeenCalledTimes(0);
+        expect(rmStub).toHaveBeenCalledTimes(0);
         return null;
       });
   });
@@ -103,7 +107,7 @@ describe('cleanup', () => {
       .resolves.toBeUndefined()
       .then(() => {
         expect(dirExistsSyncStub).toHaveBeenCalledTimes(0);
-        expect(fseMock.remove).toHaveBeenCalledTimes(0);
+        expect(rmStub).toHaveBeenCalledTimes(0);
         return null;
       });
   });
@@ -119,7 +123,7 @@ describe('cleanup', () => {
       .resolves.toBeUndefined()
       .then(() => {
         expect(dirExistsSyncStub).toHaveBeenCalledTimes(0);
-        expect(fseMock.remove).toHaveBeenCalledTimes(0);
+        expect(rmStub).toHaveBeenCalledTimes(0);
         return null;
       });
   });

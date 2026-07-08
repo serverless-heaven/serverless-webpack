@@ -6,11 +6,8 @@ const _ = require('lodash');
 const Utils = require('../../lib/utils');
 const { sep } = require('node:path');
 const npmModule = require('../../lib/packagers/npm');
-const fseMock = require('fs-extra');
-const fsMock = require('node:fs');
+const fs = require('node:fs');
 
-jest.mock('fs-extra');
-jest.mock('fs');
 jest.mock('../../lib/utils', () => {
   const original = jest.requireActual('../../lib/utils');
   return Object.assign({}, original, {
@@ -20,12 +17,34 @@ jest.mock('../../lib/utils', () => {
 
 describe('npm', () => {
   const ENV = process.env;
+  const actualExistsSync = fs.existsSync;
+  const actualReadFileSync = fs.readFileSync;
+  let existsSyncStub;
+  let readFileSyncStub;
+  let lockFileExists;
+  let lockFileContent;
 
   beforeAll(() => {
     process.env = { ...ENV, SLS_DEBUG: '*' };
   });
   beforeEach(() => {
-    fsMock.readFileSync.mockReturnValue(false);
+    lockFileExists = false;
+    lockFileContent = undefined;
+    existsSyncStub = jest.spyOn(fs, 'existsSync').mockImplementation(filePath => {
+      if (String(filePath).endsWith('package-lock.json')) {
+        return lockFileExists;
+      }
+      return actualExistsSync.call(fs, filePath);
+    });
+    readFileSyncStub = jest.spyOn(fs, 'readFileSync').mockImplementation((filePath, ...args) => {
+      if (String(filePath).endsWith('package-lock.json') && lockFileContent !== undefined) {
+        return lockFileContent;
+      }
+      return actualReadFileSync.call(fs, filePath, ...args);
+    });
+  });
+  afterEach(() => {
+    jest.restoreAllMocks();
   });
   afterAll(() => {
     process.env = ENV;
@@ -166,7 +185,7 @@ describe('npm', () => {
               ['ls', '-prod', '-json', '-depth=10'],
               { cwd: 'myPath' }
             );
-            expect(fseMock.pathExistsSync).toHaveBeenCalledWith(`myPath${sep}package-lock.json`);
+            expect(existsSyncStub).toHaveBeenCalledWith(`myPath${sep}package-lock.json`);
             return null;
           });
       });
@@ -182,7 +201,7 @@ describe('npm', () => {
               ['ls', '-prod', '-json', '-depth=1'],
               { cwd: 'myPath' }
             );
-            expect(fseMock.pathExistsSync).toHaveBeenCalledWith(`myPath${sep}package-lock.json`);
+            expect(existsSyncStub).toHaveBeenCalledWith(`myPath${sep}package-lock.json`);
             return null;
           });
       });
@@ -190,8 +209,8 @@ describe('npm', () => {
 
     describe('with lock file', () => {
       it('should use npm ls when lock file is not version 2', () => {
-        fseMock.pathExistsSync.mockReturnValue(true);
-        fsMock.readFileSync.mockReturnValue(JSON.stringify({ lockfileVersion: 1 }));
+        lockFileExists = true;
+        lockFileContent = JSON.stringify({ lockfileVersion: 1 });
         Utils.spawnProcess.mockReturnValue(Promise.resolve({ stdout: '{}', stderr: '' }));
         return expect(npmModule.getProdDependencies('myPath'))
           .resolves.toEqual({})
@@ -202,14 +221,14 @@ describe('npm', () => {
               ['ls', '-prod', '-json', '-depth=1'],
               { cwd: 'myPath' }
             );
-            expect(fseMock.pathExistsSync).toHaveBeenCalledWith(`myPath${sep}package-lock.json`);
-            expect(fsMock.readFileSync).toHaveBeenCalledWith(`myPath${sep}package-lock.json`, 'utf8');
+            expect(existsSyncStub).toHaveBeenCalledWith(`myPath${sep}package-lock.json`);
+            expect(readFileSyncStub).toHaveBeenCalledWith(`myPath${sep}package-lock.json`, 'utf8');
             return null;
           });
       });
 
       it('should returns lock file when is version 2', () => {
-        fseMock.pathExistsSync.mockReturnValue(true);
+        lockFileExists = true;
         const lockData = {
           lockfileVersion: 2,
           dependencies: {
@@ -225,19 +244,19 @@ describe('npm', () => {
             }
           }
         };
-        fsMock.readFileSync.mockReturnValue(JSON.stringify(lockData));
+        lockFileContent = JSON.stringify(lockData);
         return expect(npmModule.getProdDependencies('myPath'))
           .resolves.toEqual(lockData)
           .then(() => {
             expect(Utils.spawnProcess).toHaveBeenCalledTimes(0);
-            expect(fseMock.pathExistsSync).toHaveBeenCalledWith(`myPath${sep}package-lock.json`);
-            expect(fsMock.readFileSync).toHaveBeenCalledWith(`myPath${sep}package-lock.json`, 'utf8');
+            expect(existsSyncStub).toHaveBeenCalledWith(`myPath${sep}package-lock.json`);
+            expect(readFileSyncStub).toHaveBeenCalledWith(`myPath${sep}package-lock.json`, 'utf8');
             return null;
           });
       });
 
       it('should lockfile path be customisable', () => {
-        fseMock.pathExistsSync.mockReturnValue(true);
+        lockFileExists = true;
         const lockData = {
           lockfileVersion: 2,
           dependencies: {
@@ -253,7 +272,7 @@ describe('npm', () => {
             }
           }
         };
-        fsMock.readFileSync.mockReturnValue(JSON.stringify(lockData));
+        lockFileContent = JSON.stringify(lockData);
         return expect(
           npmModule.getProdDependencies('root-workspace/packages/my-package', 1, {
             lockFile: '../../package-lock.json'
@@ -262,8 +281,8 @@ describe('npm', () => {
           .resolves.toEqual(lockData)
           .then(() => {
             expect(Utils.spawnProcess).toHaveBeenCalledTimes(0);
-            expect(fseMock.pathExistsSync).toHaveBeenCalledWith(`root-workspace${sep}package-lock.json`);
-            expect(fsMock.readFileSync).toHaveBeenCalledWith(`root-workspace${sep}package-lock.json`, 'utf8');
+            expect(existsSyncStub).toHaveBeenCalledWith(`root-workspace${sep}package-lock.json`);
+            expect(readFileSyncStub).toHaveBeenCalledWith(`root-workspace${sep}package-lock.json`, 'utf8');
             return null;
           });
       });
