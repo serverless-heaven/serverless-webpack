@@ -4,6 +4,28 @@
 
 const path = require('path');
 
+function replacePluginLockReference(lockPath, pluginPackagePath, utils) {
+  return utils.replaceInJson(lockPath, lock => {
+    const pluginPackage = lock.packages['../..'];
+    const installedPackage = lock.packages['node_modules/serverless-webpack'] || {};
+
+    if (!pluginPackage || !lock.packages['']?.devDependencies) {
+      throw new Error('Unexpected package-lock structure for serverless-webpack local file dependency.');
+    }
+
+    lock.packages[''].devDependencies['serverless-webpack'] = `file:${pluginPackagePath}`;
+    delete lock.packages['../..'];
+    lock.packages['node_modules/serverless-webpack'] = {
+      ...pluginPackage,
+      ...installedPackage,
+      resolved: `file:${pluginPackagePath}`
+    };
+    delete lock.packages['node_modules/serverless-webpack'].link;
+
+    return lock;
+  });
+}
+
 module.exports = async (originalFixturePath, fixturePath, utils) => {
   const pluginPath = path.resolve(originalFixturePath, '..', '..');
 
@@ -15,8 +37,8 @@ module.exports = async (originalFixturePath, fixturePath, utils) => {
   await Promise.all([
     utils.replaceInFile(SLS_CONFIG_PATH, '- serverless-webpack', `- ${pluginPath}`),
     utils.replaceInFile(WEBPACK_CONFIG_PATH, "'serverless-webpack'", `'${pluginPath}'`),
-    utils.replaceInFile(PACKAGE_JSON_PATH, 'file:../..', `file:${pluginPath}`),
-    utils.replaceInFile(LOCK_PATH, '../..', `${pluginPath}`)
+    utils.replaceInFile(PACKAGE_JSON_PATH, 'file:../..', `file:${utils.pluginPackagePath}`),
+    replacePluginLockReference(LOCK_PATH, utils.pluginPackagePath, utils)
   ]);
 
   const command = /^win/.test(process.platform) ? 'npm.cmd' : 'npm';

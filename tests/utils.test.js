@@ -24,15 +24,27 @@ describe('Utils', () => {
   describe('SpawnError', () => {
     it('should store stdout and stderr', () => {
       const err = new Utils.SpawnError('message', 'stdout', 'stderr');
-      expect(err).toHaveProperty('message', 'message');
+      expect(err).toHaveProperty('message', 'message\nstdout:\nstdout\nstderr:\nstderr');
       expect(err).toHaveProperty('stdout', 'stdout');
       expect(err).toHaveProperty('stderr', 'stderr');
     });
 
-    it('should print message and stderr', () => {
-      const err = new Utils.SpawnError('message', 'stdout', 'stderr');
+    it('should include cwd, stdout and stderr in toString()', () => {
+      const err = new Utils.SpawnError('message', 'stdout', 'stderr', { cwd: 'cwd' });
 
-      expect(err.toString()).toEqual('message\nstderr');
+      expect(err.toString()).toEqual('message\ncwd: cwd\nstdout:\nstdout\nstderr:\nstderr');
+    });
+
+    it('should truncate stdout and stderr in message only', () => {
+      const stdout = 'o'.repeat(8001);
+      const stderr = 'e'.repeat(8001);
+      const err = new Utils.SpawnError('message', stdout, stderr);
+
+      expect(err.message).toContain('stdout:\n');
+      expect(err.message).toContain('stderr:\n');
+      expect(err.message).toContain('... output truncated (1 more character)');
+      expect(err.stdout).toEqual(stdout);
+      expect(err.stderr).toEqual(stderr);
     });
   });
 
@@ -92,10 +104,14 @@ describe('Utils', () => {
       childMock.on.mockReset();
       childMock.on.mockImplementation((name, cb) => {
         if (name === 'error') {
-          cb(new Error('spawn ENOENT'));
+          const err = new Error('spawn ENOENT');
+          err.code = 'ENOENT';
+          cb(err);
         }
       });
-      return expect(Utils.spawnProcess('cmd', [])).rejects.toThrow('spawn ENOENT');
+      return expect(Utils.spawnProcess('cmd', [])).rejects.toThrow(
+        'cmd failed to start. Command "cmd" was not found. Make sure it is installed and available in PATH. Original error: spawn ENOENT'
+      );
     });
 
     it('should reject on positive exit code', () => {
@@ -106,6 +122,16 @@ describe('Utils', () => {
         }
       });
       return expect(Utils.spawnProcess('cmd', [])).rejects.toThrow(Utils.SpawnError);
+    });
+
+    it('should reject with signal on process termination', () => {
+      childMock.on.mockReset();
+      childMock.on.mockImplementation((name, cb) => {
+        if (name === 'close') {
+          cb(null, 'SIGTERM');
+        }
+      });
+      return expect(Utils.spawnProcess('cmd', [])).rejects.toThrow('cmd failed after receiving signal SIGTERM');
     });
 
     it('should allow omitted args', () => {
