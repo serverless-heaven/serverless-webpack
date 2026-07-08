@@ -10,7 +10,7 @@ const _ = require('lodash');
 // unmock global modules
 jest.unmock('fs-extra');
 jest.unmock('fs');
-jest.unmock('glob');
+jest.unmock('tinyglobby');
 jest.unmock('webpack');
 
 const slsVersion = semver.coerce(pkg.devDependencies.serverless);
