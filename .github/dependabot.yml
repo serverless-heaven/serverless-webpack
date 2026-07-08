@@ -8,6 +8,8 @@ updates:
       timezone: Europe/Paris
     open-pull-requests-limit: 10
     versioning-strategy: increase
+    cooldown:
+      default-days: 7
     exclude-paths:
       - "examples/**"
       - "tests/**"
@@ -27,3 +29,5 @@ updates:
       time: '02:00'
       timezone: Europe/Paris
     open-pull-requests-limit: 10
+    cooldown:
+      default-days: 7
