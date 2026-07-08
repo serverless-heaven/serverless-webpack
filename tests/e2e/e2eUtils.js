@@ -72,7 +72,7 @@ async function runServerless(options) {
 
   try {
     if (options.useSpawnProcess) {
-      await spawnProcess('yarn', ['serverless', 'package'], { cwd: servicePath });
+      await spawnProcess('yarn', ['serverless', 'package'], { cwd: runServerlessOptions.cwd });
     } else {
       await originalRunServerless(path.join(servicePath, 'node_modules', 'serverless'), runServerlessOptions);
     }

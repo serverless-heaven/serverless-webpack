@@ -8,6 +8,7 @@ const baseModule = require('../lib/packageModules');
 
 jest.mock('fs');
 jest.mock('glob');
+jest.mock('archiver');
 
 describe('packageModules', () => {
   let serverless;
