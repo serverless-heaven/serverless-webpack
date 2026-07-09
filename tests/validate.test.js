@@ -1,21 +1,23 @@
 const _ = require('lodash');
+const fs = require('node:fs');
 const path = require('node:path');
 const Serverless = require('serverless');
 
-jest.mock('fs-extra');
 jest.mock('tinyglobby');
 
 describe('validate', () => {
   let module;
   let serverless;
   let baseModule;
-  let fsExtraMock;
   let tinyglobbyMock;
+  let existsSyncStub;
+  let rmSyncStub;
 
   beforeEach(() => {
     jest.resetModules();
-    fsExtraMock = require('fs-extra');
     tinyglobbyMock = require('tinyglobby');
+    existsSyncStub = jest.spyOn(fs, 'existsSync').mockReturnValue(false);
+    rmSyncStub = jest.spyOn(fs, 'rmSync').mockReturnValue();
     jest.doMock(path.join('..', 'lib', 'index'), () => ({
       entries: {},
       webpack: {
@@ -35,6 +37,10 @@ describe('validate', () => {
       },
       baseModule
     );
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
   });
 
   it('should expose a `validate` method', () => {
@@ -63,7 +69,9 @@ describe('validate', () => {
       }
     };
     _.set(module.serverless.service, 'custom.webpack.config', testConfig);
-    return module.validate().then(() => expect(fsExtraMock.removeSync).toHaveBeenCalledWith(testOutPath));
+    return module
+      .validate()
+      .then(() => expect(rmSyncStub).toHaveBeenCalledWith(testOutPath, { recursive: true, force: true }));
   });
 
   it('should keep the output path if requested', () => {
@@ -77,7 +85,7 @@ describe('validate', () => {
     };
     _.set(module, 'keepOutputDirectory', true);
     _.set(module.serverless.service, 'custom.webpack.config', testConfig);
-    return module.validate().then(() => expect(fsExtraMock.removeSync).toHaveBeenCalledTimes(0));
+    return module.validate().then(() => expect(rmSyncStub).toHaveBeenCalledTimes(0));
   });
 
   it('should override the output path if `out` option is specified', () => {
@@ -1187,7 +1195,7 @@ describe('validate', () => {
 
       module.options['skip-build'] = true;
 
-      fsExtraMock.pathExistsSync.mockReturnValue(true);
+      existsSyncStub.mockReturnValue(true);
       return module.validate().then(() => {
         expect(module.skipCompile).toBe(true);
         return null;
@@ -1203,7 +1211,7 @@ describe('validate', () => {
       module.serverless.config.servicePath = testServicePath;
       _.set(module.serverless.service, 'custom.webpack.config', testConfig);
       module.options['skip-build'] = true;
-      fsExtraMock.pathExistsSync.mockReturnValue(true);
+      existsSyncStub.mockReturnValue(true);
       return module.validate().then(() => {
         expect(module.keepOutputDirectory).toBe(true);
         return null;
@@ -1219,7 +1227,7 @@ describe('validate', () => {
       module.serverless.config.servicePath = testServicePath;
       _.set(module.serverless.service, 'custom.webpack.config', testConfig);
       module.options['skip-build'] = true;
-      fsExtraMock.pathExistsSync.mockReturnValue(false);
+      existsSyncStub.mockReturnValue(false);
       return expect(module.validate()).rejects.toThrow(/No compiled output found/);
     });
   });

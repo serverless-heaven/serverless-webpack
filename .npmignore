@@ -13,3 +13,4 @@ biome.jsonc
 jest.config.js
 yarn.lock
 yarn-error.log
+.nvmrc

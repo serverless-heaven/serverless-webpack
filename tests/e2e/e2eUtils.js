@@ -1,4 +1,4 @@
-const fse = require('fs-extra');
+const fs = require('node:fs');
 const path = require('node:path');
 const os = require('node:os');
 const _ = require('lodash');
@@ -9,22 +9,22 @@ const PROJECT_DIR = path.resolve(__dirname, '..', '..');
 let pluginPackagePathPromise;
 
 async function replaceInFile(path, regex, replacement) {
-  const content = await fse.readFile(path, 'utf8');
+  const content = await fs.promises.readFile(path, 'utf8');
   const updatedContent = _.replace(String(content), regex, replacement);
-  return fse.writeFile(path, updatedContent);
+  return fs.promises.writeFile(path, updatedContent);
 }
 
 async function replaceInJson(path, updater) {
-  const content = await fse.readJson(path);
+  const content = JSON.parse(await fs.promises.readFile(path, 'utf8'));
   const updatedContent = updater(content) || content;
-  return fse.writeJson(path, updatedContent, { spaces: 2 });
+  return fs.promises.writeFile(path, `${JSON.stringify(updatedContent, null, 2)}\n`);
 }
 
 async function setupFixture(name) {
   const fixturePath = path.join(FIXTURES_DIR, name);
-  const setupFixturePath = await fse.mkdtemp(path.join(os.tmpdir(), 'serverless-webpack-'));
+  const setupFixturePath = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'serverless-webpack-'));
   const pluginPackagePath = await getPluginPackagePath();
-  await fse.copy(fixturePath, setupFixturePath);
+  await fs.promises.cp(fixturePath, setupFixturePath, { recursive: true });
 
   const setupScriptPath = path.resolve(setupFixturePath, '_setup.js');
   await require(setupScriptPath)(fixturePath, setupFixturePath, {
@@ -33,7 +33,7 @@ async function setupFixture(name) {
     replaceInFile,
     spawnProcess
   });
-  await fse.unlink(setupScriptPath);
+  await fs.promises.unlink(setupScriptPath);
 
   return setupFixturePath;
 }
@@ -41,7 +41,7 @@ async function setupFixture(name) {
 async function getPluginPackagePath() {
   if (!pluginPackagePathPromise) {
     pluginPackagePathPromise = (async () => {
-      const packageDir = await fse.mkdtemp(path.join(os.tmpdir(), 'serverless-webpack-'));
+      const packageDir = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'serverless-webpack-'));
       const npmCommand = /^win/.test(process.platform) ? 'npm.cmd' : 'npm';
       const { stdout } = await spawnProcess(
         npmCommand,
