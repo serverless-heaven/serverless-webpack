@@ -1,5 +1,9 @@
 name: Publish new release on NPM
 
+permissions:
+  id-token: write
+  contents: read
+
 on:
   release:
     types:
@@ -28,5 +32,3 @@ jobs:
 
       - name: 'Publish package'
         run: npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
