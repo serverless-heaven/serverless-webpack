@@ -46,7 +46,7 @@
     "@types/node": "^26.1.0",
     "husky": "^9.1.7",
     "jest": "^30.4.2",
-    "lint-staged": "^17.2.0",
+    "lint-staged": "^17.3.0",
     "serverless": "npm:osls@^3.62.1",
     "sinon": "^22.1.0",
     "ts-node": "^10.9.2",
