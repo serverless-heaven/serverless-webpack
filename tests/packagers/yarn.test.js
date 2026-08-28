@@ -265,6 +265,23 @@ describe('yarn', () => {
         });
     });
 
+    it('should use installExtraArgs option', () => {
+      Utils.spawnProcess.mockReturnValue(Promise.resolve({ stdout: 'installed successfully', stderr: '' }));
+      return expect(yarnModule.install('myPath', { installExtraArgs: ['--production'] }, '1.22.19'))
+        .resolves.toBeUndefined()
+        .then(() => {
+          expect(Utils.spawnProcess).toHaveBeenCalledTimes(1);
+          expect(Utils.spawnProcess).toHaveBeenCalledWith(
+            expect.stringMatching(/^yarn/),
+            ['install', '--non-interactive', '--frozen-lockfile', '--production'],
+            {
+              cwd: 'myPath'
+            }
+          );
+          return null;
+        });
+    });
+
     it('should use noNonInteractive option', () => {
       Utils.spawnProcess.mockReturnValue(Promise.resolve({ stdout: 'installed successfully', stderr: '' }));
       return expect(yarnModule.install('myPath', { noNonInteractive: true }, '1.22.19'))

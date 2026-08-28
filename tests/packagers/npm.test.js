@@ -126,6 +126,23 @@ describe('npm', () => {
           return null;
         });
     });
+
+    it('should use installExtraArgs option', () => {
+      Utils.spawnProcess.mockReturnValue(Promise.resolve({ stdout: 'installed successfully', stderr: '' }));
+      return expect(npmModule.install('myPath', { installExtraArgs: ['--os=linux', '--cpu=arm64'] }))
+        .resolves.toBeUndefined()
+        .then(() => {
+          expect(Utils.spawnProcess).toHaveBeenCalledTimes(1);
+          expect(Utils.spawnProcess).toHaveBeenCalledWith(
+            expect.stringMatching(/^npm/),
+            ['install', '--os=linux', '--cpu=arm64'],
+            {
+              cwd: 'myPath'
+            }
+          );
+          return null;
+        });
+    });
   });
 
   describe('noInstall', () => {
