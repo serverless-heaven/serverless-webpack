@@ -42,7 +42,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.29.7",
-    "@biomejs/biome": "^2.5.10",
+    "@biomejs/biome": "^2.5.11",
     "@types/node": "^26.4.0",
     "husky": "^9.1.7",
     "jest": "^30.5.0",
