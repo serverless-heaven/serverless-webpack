@@ -43,7 +43,7 @@
   "devDependencies": {
     "@babel/core": "^7.29.7",
     "@biomejs/biome": "^2.5.12",
-    "@types/node": "^26.4.1",
+    "@types/node": "^26.5.1",
     "husky": "^9.1.7",
     "jest": "^30.5.1",
     "lint-staged": "^17.5.1",
