@@ -45,7 +45,7 @@
     "@biomejs/biome": "^2.5.13",
     "@types/node": "^26.6.1",
     "husky": "^9.1.7",
-    "jest": "^30.5.1",
+    "jest": "^30.5.2",
     "lint-staged": "^17.5.1",
     "serverless": "npm:osls@^3.62.1",
     "sinon": "^22.1.0",
