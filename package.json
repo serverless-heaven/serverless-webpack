@@ -41,7 +41,7 @@
     "semver": "^7.8.5"
   },
   "devDependencies": {
-    "@babel/core": "^7.29.7",
+    "@babel/core": "^8.0.6",
     "@biomejs/biome": "^2.5.14",
     "@types/node": "^26.6.3",
     "husky": "^9.1.7",
