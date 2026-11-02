@@ -1,2 +1,2 @@
-'*.{js,mjs,cjs}':
-  - 'biome check --no-errors-on-unmatched'
+"*.{js,mjs,cjs}":
+  - "biome check --no-errors-on-unmatched"

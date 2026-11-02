@@ -21,51 +21,51 @@ jobs:
           - windows-latest
           - ubuntu-latest
         node:
-          - '20'
-          - '22'
-          - '24'
+          - "20"
+          - "22"
+          - "24"
 
     steps:
-      - name: 'Checkout'
+      - name: "Checkout"
         uses: actions/checkout@v7
         with:
           fetch-depth: 2
 
-      - name: 'Install Node.js'
+      - name: "Install Node.js"
         uses: actions/setup-node@v7.1.0
         with:
-          node-version: '${{ matrix.node }}'
+          node-version: "${{ matrix.node }}"
 
-      - name: 'Install dependencies'
+      - name: "Install dependencies"
         run: npm ci
 
-      - name: 'Run tests'
-        run: 'npm run test'
+      - name: "Run tests"
+        run: "npm run test"
 
   coverage:
-    name: 'Upload coverage'
+    name: "Upload coverage"
     runs-on: ubuntu-latest
     needs:
-      - 'mocha'
+      - "mocha"
 
     steps:
-      - name: 'Checkout'
+      - name: "Checkout"
         uses: actions/checkout@v7
         with:
           fetch-depth: 2
 
-      - name: 'Install Node.js'
+      - name: "Install Node.js"
         uses: actions/setup-node@v7.1.0
         with:
-          node-version-file: '.nvmrc'
+          node-version-file: ".nvmrc"
 
-      - name: 'Install dependencies'
+      - name: "Install dependencies"
         run: npm ci
 
-      - name: 'Run tests'
-        run: 'npm run test-coverage'
+      - name: "Run tests"
+        run: "npm run test-coverage"
 
-      - name: 'Upload to Coveralls'
+      - name: "Upload to Coveralls"
         uses: coverallsapp/github-action@v2.3.8
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -82,24 +82,24 @@ jobs:
           - 20
 
     steps:
-      - name: 'Checkout'
+      - name: "Checkout"
         uses: actions/checkout@v7
         with:
           fetch-depth: 2
 
-      - name: 'Install Node.js'
+      - name: "Install Node.js"
         uses: actions/setup-node@v7.1.0
         with:
-          node-version: '${{ matrix.node }}'
+          node-version: "${{ matrix.node }}"
 
-      - name: 'Install Serverless v1'
+      - name: "Install Serverless v1"
         run: npm install serverless@1
 
-      - name: 'Install dependencies'
+      - name: "Install dependencies"
         run: npm ci
 
-      - name: 'Run tests'
-        run: 'npm run test'
+      - name: "Run tests"
+        run: "npm run test"
 
   serverless-v2:
     runs-on: ${{ matrix.os }}
@@ -113,24 +113,24 @@ jobs:
           - 20
 
     steps:
-      - name: 'Checkout'
+      - name: "Checkout"
         uses: actions/checkout@v7
         with:
           fetch-depth: 2
 
-      - name: 'Install Node.js'
+      - name: "Install Node.js"
         uses: actions/setup-node@v7.1.0
         with:
-          node-version: '${{ matrix.node }}'
+          node-version: "${{ matrix.node }}"
 
-      - name: 'Install Serverless v2'
+      - name: "Install Serverless v2"
         run: npm install serverless@2
 
-      - name: 'Install dependencies'
+      - name: "Install dependencies"
         run: npm ci
 
-      - name: 'Run tests'
-        run: 'npm run test'
+      - name: "Run tests"
+        run: "npm run test"
 
   serverless-v4:
     runs-on: ${{ matrix.os }}
@@ -144,23 +144,23 @@ jobs:
           - 20
 
     steps:
-      - name: 'Checkout'
+      - name: "Checkout"
         uses: actions/checkout@v7
         with:
           fetch-depth: 2
 
-      - name: 'Install Node.js'
+      - name: "Install Node.js"
         uses: actions/setup-node@v7.1.0
         with:
-          node-version: '${{ matrix.node }}'
+          node-version: "${{ matrix.node }}"
 
-      - name: 'Install dependencies'
+      - name: "Install dependencies"
         run: npm ci
 
-      - name: 'Install Serverless v4'
+      - name: "Install Serverless v4"
         run: npm install serverless@4
 
-      - name: 'Run tests'
+      - name: "Run tests"
         run: npm run test tests/e2e/e2e.test.js
         env:
           AWS_DEFAULT_REGION: eu-west-1
@@ -181,24 +181,24 @@ jobs:
           - 20
 
     steps:
-      - name: 'Checkout'
+      - name: "Checkout"
         uses: actions/checkout@v7
         with:
           fetch-depth: 2
 
-      - name: 'Install Node.js'
+      - name: "Install Node.js"
         uses: actions/setup-node@v7.1.0
         with:
-          node-version: '${{ matrix.node }}'
+          node-version: "${{ matrix.node }}"
 
-      - name: 'Install dependencies'
+      - name: "Install dependencies"
         run: npm ci
 
       - name: "Install osls v3"
         run: npm install --no-save --package-lock=false serverless@npm:osls@3
 
-      - name: 'Run tests'
-        run: 'npm run test'
+      - name: "Run tests"
+        run: "npm run test"
 
   osls-v4:
     runs-on: ${{ matrix.os }}
@@ -212,21 +212,21 @@ jobs:
           - 20
 
     steps:
-      - name: 'Checkout'
+      - name: "Checkout"
         uses: actions/checkout@v7
         with:
           fetch-depth: 2
 
-      - name: 'Install Node.js'
+      - name: "Install Node.js"
         uses: actions/setup-node@v7.1.0
         with:
-          node-version: '${{ matrix.node }}'
+          node-version: "${{ matrix.node }}"
 
-      - name: 'Install dependencies'
+      - name: "Install dependencies"
         run: npm ci
 
       - name: "Install osls v4"
         run: npm install --no-save --package-lock=false serverless@npm:osls@4
 
-      - name: 'Run tests'
-        run: 'npm run test'
+      - name: "Run tests"
+        run: "npm run test"
