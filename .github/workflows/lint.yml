@@ -16,18 +16,18 @@ jobs:
     name: Biome
 
     steps:
-      - name: 'Checkout'
+      - name: "Checkout"
         uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
-      - name: 'Install Node.js'
+      - name: "Install Node.js"
         uses: actions/setup-node@v7.1.0
         with:
-          node-version-file: '.nvmrc'
+          node-version-file: ".nvmrc"
 
-      - name: 'Install dependencies'
+      - name: "Install dependencies"
         run: npm ci
 
-      - name: 'Lint files'
-        run: 'npm run lint'
+      - name: "Lint files"
+        run: "npm run lint"

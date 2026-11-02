@@ -1,10 +1,10 @@
 version: 2
 updates:
-  - package-ecosystem: 'npm'
-    directory: '/'
+  - package-ecosystem: "npm"
+    directory: "/"
     schedule:
-      interval: 'weekly'
-      time: '02:00'
+      interval: "weekly"
+      time: "02:00"
       timezone: Europe/Paris
     open-pull-requests-limit: 10
     versioning-strategy: increase
@@ -16,17 +16,17 @@ updates:
     groups:
       babel-dependencies:
         patterns:
-          - '*babel*'
+          - "*babel*"
     ignore:
       # because tests aren't compatible
       - dependency-name: serverless
         versions:
-          - '>= 4.0.0'
+          - ">= 4.0.0"
   - package-ecosystem: github-actions
-    directory: '/'
+    directory: "/"
     schedule:
       interval: weekly
-      time: '02:00'
+      time: "02:00"
       timezone: Europe/Paris
     open-pull-requests-limit: 10
     cooldown:
